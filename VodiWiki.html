@@ -69,10 +69,11 @@ table {border-collapse: collapse;}
 table td {vertical-align: top;}
 .articleContentContainer table, table.twtable {margin: 1pt 0;}
 .articleContentContainer th, .articleContentContainer td, .articleContentContainer tr, .articleContentContainer caption, .twtable th, .twtable td, .twtable tr,.twtable caption {padding:3px;}
-.tiddler {padding: 6pt 6pt 0;} /* .tiddler should be renamed to .articlePanel */
 .toolbar {text-align:right; font-size:.9em;}
 #displayArea {margin: 0; padding-top: 3px}
 #pageWrapper {position:relative; height:100%;}
+#tiddlerDisplay {position:relative;}
+.tiddler {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0; padding: 6pt 6pt 0;}
 
 #saveTest {display:none;}
 
@@ -150,9 +151,15 @@ input:not([type]) {width:  11em; border:0;} /* These are nested in table cells *
 #mainMenu .button {display: block; border: 0;}
 #mainMenu li {list-style: none;}
 .menuTree > .subtree {margin-left: 0;}
+.subtree {margin-left: 0.5em;}
 .branch {position: relative;}
 .branch a {display: block;}
 .branch, .leaf {display: block; margin-left: 1.3em;}
+.treeButtons {display: block; margin-top: 0.5em;}
+
+#navToolbar, #search, #navButtons, #treePath {display: table-cell;}
+#navToolbar, #treePath {width: 100%;}
+#search, #treePath {white-space: nowrap;}
 
 #backstageCloak {display:none; z-index:500; position:absolute; width:100%; height:100%; background: black; opacity:0.6; filter:alpha(opacity=60);}
 
@@ -276,7 +283,7 @@ TertiaryDark: #666
 &lt;div class="editor" macro="edit text"&gt;&lt;/div&gt;
 &lt;div class="editor" macro="edit tags"&gt;Tags: &lt;/div&gt;
 &lt;div class="editor" macro="edit parenttiddler"&gt;Parent:&lt;/div&gt;
-&lt;div class="editorFooter"&gt;&lt;span macro="message views.editor.tagPrompt"&gt;&lt;/span&gt;&lt;span macro="tagChooser"&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class="editorFooter"&gt;&lt;span macro="message views.editor.tagHint"&gt;&lt;/span&gt;&lt;span macro="tagChooser"&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;!--}}}--&gt;
 </pre>
 </div>
@@ -906,10 +913,10 @@ config.macros.newSubTiddler.handler = function(place, macroName, params) { // Im
 	// process command line parameters
 	var label = params[0];
 	var createRoot = params[1];
-	if (createRoot==&quot;true&quot;) {
-		renderTiddlyButton(place, label, prompt,function() {config.macros.newSubTiddler.create(true);},	null, null, null);
+	if (createRoot == &quot;true&quot;) {
+		renderTiddlyButton(place, label, "Create a new root level page", function() {config.macros.newSubTiddler.create(true);},	null, null, null);
 	} else{
-		renderTiddlyButton(place, label, prompt,function() {config.macros.newSubTiddler.create(false);},	null, null, null);
+		renderTiddlyButton(place, label, "Create a sub page for the current page", function() {config.macros.newSubTiddler.create(false);},	null, null, null);
 	}
 };
 
@@ -1249,8 +1256,8 @@ config.commands.navigateForward = {
 config.macros.navigate = {};
 
 config.macros.navigate.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
-	renderTiddlyButton(place, '←', prompt,function() {config.commands.navigateBack.handler();},	null, null, null);
-	renderTiddlyButton(place, '→', prompt,function() {config.commands.navigateForward.handler();},	null, null, null);
+	renderTiddlyButton(place, '←', "Navigate Backwards", function() {config.commands.navigateBack.handler();},	null, null, null);
+	renderTiddlyButton(place, '→', "Navigate Foward", function() {config.commands.navigateForward.handler();},	null, null, null);
 };
 
 if (Story.prototype._DisplayTiddlerFunction == undefined)
@@ -1615,7 +1622,7 @@ config.macros.tagsTree.createSubTree = function(place, id, root, ancestors, leve
 			createTiddlyText(renderTiddlyLink(wrapper, root),t&amp;&amp;labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
 		}
 		else 
-			createTiddlyText(renderTiddlyLink(place, root,false,&quot;leaf&quot;),t&amp;&amp;labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
+			createTiddlyText(renderTiddlyLink(place, root, false, &quot;leaf&quot;),t&amp;&amp;labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
 	}
 	if (childNodes.length &amp;&amp; depth) {
 		var d = createTiddlyElement(place,&quot;div&quot;,null,&quot;subtree&quot;);
@@ -1768,15 +1775,13 @@ store.addNotification(&quot;TagsTreeStyleSheet&quot;, refreshStyles);
 !Code
 ***/
 //{{{
-config.options.txtTheme = &quot;VodiTheme&quot;;
+
 config.shadowTiddlers.TagsTreeStyleSheet = &quot;&quot;;
 config.macros.tagsTree.expand = &quot;▷&quot;;
 config.macros.tagsTree.collapse = &quot;◿&quot;;
 config.macros.tagsTree.styles = [&quot;div&quot;,&quot;div&quot;,&quot;div&quot;,&quot;div&quot;,&quot;div&quot;,&quot;div&quot;];
 config.shadowTiddlers.MainMenu='&lt;&lt;tabs menuTabSet &quot;╘&quot; &quot;Structured tree&quot; MenuTree &quot;A-Z&quot; &quot;Sorted list&quot; TabAll &quot;🕓&quot; &quot;Timeline&quot; TabTimeline&gt;&gt;'
 config.options.chkInsertTabs=true;
-config.options.chkSinglePageMode=true;
-config.options.chkSinglePageKeepEditedTiddlers=false;
 config.macros.search.label='Search';
 
 // import default setting &quot;Keep these tiddlers linked to this server...&quot; (Checkbox 'chkSync') had to be patched, since it isn't reachable via script
@@ -1824,35 +1829,6 @@ HTML5DownloadSaveFile = function(filePath, content) {
 
 //}}}</pre>
 </div>
-<div title="VodiTheme" modifier="YourName" created="201208271024" modified="201910131834" tags="systemTheme excludeLists excludeSearch" parenttiddler="" changecount="103">
-<pre>|Name|VodiTheme|
-|Version|2019.09.16|
-|StyleSheet|##StyleSheet|
-
-!StyleSheet
-
-/*{{{*/
-
-/* Vodi Theme xxx */
-
-/* Margins &amp; Padding */
-
-.subtree {margin-left: 0.5em;}
-.treeButtons {display: block;margin-top: 0.5em;}
-
-/* Line-Height */
-
-/* Main Layout */
-
-#navToolbar, #search, #navButtons, #treePath {display: table-cell;}
-#navToolbar, #treePath {width: 100%;}
-#search, #treePath {white-space: nowrap;}
-#tiddlerDisplay {position:relative;}
-.tiddler {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0;}
-
-/*}}}*/
-</pre>
-</div>
 <div title="YourSearchPlugin" modifier="YourName" created="201209051341" modified="201209051347" tags="systemConfig excludeLists excludeSearch">
 <pre>/***
 |''Name:''|YourSearchPlugin|
@@ -1877,7 +1853,7 @@ This plugin's source code is compressed (and hidden).
 Use this [[link|http://tiddlywiki.abego-software.de/archive/YourSearchPlugin/2.1.6/YourSearchPlugin-2.1.6-src.js]] to get the readable source code.
 ***/
 ///%
-if(!version.extensions.YourSearchPlugin){version.extensions.YourSearchPlugin={major:2,minor:1,revision:6,source:&quot;http://tiddlywiki.abego-software.de/#YourSearchPlugin&quot;,licence:&quot;[[BSD open source license (abego Software)|http://www.abego-software.de/legal/apl-v10.html]]&quot;,copyright:&quot;Copyright (c) abego Software GmbH, 2005-2012 (www.abego-software.de)&quot;};if(!window.abego){window.abego={}}if(!Array.forEach){Array.forEach=function(c,e,d){for(var b=0,a=c.length;b&lt;a;b++){e.call(d,c[b],b,c)}};Array.prototype.forEach=function(d,c){for(var b=0,a=this.length;b&lt;a;b++){d.call(c,this[b],b,this)}}}abego.toInt=function(b,a){if(!b){return a}var c=parseInt(b);return(c==NaN)?a:c};abego.createEllipsis=function(a){var b=createTiddlyElement(a,&quot;span&quot;);b.innerHTML=&quot;&amp;hellip;&quot;};abego.shallowCopy=function(b){if(!b){return b}var a={};for(var c in b){a[c]=b[c]}return a};abego.copyOptions=function(a){return !a?{}:abego.shallowCopy(a)};abego.countStrings=function(d,c){if(!c){return 0}var a=c.length;var f=0;var e=0;while(true){var b=d.indexOf(c,e);if(b&lt;0){return f}f++;e=b+a}return f};abego.getBracedText=function(j,e,a){if(!e){e=0}var k=/\{([^\}]*)\}/gm;k.lastIndex=e;var d=k.exec(j);if(d){var l=d[1];var b=abego.countStrings(l,&quot;{&quot;);if(!b){if(a){a.lastIndex=k.lastIndex}return l}var g=j.length;for(var f=k.lastIndex;f&lt;g&amp;&amp;b;f++){var h=j.charAt(f);if(h==&quot;{&quot;){b++}else{if(h==&quot;}&quot;){b--}}}if(!b){if(a){a.lastIndex=f-1}return j.substring(d.index+1,f-1)}}};abego.select=function(d,c,b,a){if(!a){a=[]}d.forEach(function(e){if(c.call(b,e)){a.push(e)}});return a};abego.consumeEvent=function(a){if(a.stopPropagation){a.stopPropagation()}if(a.preventDefault){a.preventDefault()}a.cancelBubble=true;a.returnValue=true};abego.TiddlerFilterTerm=function(d,b){if(!b){b={}}var c=d;if(!b.textIsRegExp){c=d.escapeRegExp();if(b.fullWordMatch){c=&quot;\\b&quot;+c+&quot;\\b&quot;}}var a=new RegExp(c,&quot;m&quot;+(b.caseSensitive?&quot;&quot;:&quot;i&quot;));this.tester=new abego.MultiFieldRegExpTester(a,b.fields,b.withExtendedFields)};abego.TiddlerFilterTerm.prototype.test=function(a){return this.tester.test(a)};abego.parseNewTiddlerCommandLine=function(c){var a=/(.*?)\.(?:\s+|$)([^#]*)(#.*)?/.exec(c);if(!a){a=/([^#]*)()(#.*)?/.exec(c)}if(a){var d;if(a[3]){var b=a[3].replace(/#/g,&quot;&quot;);d=b.parseParams(&quot;tag&quot;)}else{d=[[]]}var e=a[2]?a[2].trim():&quot;&quot;;d.push({name:&quot;text&quot;,value:e});d[0].text=[e];return{title:a[1].trim(),params:d}}else{return{title:c.trim(),params:[[]]}}};abego.parseTiddlerFilterTerm=function(queryText,offset,options){var re=/\s*(?:(?:\{([^\}]*)\})|(?:(=)|([#%!])|(?:(\w+)\s*\:(?!\/\/))|(?:(?:(&quot;(?:(?:\\&quot;)|[^&quot;])+&quot;)|(?:\/((?:(?:\\\/)|[^\/])+)\/)|(\w+\:\/\/[^\s]+)|([^\s\)\-\&quot;]+)))))/mg;var shortCuts={&quot;!&quot;:&quot;title&quot;,&quot;%&quot;:&quot;text&quot;,&quot;#&quot;:&quot;tags&quot;};var fieldNames={};var fullWordMatch=false;re.lastIndex=offset;while(true){var i=re.lastIndex;var m=re.exec(queryText);if(!m||m.index!=i){throw&quot;Word or String literal expected&quot;}if(m[1]){var lastIndexRef={};var code=abego.getBracedText(queryText,0,lastIndexRef);if(!code){throw&quot;Invalid {...} syntax&quot;}var f=Function(&quot;tiddler&quot;,&quot;return (&quot;+code+&quot;);&quot;);return{func:f,lastIndex:lastIndexRef.lastIndex,markRE:null}}if(m[2]){fullWordMatch=true}else{if(m[3]){fieldNames[shortCuts[m[3]]]=1}else{if(m[4]){fieldNames[m[4]]=1}else{var textIsRegExp=m[6];var text=m[5]?window.eval(m[5]):m[6]?m[6]:m[7]?m[7]:m[8];options=abego.copyOptions(options);options.fullWordMatch=fullWordMatch;options.textIsRegExp=textIsRegExp;var fields=[];for(var n in fieldNames){fields.push(n)}if(fields.length==0){options.fields=options.defaultFields}else{options.fields=fields;options.withExtendedFields=false}var term=new abego.TiddlerFilterTerm(text,options);var markREText=textIsRegExp?text:text.escapeRegExp();if(markREText&amp;&amp;fullWordMatch){markREText=&quot;\\b&quot;+markREText+&quot;\\b&quot;}return{func:function(tiddler){return term.test(tiddler)},lastIndex:re.lastIndex,markRE:markREText?&quot;(?:&quot;+markREText+&quot;)&quot;:null}}}}}};abego.BoolExp=function(i,c,j){this.s=i;var h=j&amp;&amp;j.defaultOperationIs_OR;var e=/\s*\)/g;var f=/\s*(?:(and|\&amp;\&amp;)|(or|\|\|))/gi;var b=/\s*(\-|not)?(\s*\()?/gi;var a;var d=function(p){b.lastIndex=p;var l=b.exec(i);var o=false;var k=null;if(l&amp;&amp;l.index==p){p+=l[0].length;o=l[1];if(l[2]){var n=a(p);e.lastIndex=n.lastIndex;if(!e.exec(i)){throw&quot;Missing ')'&quot;}k={func:n.func,lastIndex:e.lastIndex,markRE:n.markRE}}}if(!k){k=c(i,p,j)}if(o){k.func=(function(m){return function(q){return !m(q)}})(k.func);k.markRE=null}return k};a=function(s){var n=d(s);while(true){var p=n.lastIndex;f.lastIndex=p;var k=f.exec(i);var o;var q;if(k&amp;&amp;k.index==p){o=!k[1];q=d(f.lastIndex)}else{try{q=d(p)}catch(r){return n}o=h}n.func=(function(t,m,l){return l?function(u){return t(u)||m(u)}:function(u){return t(u)&amp;&amp;m(u)}})(n.func,q.func,o);n.lastIndex=q.lastIndex;if(!n.markRE){n.markRE=q.markRE}else{if(q.markRE){n.markRE=n.markRE+&quot;|&quot;+q.markRE}}}};var g=a(0);this.evalFunc=g.func;if(g.markRE){this.markRegExp=new RegExp(g.markRE,j.caseSensitive?&quot;mg&quot;:&quot;img&quot;)}};abego.BoolExp.prototype.exec=function(){return this.evalFunc.apply(this,arguments)};abego.BoolExp.prototype.getMarkRegExp=function(){return this.markRegExp};abego.BoolExp.prototype.toString=function(){return this.s};abego.MultiFieldRegExpTester=function(b,a,c){this.re=b;this.fields=a?a:[&quot;title&quot;,&quot;text&quot;,&quot;tags&quot;];this.withExtendedFields=c};abego.MultiFieldRegExpTester.prototype.test=function(b){var d=this.re;for(var a=0;a&lt;this.fields.length;a++){var c=store.getValue(b,this.fields[a]);if(typeof c==&quot;string&quot;&amp;&amp;d.test(c)){return this.fields[a]}}if(this.withExtendedFields){return store.forEachField(b,function(e,g,f){return typeof f==&quot;string&quot;&amp;&amp;d.test(f)?g:null},true)}return null};abego.TiddlerQuery=function(b,a,d,c,e){if(d){this.regExp=new RegExp(b,a?&quot;mg&quot;:&quot;img&quot;);this.tester=new abego.MultiFieldRegExpTester(this.regExp,c,e)}else{this.expr=new abego.BoolExp(b,abego.parseTiddlerFilterTerm,{defaultFields:c,caseSensitive:a,withExtendedFields:e})}this.getQueryText=function(){return b};this.getUseRegExp=function(){return d};this.getCaseSensitive=function(){return a};this.getDefaultFields=function(){return c};this.getWithExtendedFields=function(){return e}};abego.TiddlerQuery.prototype.test=function(a){if(!a){return false}if(this.regExp){return this.tester.test(a)}return this.expr.exec(a)};abego.TiddlerQuery.prototype.filter=function(a){return abego.select(a,this.test,this)};abego.TiddlerQuery.prototype.getMarkRegExp=function(){if(this.regExp){return&quot;&quot;.search(this.regExp)&gt;=0?null:this.regExp}return this.expr.getMarkRegExp()};abego.TiddlerQuery.prototype.toString=function(){return(this.regExp?this.regExp:this.expr).toString()};abego.PageWiseRenderer=function(){this.firstIndexOnPage=0};merge(abego.PageWiseRenderer.prototype,{setItems:function(a){this.items=a;this.setFirstIndexOnPage(0)},getMaxPagesInNavigation:function(){return 10},getItemsCount:function(a){return this.items?this.items.length:0},getCurrentPageIndex:function(){return Math.floor(this.firstIndexOnPage/this.getItemsPerPage())},getLastPageIndex:function(){return Math.floor((this.getItemsCount()-1)/this.getItemsPerPage())},setFirstIndexOnPage:function(a){this.firstIndexOnPage=Math.min(Math.max(0,a),this.getItemsCount()-1)},getFirstIndexOnPage:function(){this.firstIndexOnPage=Math.floor(this.firstIndexOnPage/this.getItemsPerPage())*this.getItemsPerPage();return this.firstIndexOnPage},getLastIndexOnPage:function(){return Math.min(this.getFirstIndexOnPage()+this.getItemsPerPage()-1,this.getItemsCount()-1)},onPageChanged:function(a,b){},renderPage:function(a){if(a.beginRendering){a.beginRendering(this)}try{if(this.getItemsCount()){var d=this.getLastIndexOnPage();var c=-1;for(var b=this.getFirstIndexOnPage();b&lt;=d;b++){c++;a.render(this,this.items[b],b,c)}}}finally{if(a.endRendering){a.endRendering(this)}}},addPageNavigation:function(c){if(!this.getItemsCount()){return}var k=this;var g=function(n){if(!n){n=window.event}abego.consumeEvent(n);var i=abego.toInt(this.getAttribute(&quot;page&quot;),0);var m=k.getCurrentPageIndex();if(i==m){return}var l=i*k.getItemsPerPage();k.setFirstIndexOnPage(l);k.onPageChanged(i,m)};var e;var h=this.getCurrentPageIndex();var f=this.getLastPageIndex();if(h&gt;0){e=renderTiddlyButton(c,&quot;Previous&quot;,&quot;Go to previous page (Shortcut: Alt-'&lt;')&quot;,g,&quot;prev&quot;);e.setAttribute(&quot;page&quot;,(h-1).toString());e.setAttribute(&quot;accessKey&quot;,&quot;&lt;&quot;)}for(var d=-this.getMaxPagesInNavigation();d&lt;this.getMaxPagesInNavigation();d++){var b=h+d;if(b&lt;0){continue}if(b&gt;f){break}var a=(d+h+1).toString();var j=b==h?&quot;currentPage&quot;:&quot;otherPage&quot;;e=renderTiddlyButton(c,a,&quot;Go to page %0&quot;.format([a]),g,j);e.setAttribute(&quot;page&quot;,(b).toString())}if(h&lt;f){e=renderTiddlyButton(c,&quot;Next&quot;,&quot;Go to next page (Shortcut: Alt-'&gt;')&quot;,g,&quot;next&quot;);e.setAttribute(&quot;page&quot;,(h+1).toString());e.setAttribute(&quot;accessKey&quot;,&quot;&gt;&quot;)}}});abego.LimitedTextRenderer=function(){var l=40;var c=4;var k=function(p,z,v){var q=p.length;if(q==0){p.push({start:z,end:v});return}var u=0;for(;u&lt;q;u++){var w=p[u];if(w.start&lt;=v&amp;&amp;z&lt;=w.end){var o;var s=u+1;for(;s&lt;q;s++){o=p[s];if(o.start&gt;v||z&gt;w.end){break}}var x=z;var y=v;for(var t=u;t&lt;s;t++){o=p[t];x=Math.min(x,o.start);y=Math.max(y,o.end)}p.splice(u,s-u,{start:x,end:y});return}if(w.start&gt;v){break}}p.splice(u,0,{start:z,end:v})};var d=function(n){var q=0;for(var p=0;p&lt;n.length;p++){var o=n[p];q+=o.end-o.start}return q};var b=function(n){return(n&gt;=&quot;a&quot;&amp;&amp;n&lt;=&quot;z&quot;)||(n&gt;=&quot;A&quot;&amp;&amp;n&lt;=&quot;Z&quot;)||n==&quot;_&quot;};var f=function(p,r){if(!b(p[r])){return null}for(var o=r-1;o&gt;=0&amp;&amp;b(p[o]);o--){}var q=o+1;var t=p.length;for(o=r+1;o&lt;t&amp;&amp;b(p[o]);o++){}return{start:q,end:o}};var a=function(o,q,p){var n;if(p){n=f(o,q)}else{if(q&lt;=0){return q}n=f(o,q-1)}if(!n){return q}if(p){if(n.start&gt;=q-c){return n.start}if(n.end&lt;=q+c){return n.end}}else{if(n.end&lt;=q+c){return n.end}if(n.start&gt;=q-c){return n.start}}return q};var j=function(r,q){var n=[];if(q){var u=0;do{q.lastIndex=u;var o=q.exec(r);if(o){if(u&lt;o.index){var p=r.substring(u,o.index);n.push({text:p})}n.push({text:o[0],isMatch:true});u=o.index+o[0].length}else{n.push({text:r.substr(u)});break}}while(true)}else{n.push({text:r})}return n};var i=function(p){var n=0;for(var o=0;o&lt;p.length;o++){if(p[o].isMatch){n++}}return n};var h=function(v,u,q,t,o){var w=Math.max(Math.floor(o/(t+1)),l);var n=Math.max(w-(q-u),0);var r=Math.min(Math.floor(q+n/3),v.length);var p=Math.max(r-w,0);p=a(v,p,true);r=a(v,r,false);return{start:p,end:r}};var m=function(r,y,o){var n=[];var v=i(r);var u=0;for(var p=0;p&lt;r.length;p++){var x=r[p];var w=x.text;if(x.isMatch){var q=h(y,u,u+w.length,v,o);k(n,q.start,q.end)}u+=w.length}return n};var g=function(t,p,o){var n=o-d(p);while(n&gt;0){if(p.length==0){k(p,0,a(t,o,false));return}else{var q=p[0];var v;var r;if(q.start==0){v=q.end;if(p.length&gt;1){r=p[1].start}else{k(p,v,a(t,v+n,false));return}}else{v=0;r=q.start}var u=Math.min(r,v+n);k(p,v,u);n-=(u-v)}}};var e=function(p,x,w,n,o){if(n.length==0){return}var u=function(z,I,D,F,C){var H;var G;var E=0;var B=0;var A=0;for(;B&lt;D.length;B++){H=D[B];G=H.text;if(F&lt;E+G.length){A=F-E;break}E+=G.length}var y=C-F;for(;B&lt;D.length&amp;&amp;y&gt;0;B++){H=D[B];G=H.text.substr(A);A=0;if(G.length&gt;y){G=G.substr(0,y)}if(H.isMatch){createTiddlyElement(z,&quot;span&quot;,null,&quot;marked&quot;,G)}else{createTiddlyText(z,G)}y-=G.length}if(C&lt;I.length){abego.createEllipsis(z)}};if(n[0].start&gt;0){abego.createEllipsis(p)}var q=o;for(var r=0;r&lt;n.length&amp;&amp;q&gt;0;r++){var t=n[r];var v=Math.min(t.end-t.start,q);u(p,x,w,t.start,t.start+v);q-=v}};this.render=function(p,q,o,t){if(q.length&lt;o){o=q.length}var r=j(q,t);var n=m(r,q,o);g(q,n,o);e(p,q,r,n,o)}};(function(){function alertAndThrow(msg){alert(msg);throw msg}if(version.major&lt;2||(version.major==2&amp;&amp;version.minor&lt;1)){alertAndThrow(&quot;YourSearchPlugin requires TiddlyWiki 2.1 or newer.\n\nCheck the archive for YourSearch plugins\nsupporting older versions of TiddlyWiki.\n\nArchive: http://tiddlywiki.abego-software.de/archive&quot;)}abego.YourSearch={};var lastResults=undefined;var lastQuery=undefined;var setLastResults=function(array){lastResults=array};var getLastResults=function(){return lastResults?lastResults:[]};var getLastResultsCount=function(){return lastResults?lastResults.length:0};var matchInTitleWeight=4;var precisionInTitleWeight=10;var matchInTagsWeight=2;var getMatchCount=function(s,re){var m=s.match(re);return m?m.length:0};var standardRankFunction=function(tiddler,query){var markRE=query.getMarkRegExp();if(!markRE){return 1}var matchesInTitle=tiddler.title.match(markRE);var nMatchesInTitle=matchesInTitle?matchesInTitle.length:0;var nMatchesInTags=getMatchCount(tiddler.getTags(),markRE);var lengthOfMatchesInTitle=matchesInTitle?matchesInTitle.join(&quot;&quot;).length:0;var precisionInTitle=tiddler.title.length&gt;0?lengthOfMatchesInTitle/tiddler.title.length:0;var rank=nMatchesInTitle*matchInTitleWeight+nMatchesInTags*matchInTagsWeight+precisionInTitle*precisionInTitleWeight+1;return rank};var findMatches=function(store,searchText,caseSensitive,useRegExp,sortField,excludeTag){lastQuery=null;var candidates=store.reverseLookup(&quot;tags&quot;,excludeTag,false);try{var defaultFields=[];if(config.options.chkSearchInTitle){defaultFields.push(&quot;title&quot;)}if(config.options.chkSearchInText){defaultFields.push(&quot;text&quot;)}if(config.options.chkSearchInTags){defaultFields.push(&quot;tags&quot;)}lastQuery=new abego.TiddlerQuery(searchText,caseSensitive,useRegExp,defaultFields,config.options.chkSearchExtendedFields)}catch(e){return[]}var results=lastQuery.filter(candidates);var rankFunction=abego.YourSearch.getRankFunction();for(var i=0;i&lt;results.length;i++){var tiddler=results[i];var rank=rankFunction(tiddler,lastQuery);tiddler.searchRank=rank}if(!sortField){sortField=&quot;title&quot;}var sortFunction=function(a,b){var searchRankDiff=a.searchRank-b.searchRank;if(searchRankDiff==0){if(a[sortField]==b[sortField]){return(0)}else{return(a[sortField]&lt;b[sortField])?-1:+1}}else{return(searchRankDiff&gt;0)?-1:+1}};results.sort(sortFunction);return results};var maxCharsInTitle=80;var maxCharsInTags=50;var maxCharsInText=250;var maxCharsInField=50;var itemsPerPageDefault=25;var itemsPerPageWithPreviewDefault=10;var yourSearchResultID=&quot;yourSearchResult&quot;;var yourSearchResultItemsID=&quot;yourSearchResultItems&quot;;var lastSearchText=null;var resultElement=null;var searchInputField=null;var searchButton=null;var lastNewTiddlerButton=null;var initStylesheet=function(){if(version.extensions.YourSearchPlugin.styleSheetInited){return}version.extensions.YourSearchPlugin.styleSheetInited=true;setStylesheet(store.getTiddlerText(&quot;YourSearchStyleSheet&quot;),&quot;yourSearch&quot;)};var isResultOpen=function(){return resultElement!=null&amp;&amp;resultElement.parentNode==document.body};var closeResult=function(){if(isResultOpen()){document.body.removeChild(resultElement)}};var closeResultAndDisplayTiddler=function(e){closeResult();var title=this.getAttribute(&quot;tiddlyLink&quot;);if(title){var withHilite=this.getAttribute(&quot;withHilite&quot;);var oldHighlightHack=highlightHack;if(withHilite&amp;&amp;withHilite==&quot;true&quot;&amp;&amp;lastQuery){highlightHack=lastQuery.getMarkRegExp()}story.displayTiddler(this,title);highlightHack=oldHighlightHack}return(false)};var adjustResultPositionAndSize=function(){if(!searchInputField){return}var root=searchInputField;var rootLeft=findPosX(root);var rootTop=findPosY(root);var rootHeight=root.offsetHeight;var popupLeft=rootLeft;var popupTop=rootTop+rootHeight;var winWidth=findWindowWidth();if(winWidth&lt;resultElement.offsetWidth){resultElement.style.width=(winWidth-100)+&quot;px&quot;;winWidth=findWindowWidth()}var popupWidth=resultElement.offsetWidth;if(popupLeft+popupWidth&gt;winWidth){popupLeft=winWidth-popupWidth-30}if(popupLeft&lt;0){popupLeft=0}resultElement.style.left=popupLeft+&quot;px&quot;;resultElement.style.top=popupTop+&quot;px&quot;;resultElement.style.display=&quot;block&quot;};var scrollVisible=function(){if(resultElement){window.scrollTo(0,ensureVisible(resultElement))}if(searchInputField){window.scrollTo(0,ensureVisible(searchInputField))}};var ensureResultIsDisplayedNicely=function(){adjustResultPositionAndSize();scrollVisible()};var indexInPage=undefined;var currentTiddler=undefined;var pager=new abego.PageWiseRenderer();var MyItemRenderer=function(parent){this.itemHtml=store.getTiddlerText(&quot;YourSearchItemTemplate&quot;);if(!this.itemHtml){alertAndThrow(&quot;YourSearchItemTemplate not found&quot;)}this.place=document.getElementById(yourSearchResultItemsID);if(!this.place){this.place=createTiddlyElement(parent,&quot;div&quot;,yourSearchResultItemsID)}};merge(MyItemRenderer.prototype,{render:function(pager,object,index,indexOnPage){indexInPage=indexOnPage;currentTiddler=object;var item=createTiddlyElement(this.place,&quot;div&quot;,null,&quot;yourSearchItem&quot;);item.innerHTML=this.itemHtml;applyHtmlMacros(item,null);refreshElements(item,null)},endRendering:function(pager){currentTiddler=null}});var refreshResult=function(){if(!resultElement||!searchInputField){return}var html=store.getTiddlerText(&quot;YourSearchResultTemplate&quot;);if(!html){html=&quot;&lt;b&gt;Tiddler YourSearchResultTemplate not found&lt;/b&gt;&quot;}resultElement.innerHTML=html;applyHtmlMacros(resultElement,null);refreshElements(resultElement,null);var itemRenderer=new MyItemRenderer(resultElement);pager.renderPage(itemRenderer);ensureResultIsDisplayedNicely()};pager.getItemsPerPage=function(){var n=(config.options.chkPreviewText)?abego.toInt(config.options.txtItemsPerPageWithPreview,itemsPerPageWithPreviewDefault):abego.toInt(config.options.txtItemsPerPage,itemsPerPageDefault);return(n&gt;0)?n:1};pager.onPageChanged=function(){refreshResult()};var reopenResultIfApplicable=function(){if(searchInputField==null||!config.options.chkUseYourSearch){return}if((searchInputField.value==lastSearchText)&amp;&amp;lastSearchText&amp;&amp;!isResultOpen()){if(resultElement&amp;&amp;(resultElement.parentNode!=document.body)){document.body.appendChild(resultElement);ensureResultIsDisplayedNicely()}else{abego.YourSearch.onShowResult(true)}}};var invalidateResult=function(){closeResult();resultElement=null;lastSearchText=null};var isDescendantOrSelf=function(self,e){while(e!=null){if(self==e){return true}e=e.parentNode}return false};var onDocumentClick=function(e){if(e.target==searchInputField){return}if(e.target==searchButton){return}if(resultElement&amp;&amp;isDescendantOrSelf(resultElement,e.target)){return}closeResult()};var onDocumentKeyup=function(e){if(e.keyCode==27){closeResult()}};addEvent(document,&quot;click&quot;,onDocumentClick);addEvent(document,&quot;keyup&quot;,onDocumentKeyup);var myStorySearch=function(text,useCaseSensitive,useRegExp){lastSearchText=text;setLastResults(findMatches(store,text,useCaseSensitive,useRegExp,&quot;title&quot;,&quot;excludeSearch&quot;));abego.YourSearch.onShowResult()};var myMacroSearchHandler=function(place,macroName,params,wikifier,paramString,tiddler){initStylesheet();lastSearchText=&quot;&quot;;var searchTimeout=null;var doSearch=function(txt){if(config.options.chkUseYourSearch){myStorySearch(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch)}else{story.search(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch)}lastSearchText=txt.value};var clickHandler=function(e){doSearch(searchInputField);return false};var keyHandler=function(e){if(!e){e=window.event}searchInputField=this;switch(e.keyCode){case 27:if(isResultOpen()){closeResult()}else{this.value=&quot;&quot;;clearMessage()}break}if(String.fromCharCode(e.keyCode)==this.accessKey||e.altKey){reopenResultIfApplicable()}if(this.value.length&lt;3&amp;&amp;searchTimeout){clearTimeout(searchTimeout)}if(this.value.length&gt;2){if(this.value!=lastSearchText){if(!config.options.chkUseYourSearch||config.options.chkSearchAsYouType){if(searchTimeout){clearTimeout(searchTimeout)}var txt=this;searchTimeout=setTimeout(function(){doSearch(txt)},500)}}else{if(searchTimeout){clearTimeout(searchTimeout)}}}if(this.value.length==0){closeResult()}};var focusHandler=function(e){this.select();clearMessage();reopenResultIfApplicable()};var args=paramString.parseParams(&quot;list&quot;,null,true);var buttonAtRight=getFlag(args,&quot;buttonAtRight&quot;);var sizeTextbox=getParam(args,&quot;sizeTextbox&quot;,this.sizeTextbox);var txt=createTiddlyElement(null,&quot;input&quot;,null,&quot;txtOptionInput searchField&quot;,null);if(params[0]){txt.value=params[0]}txt.onkeyup=keyHandler;txt.onfocus=focusHandler;txt.setAttribute(&quot;size&quot;,sizeTextbox);txt.setAttribute(&quot;accessKey&quot;,this.accessKey);txt.setAttribute(&quot;autocomplete&quot;,&quot;off&quot;);if(config.browser.isSafari){txt.setAttribute(&quot;type&quot;,&quot;search&quot;);txt.setAttribute(&quot;results&quot;,&quot;5&quot;)}else{if(!config.browser.isIE){txt.setAttribute(&quot;type&quot;,&quot;text&quot;)}}var btn=renderTiddlyButton(null,this.label,this.prompt,clickHandler);if(place){if(!buttonAtRight){place.appendChild(btn)}place.appendChild(txt);if(buttonAtRight){place.appendChild(btn)}}searchInputField=txt;searchButton=btn};var openAllFoundTiddlers=function(){closeResult();var results=getLastResults();var n=results.length;if(n){var titles=[];for(var i=0;i&lt;n;i++){titles.push(results[i].title)}story.displayTiddlers(null,titles)}};var createOptionWithRefresh=function(place,optionParams,wikifier,tiddler){invokeMacro(place,&quot;option&quot;,optionParams,wikifier,tiddler);var elem=place.lastChild;var oldOnClick=elem.onclick;elem.onclick=function(e){var result=oldOnClick.apply(this,arguments);refreshResult();return result};return elem};var removeTextDecoration=function(s){var removeThis=[&quot;''&quot;,&quot;{{{&quot;,&quot;}}}&quot;,&quot;//&quot;,&quot;&lt;&lt;&lt;&quot;,&quot;/***&quot;,&quot;***/&quot;];var reText=&quot;&quot;;for(var i=0;i&lt;removeThis.length;i++){if(i!=0){reText+=&quot;|&quot;}reText+=&quot;(&quot;+removeThis[i].escapeRegExp()+&quot;)&quot;}return s.replace(new RegExp(reText,&quot;mg&quot;),&quot;&quot;).trim()};var getShortCutNumber=function(){var i=indexInPage;return(i&gt;=0&amp;&amp;i&lt;=9)?(i&lt;9?(i+1):0):-1};var limitedTextRenderer=new abego.LimitedTextRenderer();var renderLimitedText=function(place,s,maxLen){limitedTextRenderer.render(place,s,maxLen,lastQuery.getMarkRegExp())};var oldTiddlyWikiSaveTiddler=TiddlyWiki.prototype.saveTiddler;TiddlyWiki.prototype.saveTiddler=function(title,newTitle,newBody,modifier,modified,tags,fields){oldTiddlyWikiSaveTiddler.apply(this,arguments);invalidateResult()};var oldTiddlyWikiRemoveTiddler=TiddlyWiki.prototype.removeTiddler;TiddlyWiki.prototype.removeTiddler=function(title){oldTiddlyWikiRemoveTiddler.apply(this,arguments);invalidateResult()};config.macros.yourSearch={label:&quot;yourSearch&quot;,prompt:&quot;Gives access to the current/last YourSearch result&quot;,handler:function(place,macroName,params,wikifier,paramString,tiddler){if(params.length==0){return}var name=params[0];var func=config.macros.yourSearch.funcs[name];if(func){func(place,macroName,params,wikifier,paramString,tiddler)}},tests:{&quot;true&quot;:function(){return true},&quot;false&quot;:function(){return false},found:function(){return getLastResultsCount()&gt;0},previewText:function(){return config.options.chkPreviewText}},funcs:{itemRange:function(place){if(getLastResultsCount()){var lastIndex=pager.getLastIndexOnPage();var s=&quot;%0 - %1&quot;.format([pager.getFirstIndexOnPage()+1,lastIndex+1]);createTiddlyText(place,s)}},count:function(place){createTiddlyText(place,getLastResultsCount().toString())},query:function(place){if(lastQuery){createTiddlyText(place,lastQuery.toString())}},version:function(place){var t=&quot;YourSearch %0.%1.%2&quot;.format([version.extensions.YourSearchPlugin.major,version.extensions.YourSearchPlugin.minor,version.extensions.YourSearchPlugin.revision]);var e=createTiddlyElement(place,&quot;a&quot;);e.setAttribute(&quot;href&quot;,&quot;http://tiddlywiki.abego-software.de/#YourSearchPlugin&quot;);e.innerHTML='&lt;font color=&quot;black&quot; face=&quot;Arial, Helvetica, sans-serif&quot;&gt;'+t+&quot;&lt;font&gt;&quot;},copyright:function(place){var e=createTiddlyElement(place,&quot;a&quot;);e.setAttribute(&quot;href&quot;,&quot;http://www.abego-software.de&quot;);e.innerHTML='&lt;font color=&quot;black&quot; face=&quot;Arial, Helvetica, sans-serif&quot;&gt;&amp;copy; 2005-2008 &lt;b&gt;&lt;font color=&quot;red&quot;&gt;abego&lt;/font&gt;&lt;/b&gt; Software&lt;font&gt;'},newTiddlerButton:function(place){if(lastQuery){var r=abego.parseNewTiddlerCommandLine(lastQuery.getQueryText());var btn=config.macros.newTiddler.createNewTiddlerButton(place,r.title,r.params,&quot;new tiddler&quot;,&quot;Create a new tiddler based on search text. (Shortcut: Ctrl-Enter; Separators: '.', '#')&quot;,null,&quot;text&quot;);var oldOnClick=btn.onclick;btn.onclick=function(){closeResult();oldOnClick.apply(this,arguments)};lastNewTiddlerButton=btn}},linkButton:function(place,macroName,params,wikifier,paramString,tiddler){if(params&lt;2){return}var tiddlyLink=params[1];var text=params&lt;3?tiddlyLink:params[2];var tooltip=params&lt;4?text:params[3];var accessKey=params&lt;5?null:params[4];var btn=renderTiddlyButton(place,text,tooltip,closeResultAndDisplayTiddler,null,null,accessKey);btn.setAttribute(&quot;tiddlyLink&quot;,tiddlyLink)},closeButton:function(place,macroName,params,wikifier,paramString,tiddler){renderTiddlyButton(place,&quot;close&quot;,&quot;Close the Search Results (Shortcut: ESC)&quot;,closeResult)},openAllButton:function(place,macroName,params,wikifier,paramString,tiddler){var n=getLastResultsCount();if(n==0){return}var title=n==1?&quot;open tiddler&quot;:&quot;open all %0 tiddlers&quot;.format([n]);var button=renderTiddlyButton(place,title,&quot;Open all found tiddlers (Shortcut: Alt-O)&quot;,openAllFoundTiddlers);button.setAttribute(&quot;accessKey&quot;,&quot;O&quot;)},naviBar:function(place,macroName,params,wikifier,paramString,tiddler){pager.addPageNavigation(place)},&quot;if&quot;:function(place,macroName,params,wikifier,paramString,tiddler){if(params.length&lt;2){return}var testName=params[1];var negate=(testName==&quot;not&quot;);if(negate){if(params.length&lt;3){return}testName=params[2]}var test=config.macros.yourSearch.tests[testName];var showIt=false;try{if(test){showIt=test(place,macroName,params,wikifier,paramString,tiddler)!=negate}else{showIt=(!eval(testName))==negate}}catch(ex){}if(!showIt){place.style.display=&quot;none&quot;}},chkPreviewText:function(place,macroName,params,wikifier,paramString,tiddler){var elem=createOptionWithRefresh(place,&quot;chkPreviewText&quot;,wikifier,tiddler);elem.setAttribute(&quot;accessKey&quot;,&quot;P&quot;);elem.title=&quot;Show text preview of found tiddlers (Shortcut: Alt-P)&quot;;return elem}}};config.macros.foundTiddler={label:&quot;foundTiddler&quot;,prompt:&quot;Provides information on the tiddler currently processed on the YourSearch result page&quot;,handler:function(place,macroName,params,wikifier,paramString,tiddler){var name=params[0];var func=config.macros.foundTiddler.funcs[name];if(func){func(place,macroName,params,wikifier,paramString,tiddler)}},funcs:{title:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}var shortcutNumber=getShortCutNumber();var tooltip=shortcutNumber&gt;=0?&quot;Open tiddler (Shortcut: Alt-%0)&quot;.format([shortcutNumber.toString()]):&quot;Open tiddler&quot;;var btn=renderTiddlyButton(place,null,tooltip,closeResultAndDisplayTiddler,null);btn.setAttribute(&quot;tiddlyLink&quot;,currentTiddler.title);btn.setAttribute(&quot;withHilite&quot;,&quot;true&quot;);renderLimitedText(btn,currentTiddler.title,maxCharsInTitle);if(shortcutNumber&gt;=0){btn.setAttribute(&quot;accessKey&quot;,shortcutNumber.toString())}},tags:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}renderLimitedText(place,currentTiddler.getTags(),maxCharsInTags)},text:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}renderLimitedText(place,removeTextDecoration(currentTiddler.text),maxCharsInText)},field:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}var name=params[1];var len=params.length&gt;2?abego.toInt(params[2],maxCharsInField):maxCharsInField;var v=store.getValue(currentTiddler,name);if(v){renderLimitedText(place,removeTextDecoration(v),len)}},number:function(place,macroName,params,wikifier,paramString,tiddler){var numberToDisplay=getShortCutNumber();if(numberToDisplay&gt;=0){var text=&quot;%0)&quot;.format([numberToDisplay.toString()]);createTiddlyElement(place,&quot;span&quot;,null,&quot;shortcutNumber&quot;,text)}}}};var opts={chkUseYourSearch:true,chkPreviewText:true,chkSearchAsYouType:true,chkSearchInTitle:true,chkSearchInText:true,chkSearchInTags:true,chkSearchExtendedFields:true,txtItemsPerPage:itemsPerPageDefault,txtItemsPerPageWithPreview:itemsPerPageWithPreviewDefault};for(var n in opts){if(config.options[n]==undefined){config.options[n]=opts[n]}}config.shadowTiddlers[&quot;YourSearch Help&quot;]=&quot;!Field Search\nWith the Field Search you can restrict your search to certain fields of a tiddler, e.g only search the tags or only the titles. The general form is //fieldname//'':''//textToSearch// (e.g. {{{title:intro}}}). In addition one-character shortcuts are also supported for the standard fields {{{title}}}, {{{text}}} and {{{tags}}}:\n|!What you want|!What you type|!Example|\n|Search ''titles only''|start word with ''!''|{{{!jonny}}} (shortcut for {{{title:jonny}}})|\n|Search ''contents/text only''|start word with ''%''|{{{%football}}} (shortcut for {{{text:football}}})|\n|Search ''tags only''|start word with ''#''|{{{#Plugin}}} (shortcut for {{{tags:Plugin}}})|\n\nUsing this feature you may also search the extended fields (\&quot;Metadata\&quot;) introduced with TiddlyWiki 2.1, e.g. use {{{priority:1}}} to find all tiddlers with the priority field set to \&quot;1\&quot;.\n\nYou may search a word in more than one field. E.g. {{{!#Plugin}}} (or {{{title:tags:Plugin}}} in the \&quot;long form\&quot;) finds tiddlers containing \&quot;Plugin\&quot; either in the title or in the tags (but does not look for \&quot;Plugin\&quot; in the text). \n\n!Boolean Search\nThe Boolean Search is useful when searching for multiple words.\n|!What you want|!What you type|!Example|\n|''All words'' must exist|List of words|{{{jonny jeremy}}} (or {{{jonny and jeremy}}})|\n|''At least one word'' must exist|Separate words by ''or''|{{{jonny or jeremy}}}|\n|A word ''must not exist''|Start word with ''-''|{{{-jonny}}} (or {{{not jonny}}})|\n\n''Note:'' When you specify two words, separated with a space, YourSearch finds all tiddlers that contain both words, but not necessarily next to each other. If you want to find a sequence of word, e.g. '{{{John Brown}}}', you need to put the words into quotes. I.e. you type: {{{\&quot;john brown\&quot;}}}.\n\nUsing parenthesis you may change the default \&quot;left to right\&quot; evaluation of the boolean search. E.g. {{{not (jonny or jeremy)}}} finds all tiddlers that contain neither \&quot;jonny\&quot; nor \&quot;jeremy. In contrast to this {{{not jonny or jeremy}}} (i.e. without parenthesis) finds all tiddlers that either don't contain \&quot;jonny\&quot; or that contain \&quot;jeremy\&quot;.\n\n!'Exact Word' Search\nBy default a search result all matches that 'contain' the searched text. E.g. if you search for {{{Task}}} you will get all tiddlers containing 'Task', but also '~CompletedTask', '~TaskForce' etc.\n\nIf you only want to get the tiddlers that contain 'exactly the word' you need to prefix it with a '='. E.g. typing '=Task' will find the tiddlers that contain the word 'Task', ignoring words that just contain 'Task' as a substring.\n\n!~CaseSensitiveSearch and ~RegExpSearch\nThe standard search options ~CaseSensitiveSearch and ~RegExpSearch are fully supported by YourSearch. However when ''~RegExpSearch'' is on Filtered and Boolean Search are disabled.\n\nIn addition you may do a \&quot;regular expression\&quot; search even with the ''~RegExpSearch'' set to false by directly entering the regular expression into the search field, framed with {{{/.../}}}. \n\nExample: {{{/m[ae][iy]er/}}} will find all tiddlers that contain either \&quot;maier\&quot;, \&quot;mayer\&quot;, \&quot;meier\&quot; or \&quot;meyer\&quot;.\n\n!~JavaScript Expression Filtering\nIf you are familiar with JavaScript programming and know some TiddlyWiki internals you may also use JavaScript expression for the search. Just enter a JavaScript boolean expression into the search field, framed with {{{ { ... } }}}. In the code refer to the variable tiddler and evaluate to {{{true}}} when the given tiddler should be included in the result. \n\nExample: {{{ { tiddler.modified &gt; new Date(\&quot;Jul 4, 2005\&quot;)} }}} returns all tiddler modified after July 4th, 2005.\n\n!Combined Search\nYou are free to combine the various search options. \n\n''Examples''\n|!What you type|!Result|\n|{{{!jonny !jeremy -%football}}}|all tiddlers with both {{{jonny}}} and {{{jeremy}}} in its titles, but no {{{football}}} in content.|\n|{{{#=Task}}}|All tiddlers tagged with 'Task' (the exact word). Tags named '~CompletedTask', '~TaskForce' etc. are not considered.|\n\n!Access Keys\nYou are encouraged to use the access keys (also called \&quot;shortcut\&quot; keys) for the most frequently used operations. For quick reference these shortcuts are also mentioned in the tooltip for the various buttons etc.\n\n|!Key|!Operation|\n|{{{Alt-F}}}|''The most important keystroke'': It moves the cursor to the search input field so you can directly start typing your query. Pressing {{{Alt-F}}} will also display the previous search result. This way you can quickly display multiple tiddlers using \&quot;Press {{{Alt-F}}}. Select tiddler.\&quot; sequences.|\n|{{{ESC}}}|Closes the [[YourSearch Result]]. When the [[YourSearch Result]] is already closed and the cursor is in the search input field the field's content is cleared so you start a new query.|\n|{{{Alt-1}}}, {{{Alt-2}}},... |Pressing these keys opens the first, second etc. tiddler from the result list.|\n|{{{Alt-O}}}|Opens all found tiddlers.|\n|{{{Alt-P}}}|Toggles the 'Preview Text' mode.|\n|{{{Alt-'&lt;'}}}, {{{Alt-'&gt;'}}}|Displays the previous or next page in the [[YourSearch Result]].|\n|{{{Return}}}|When you have turned off the 'as you type' search mode pressing the {{{Return}}} key actually starts the search (as does pressing the 'search' button).|\n\n//If some of these shortcuts don't work for you check your browser if you have other extensions installed that already \&quot;use\&quot; these shortcuts.//&quot;;config.shadowTiddlers[&quot;YourSearch Options&quot;]=&quot;|&gt;|!YourSearch Options|\n|&gt;|&lt;&lt;option chkUseYourSearch&gt;&gt; Use 'Your Search'|\n|!|&lt;&lt;option chkPreviewText&gt;&gt; Show Text Preview|\n|!|&lt;&lt;option chkSearchAsYouType&gt;&gt; 'Search As You Type' Mode (No RETURN required to start search)|\n|!|Default Search Filter:&lt;&lt;option chkSearchInTitle&gt;&gt;Title ('!')     &lt;&lt;option chkSearchInText&gt;&gt;Text ('%')     &lt;&lt;option chkSearchInTags&gt;&gt;Tags ('#')    &lt;&lt;option chkSearchExtendedFields&gt;&gt;Extended Fields&lt;html&gt;&lt;br&gt;&lt;font size=\&quot;-2\&quot;&gt;The fields of a tiddlers that are searched when you don't explicitly specify a filter in the search text &lt;br&gt;(Explictly specify fields using one or more '!', '%', '#' or 'fieldname:' prefix before the word/text to find).&lt;/font&gt;&lt;/html&gt;|\n|!|Number of items on search result page: &lt;&lt;option txtItemsPerPage&gt;&gt;|\n|!|Number of items on search result page with preview text: &lt;&lt;option txtItemsPerPageWithPreview&gt;&gt;|\n&quot;;config.shadowTiddlers.YourSearchStyleSheet=&quot;/***\n!~YourSearchResult Stylesheet\n***/\n/*{{{*/\n.yourSearchResult {\n\tposition: absolute;\n\twidth: 800px;\n\n\tpadding: 0.2em;\n\tlist-style: none;\n\tmargin: 0;\n\n\tbackground: #ffd;\n\tborder: 1px solid DarkGray;\n}\n\n/*}}}*/\n/***\n!!Summary Section\n***/\n/*{{{*/\n.yourSearchResult .summary {\n\tborder-bottom-width: thin;\n\tborder-bottom-style: solid;\n\tborder-bottom-color: #999999;\n\tpadding-bottom: 4px;\n}\n\n.yourSearchRange, .yourSearchCount, .yourSearchQuery   {\n\tfont-weight: bold;\n}\n\n.yourSearchResult .summary .button {\n\tfont-size: 10px;\n\n\tpadding-left: 0.3em;\n\tpadding-right: 0.3em;\n}\n\n.yourSearchResult .summary .chkBoxLabel {\n\tfont-size: 10px;\n\n\tpadding-right: 0.3em;\n}\n\n/*}}}*/\n/***\n!!Items Area\n***/\n/*{{{*/\n.yourSearchResult .marked {\n\tbackground: none;\n\tfont-weight: bold;\n}\n\n.yourSearchItem {\n\tmargin-top: 2px;\n}\n\n.yourSearchNumber {\n\tcolor: #808080;\n}\n\n\n.yourSearchTags {\n\tcolor: #008000;\n}\n\n.yourSearchText {\n\tcolor: #808080;\n\tmargin-bottom: 6px;\n}\n\n/*}}}*/\n/***\n!!Footer\n***/\n/*{{{*/\n.yourSearchFooter {\n\tmargin-top: 8px;\n\tborder-top-width: thin;\n\tborder-top-style: solid;\n\tborder-top-color: #999999;\n}\n\n.yourSearchFooter a:hover{\n\tbackground: none;\n\tcolor: none;\n}\n/*}}}*/\n/***\n!!Navigation Bar\n***/\n/*{{{*/\n.yourSearchNaviBar a {\n\tfont-size: 16px;\n\tmargin-left: 4px;\n\tmargin-right: 4px;\n\tcolor: black;\n\ttext-decoration: underline;\n}\n\n.yourSearchNaviBar a:hover {\n\tbackground-color: none;\n}\n\n.yourSearchNaviBar .prev {\n\tfont-weight: bold;\n\tcolor: blue;\n}\n\n.yourSearchNaviBar .currentPage {\n\tcolor: #FF0000;\n\tfont-weight: bold;\n\ttext-decoration: none;\n}\n\n.yourSearchNaviBar .next {\n\tfont-weight: bold;\n\tcolor: blue;\n}\n/*}}}*/\n&quot;;config.shadowTiddlers.YourSearchResultTemplate='&lt;!--\n{{{\n--&gt;\n&lt;span macro=&quot;yourSearch if found&quot;&gt;\n&lt;!-- The Summary Header ============================================ --&gt;\n&lt;table class=&quot;summary&quot; border=&quot;0&quot; width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tbody&gt;\n  &lt;tr&gt;\n\t&lt;td align=&quot;left&quot;&gt;\n\t\tYourSearch Result &lt;span class=&quot;yourSearchRange&quot; macro=&quot;yourSearch itemRange&quot;&gt;&lt;/span&gt;\n\t\t&amp;nbsp;of&amp;nbsp;&lt;span class=&quot;yourSearchCount&quot; macro=&quot;yourSearch count&quot;&gt;&lt;/span&gt;\n\t\tfor&amp;nbsp;&lt;span class=&quot;yourSearchQuery&quot; macro=&quot;yourSearch query&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n\t&lt;td class=&quot;yourSearchButtons&quot; align=&quot;right&quot;&gt;\n\t\t&lt;span macro=&quot;yourSearch chkPreviewText&quot;&gt;&lt;/span&gt;&lt;span class=&quot;chkBoxLabel&quot;&gt;preview text&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch newTiddlerButton&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch openAllButton&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Options\' options \'Configure YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Help\' help \'Get help how to use YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch closeButton&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;&lt;/table&gt;\n\n&lt;!-- The List of Found Tiddlers ============================================ --&gt;\n&lt;div id=&quot;yourSearchResultItems&quot; itemsPerPage=&quot;25&quot; itemsPerPageWithPreview=&quot;10&quot;&gt;&lt;/div&gt;\n\n&lt;!-- The Footer (with the Navigation) ============================================ --&gt;\n&lt;table class=&quot;yourSearchFooter&quot; border=&quot;0&quot; width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tbody&gt;\n  &lt;tr&gt;\n\t&lt;td align=&quot;left&quot;&gt;\n\t\tResult page: &lt;span class=&quot;yourSearchNaviBar&quot; macro=&quot;yourSearch naviBar&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n\t&lt;td align=&quot;right&quot;&gt;&lt;span macro=&quot;yourSearch version&quot;&gt;&lt;/span&gt;, &lt;span macro=&quot;yourSearch copyright&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;&lt;/table&gt;\n&lt;!-- end of the \'tiddlers found\' case =========================================== --&gt;\n&lt;/span&gt;\n\n\n&lt;!-- The &quot;No tiddlers found&quot; case =========================================== --&gt;\n&lt;span macro=&quot;yourSearch if not found&quot;&gt;\n&lt;table class=&quot;summary&quot; border=&quot;0&quot; width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tbody&gt;\n  &lt;tr&gt;\n\t&lt;td align=&quot;left&quot;&gt;\n\t\tYourSearch Result: No tiddlers found for &lt;span class=&quot;yourSearchQuery&quot; macro=&quot;yourSearch query&quot;&gt;&lt;/span&gt;.\n\t&lt;/td&gt;\n\t&lt;td class=&quot;yourSearchButtons&quot; align=&quot;right&quot;&gt;\n\t\t&lt;span macro=&quot;yourSearch newTiddlerButton&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Options\' options \'Configure YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Help\' help \'Get help how to use YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch closeButton&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;&lt;/table&gt;\n&lt;/span&gt;\n\n\n&lt;!--\n}}}\n--&gt;\n';config.shadowTiddlers.YourSearchItemTemplate=&quot;&lt;!--\n{{{\n--&gt;\n&lt;span class='yourSearchNumber' macro='foundTiddler number'&gt;&lt;/span&gt;\n&lt;span class='yourSearchTitle' macro='foundTiddler title'/&gt;&lt;/span&gt;&amp;nbsp;-&amp;nbsp;\n&lt;span class='yourSearchTags' macro='foundTiddler field tags 50'/&gt;&lt;/span&gt;\n&lt;span macro=\&quot;yourSearch if previewText\&quot;&gt;&lt;div class='yourSearchText' macro='foundTiddler field text 250'/&gt;&lt;/div&gt;&lt;/span&gt;\n&lt;!--\n}}}\n--&gt;&quot;;config.shadowTiddlers.YourSearch=&quot;&lt;&lt;tiddler [[YourSearch Help]]&gt;&gt;&quot;;config.shadowTiddlers[&quot;YourSearch Result&quot;]=&quot;The popup-like window displaying the result of a YourSearch query.&quot;;config.macros.search.handler=myMacroSearchHandler;var checkForOtherHijacker=function(){if(config.macros.search.handler!=myMacroSearchHandler){alert(&quot;Message from YourSearchPlugin:\n\n\nAnother plugin has disabled the 'Your Search' features.\n\n\nYou may disable the other plugin or change the load order of \nthe plugins (by changing the names of the tiddlers)\nto enable the 'Your Search' features.&quot;)}};setTimeout(checkForOtherHijacker,5000);abego.YourSearch.getStandardRankFunction=function(){return standardRankFunction};abego.YourSearch.getRankFunction=function(){return abego.YourSearch.getStandardRankFunction()};abego.YourSearch.getCurrentTiddler=function(){return currentTiddler};abego.YourSearch.closeResult=function(){closeResult()};abego.YourSearch.getFoundTiddlers=function(){return lastResults};abego.YourSearch.getQuery=function(){return lastQuery};abego.YourSearch.onShowResult=function(useOldResult){highlightHack=lastQuery?lastQuery.getMarkRegExp():null;if(!useOldResult){pager.setItems(getLastResults())}if(!resultElement){resultElement=createTiddlyElement(document.body,&quot;div&quot;,yourSearchResultID,&quot;yourSearchResult&quot;)}else{if(resultElement.parentNode!=document.body){document.body.appendChild(resultElement)}}refreshResult();highlightHack=null}})()};
+if(!version.extensions.YourSearchPlugin){version.extensions.YourSearchPlugin={major:2,minor:1,revision:6,source:&quot;http://tiddlywiki.abego-software.de/#YourSearchPlugin&quot;,licence:&quot;[[BSD open source license (abego Software)|http://www.abego-software.de/legal/apl-v10.html]]&quot;,copyright:&quot;Copyright (c) abego Software GmbH, 2005-2012 (www.abego-software.de)&quot;};if(!window.abego){window.abego={}}if(!Array.forEach){Array.forEach=function(c,e,d){for(var b=0,a=c.length;b&lt;a;b++){e.call(d,c[b],b,c)}};Array.prototype.forEach=function(d,c){for(var b=0,a=this.length;b&lt;a;b++){d.call(c,this[b],b,this)}}}abego.toInt=function(b,a){if(!b){return a}var c=parseInt(b);return(c==NaN)?a:c};abego.createEllipsis=function(a){var b=createTiddlyElement(a,&quot;span&quot;);b.innerHTML=&quot;&amp;hellip;&quot;};abego.shallowCopy=function(b){if(!b){return b}var a={};for(var c in b){a[c]=b[c]}return a};abego.copyOptions=function(a){return !a?{}:abego.shallowCopy(a)};abego.countStrings=function(d,c){if(!c){return 0}var a=c.length;var f=0;var e=0;while(true){var b=d.indexOf(c,e);if(b&lt;0){return f}f++;e=b+a}return f};abego.getBracedText=function(j,e,a){if(!e){e=0}var k=/\{([^\}]*)\}/gm;k.lastIndex=e;var d=k.exec(j);if(d){var l=d[1];var b=abego.countStrings(l,&quot;{&quot;);if(!b){if(a){a.lastIndex=k.lastIndex}return l}var g=j.length;for(var f=k.lastIndex;f&lt;g&amp;&amp;b;f++){var h=j.charAt(f);if(h==&quot;{&quot;){b++}else{if(h==&quot;}&quot;){b--}}}if(!b){if(a){a.lastIndex=f-1}return j.substring(d.index+1,f-1)}}};abego.select=function(d,c,b,a){if(!a){a=[]}d.forEach(function(e){if(c.call(b,e)){a.push(e)}});return a};abego.consumeEvent=function(a){if(a.stopPropagation){a.stopPropagation()}if(a.preventDefault){a.preventDefault()}a.cancelBubble=true;a.returnValue=true};abego.TiddlerFilterTerm=function(d,b){if(!b){b={}}var c=d;if(!b.textIsRegExp){c=d.escapeRegExp();if(b.fullWordMatch){c=&quot;\\b&quot;+c+&quot;\\b&quot;}}var a=new RegExp(c,&quot;m&quot;+(b.caseSensitive?&quot;&quot;:&quot;i&quot;));this.tester=new abego.MultiFieldRegExpTester(a,b.fields,b.withExtendedFields)};abego.TiddlerFilterTerm.prototype.test=function(a){return this.tester.test(a)};abego.parseNewTiddlerCommandLine=function(c){var a=/(.*?)\.(?:\s+|$)([^#]*)(#.*)?/.exec(c);if(!a){a=/([^#]*)()(#.*)?/.exec(c)}if(a){var d;if(a[3]){var b=a[3].replace(/#/g,&quot;&quot;);d=b.parseParams(&quot;tag&quot;)}else{d=[[]]}var e=a[2]?a[2].trim():&quot;&quot;;d.push({name:&quot;text&quot;,value:e});d[0].text=[e];return{title:a[1].trim(),params:d}}else{return{title:c.trim(),params:[[]]}}};abego.parseTiddlerFilterTerm=function(queryText,offset,options){var re=/\s*(?:(?:\{([^\}]*)\})|(?:(=)|([#%!])|(?:(\w+)\s*\:(?!\/\/))|(?:(?:(&quot;(?:(?:\\&quot;)|[^&quot;])+&quot;)|(?:\/((?:(?:\\\/)|[^\/])+)\/)|(\w+\:\/\/[^\s]+)|([^\s\)\-\&quot;]+)))))/mg;var shortCuts={&quot;!&quot;:&quot;title&quot;,&quot;%&quot;:&quot;text&quot;,&quot;#&quot;:&quot;tags&quot;};var fieldNames={};var fullWordMatch=false;re.lastIndex=offset;while(true){var i=re.lastIndex;var m=re.exec(queryText);if(!m||m.index!=i){throw&quot;Word or String literal expected&quot;}if(m[1]){var lastIndexRef={};var code=abego.getBracedText(queryText,0,lastIndexRef);if(!code){throw&quot;Invalid {...} syntax&quot;}var f=Function(&quot;tiddler&quot;,&quot;return (&quot;+code+&quot;);&quot;);return{func:f,lastIndex:lastIndexRef.lastIndex,markRE:null}}if(m[2]){fullWordMatch=true}else{if(m[3]){fieldNames[shortCuts[m[3]]]=1}else{if(m[4]){fieldNames[m[4]]=1}else{var textIsRegExp=m[6];var text=m[5]?window.eval(m[5]):m[6]?m[6]:m[7]?m[7]:m[8];options=abego.copyOptions(options);options.fullWordMatch=fullWordMatch;options.textIsRegExp=textIsRegExp;var fields=[];for(var n in fieldNames){fields.push(n)}if(fields.length==0){options.fields=options.defaultFields}else{options.fields=fields;options.withExtendedFields=false}var term=new abego.TiddlerFilterTerm(text,options);var markREText=textIsRegExp?text:text.escapeRegExp();if(markREText&amp;&amp;fullWordMatch){markREText=&quot;\\b&quot;+markREText+&quot;\\b&quot;}return{func:function(tiddler){return term.test(tiddler)},lastIndex:re.lastIndex,markRE:markREText?&quot;(?:&quot;+markREText+&quot;)&quot;:null}}}}}};abego.BoolExp=function(i,c,j){this.s=i;var h=j&amp;&amp;j.defaultOperationIs_OR;var e=/\s*\)/g;var f=/\s*(?:(and|\&amp;\&amp;)|(or|\|\|))/gi;var b=/\s*(\-|not)?(\s*\()?/gi;var a;var d=function(p){b.lastIndex=p;var l=b.exec(i);var o=false;var k=null;if(l&amp;&amp;l.index==p){p+=l[0].length;o=l[1];if(l[2]){var n=a(p);e.lastIndex=n.lastIndex;if(!e.exec(i)){throw&quot;Missing ')'&quot;}k={func:n.func,lastIndex:e.lastIndex,markRE:n.markRE}}}if(!k){k=c(i,p,j)}if(o){k.func=(function(m){return function(q){return !m(q)}})(k.func);k.markRE=null}return k};a=function(s){var n=d(s);while(true){var p=n.lastIndex;f.lastIndex=p;var k=f.exec(i);var o;var q;if(k&amp;&amp;k.index==p){o=!k[1];q=d(f.lastIndex)}else{try{q=d(p)}catch(r){return n}o=h}n.func=(function(t,m,l){return l?function(u){return t(u)||m(u)}:function(u){return t(u)&amp;&amp;m(u)}})(n.func,q.func,o);n.lastIndex=q.lastIndex;if(!n.markRE){n.markRE=q.markRE}else{if(q.markRE){n.markRE=n.markRE+&quot;|&quot;+q.markRE}}}};var g=a(0);this.evalFunc=g.func;if(g.markRE){this.markRegExp=new RegExp(g.markRE,j.caseSensitive?&quot;mg&quot;:&quot;img&quot;)}};abego.BoolExp.prototype.exec=function(){return this.evalFunc.apply(this,arguments)};abego.BoolExp.prototype.getMarkRegExp=function(){return this.markRegExp};abego.BoolExp.prototype.toString=function(){return this.s};abego.MultiFieldRegExpTester=function(b,a,c){this.re=b;this.fields=a?a:[&quot;title&quot;,&quot;text&quot;,&quot;tags&quot;];this.withExtendedFields=c};abego.MultiFieldRegExpTester.prototype.test=function(b){var d=this.re;for(var a=0;a&lt;this.fields.length;a++){var c=store.getValue(b,this.fields[a]);if(typeof c==&quot;string&quot;&amp;&amp;d.test(c)){return this.fields[a]}}if(this.withExtendedFields){return store.forEachField(b,function(e,g,f){return typeof f==&quot;string&quot;&amp;&amp;d.test(f)?g:null},true)}return null};abego.TiddlerQuery=function(b,a,d,c,e){if(d){this.regExp=new RegExp(b,a?&quot;mg&quot;:&quot;img&quot;);this.tester=new abego.MultiFieldRegExpTester(this.regExp,c,e)}else{this.expr=new abego.BoolExp(b,abego.parseTiddlerFilterTerm,{defaultFields:c,caseSensitive:a,withExtendedFields:e})}this.getQueryText=function(){return b};this.getUseRegExp=function(){return d};this.getCaseSensitive=function(){return a};this.getDefaultFields=function(){return c};this.getWithExtendedFields=function(){return e}};abego.TiddlerQuery.prototype.test=function(a){if(!a){return false}if(this.regExp){return this.tester.test(a)}return this.expr.exec(a)};abego.TiddlerQuery.prototype.filter=function(a){return abego.select(a,this.test,this)};abego.TiddlerQuery.prototype.getMarkRegExp=function(){if(this.regExp){return&quot;&quot;.search(this.regExp)&gt;=0?null:this.regExp}return this.expr.getMarkRegExp()};abego.TiddlerQuery.prototype.toString=function(){return(this.regExp?this.regExp:this.expr).toString()};abego.PageWiseRenderer=function(){this.firstIndexOnPage=0};merge(abego.PageWiseRenderer.prototype,{setItems:function(a){this.items=a;this.setFirstIndexOnPage(0)},getMaxPagesInNavigation:function(){return 10},getItemsCount:function(a){return this.items?this.items.length:0},getCurrentPageIndex:function(){return Math.floor(this.firstIndexOnPage/this.getItemsPerPage())},getLastPageIndex:function(){return Math.floor((this.getItemsCount()-1)/this.getItemsPerPage())},setFirstIndexOnPage:function(a){this.firstIndexOnPage=Math.min(Math.max(0,a),this.getItemsCount()-1)},getFirstIndexOnPage:function(){this.firstIndexOnPage=Math.floor(this.firstIndexOnPage/this.getItemsPerPage())*this.getItemsPerPage();return this.firstIndexOnPage},getLastIndexOnPage:function(){return Math.min(this.getFirstIndexOnPage()+this.getItemsPerPage()-1,this.getItemsCount()-1)},onPageChanged:function(a,b){},renderPage:function(a){if(a.beginRendering){a.beginRendering(this)}try{if(this.getItemsCount()){var d=this.getLastIndexOnPage();var c=-1;for(var b=this.getFirstIndexOnPage();b&lt;=d;b++){c++;a.render(this,this.items[b],b,c)}}}finally{if(a.endRendering){a.endRendering(this)}}},addPageNavigation:function(c){if(!this.getItemsCount()){return}var k=this;var g=function(n){if(!n){n=window.event}abego.consumeEvent(n);var i=abego.toInt(this.getAttribute(&quot;page&quot;),0);var m=k.getCurrentPageIndex();if(i==m){return}var l=i*k.getItemsPerPage();k.setFirstIndexOnPage(l);k.onPageChanged(i,m)};var e;var h=this.getCurrentPageIndex();var f=this.getLastPageIndex();if(h&gt;0){e=renderTiddlyButton(c,&quot;Previous&quot;,&quot;Go to previous page (Shortcut: Alt-'&lt;')&quot;,g,&quot;prev&quot;);e.setAttribute(&quot;page&quot;,(h-1).toString());e.setAttribute(&quot;accessKey&quot;,&quot;&lt;&quot;)}for(var d=-this.getMaxPagesInNavigation();d&lt;this.getMaxPagesInNavigation();d++){var b=h+d;if(b&lt;0){continue}if(b&gt;f){break}var a=(d+h+1).toString();var j=b==h?&quot;currentPage&quot;:&quot;otherPage&quot;;e=renderTiddlyButton(c,a,&quot;Go to page %0&quot;.format([a]),g,j);e.setAttribute(&quot;page&quot;,(b).toString())}if(h&lt;f){e=renderTiddlyButton(c,&quot;Next&quot;,&quot;Go to next page (Shortcut: Alt-'&gt;')&quot;,g,&quot;next&quot;);e.setAttribute(&quot;page&quot;,(h+1).toString());e.setAttribute(&quot;accessKey&quot;,&quot;&gt;&quot;)}}});abego.LimitedTextRenderer=function(){var l=40;var c=4;var k=function(p,z,v){var q=p.length;if(q==0){p.push({start:z,end:v});return}var u=0;for(;u&lt;q;u++){var w=p[u];if(w.start&lt;=v&amp;&amp;z&lt;=w.end){var o;var s=u+1;for(;s&lt;q;s++){o=p[s];if(o.start&gt;v||z&gt;w.end){break}}var x=z;var y=v;for(var t=u;t&lt;s;t++){o=p[t];x=Math.min(x,o.start);y=Math.max(y,o.end)}p.splice(u,s-u,{start:x,end:y});return}if(w.start&gt;v){break}}p.splice(u,0,{start:z,end:v})};var d=function(n){var q=0;for(var p=0;p&lt;n.length;p++){var o=n[p];q+=o.end-o.start}return q};var b=function(n){return(n&gt;=&quot;a&quot;&amp;&amp;n&lt;=&quot;z&quot;)||(n&gt;=&quot;A&quot;&amp;&amp;n&lt;=&quot;Z&quot;)||n==&quot;_&quot;};var f=function(p,r){if(!b(p[r])){return null}for(var o=r-1;o&gt;=0&amp;&amp;b(p[o]);o--){}var q=o+1;var t=p.length;for(o=r+1;o&lt;t&amp;&amp;b(p[o]);o++){}return{start:q,end:o}};var a=function(o,q,p){var n;if(p){n=f(o,q)}else{if(q&lt;=0){return q}n=f(o,q-1)}if(!n){return q}if(p){if(n.start&gt;=q-c){return n.start}if(n.end&lt;=q+c){return n.end}}else{if(n.end&lt;=q+c){return n.end}if(n.start&gt;=q-c){return n.start}}return q};var j=function(r,q){var n=[];if(q){var u=0;do{q.lastIndex=u;var o=q.exec(r);if(o){if(u&lt;o.index){var p=r.substring(u,o.index);n.push({text:p})}n.push({text:o[0],isMatch:true});u=o.index+o[0].length}else{n.push({text:r.substr(u)});break}}while(true)}else{n.push({text:r})}return n};var i=function(p){var n=0;for(var o=0;o&lt;p.length;o++){if(p[o].isMatch){n++}}return n};var h=function(v,u,q,t,o){var w=Math.max(Math.floor(o/(t+1)),l);var n=Math.max(w-(q-u),0);var r=Math.min(Math.floor(q+n/3),v.length);var p=Math.max(r-w,0);p=a(v,p,true);r=a(v,r,false);return{start:p,end:r}};var m=function(r,y,o){var n=[];var v=i(r);var u=0;for(var p=0;p&lt;r.length;p++){var x=r[p];var w=x.text;if(x.isMatch){var q=h(y,u,u+w.length,v,o);k(n,q.start,q.end)}u+=w.length}return n};var g=function(t,p,o){var n=o-d(p);while(n&gt;0){if(p.length==0){k(p,0,a(t,o,false));return}else{var q=p[0];var v;var r;if(q.start==0){v=q.end;if(p.length&gt;1){r=p[1].start}else{k(p,v,a(t,v+n,false));return}}else{v=0;r=q.start}var u=Math.min(r,v+n);k(p,v,u);n-=(u-v)}}};var e=function(p,x,w,n,o){if(n.length==0){return}var u=function(z,I,D,F,C){var H;var G;var E=0;var B=0;var A=0;for(;B&lt;D.length;B++){H=D[B];G=H.text;if(F&lt;E+G.length){A=F-E;break}E+=G.length}var y=C-F;for(;B&lt;D.length&amp;&amp;y&gt;0;B++){H=D[B];G=H.text.substr(A);A=0;if(G.length&gt;y){G=G.substr(0,y)}if(H.isMatch){createTiddlyElement(z,&quot;span&quot;,null,&quot;marked&quot;,G)}else{createTiddlyText(z,G)}y-=G.length}if(C&lt;I.length){abego.createEllipsis(z)}};if(n[0].start&gt;0){abego.createEllipsis(p)}var q=o;for(var r=0;r&lt;n.length&amp;&amp;q&gt;0;r++){var t=n[r];var v=Math.min(t.end-t.start,q);u(p,x,w,t.start,t.start+v);q-=v}};this.render=function(p,q,o,t){if(q.length&lt;o){o=q.length}var r=j(q,t);var n=m(r,q,o);g(q,n,o);e(p,q,r,n,o)}};(function(){function alertAndThrow(msg){alert(msg);throw msg}if(version.major&lt;2||(version.major==2&amp;&amp;version.minor&lt;1)){alertAndThrow(&quot;YourSearchPlugin requires TiddlyWiki 2.1 or newer.\n\nCheck the archive for YourSearch plugins\nsupporting older versions of TiddlyWiki.\n\nArchive: http://tiddlywiki.abego-software.de/archive&quot;)}abego.YourSearch={};var lastResults=undefined;var lastQuery=undefined;var setLastResults=function(array){lastResults=array};var getLastResults=function(){return lastResults?lastResults:[]};var getLastResultsCount=function(){return lastResults?lastResults.length:0};var matchInTitleWeight=4;var precisionInTitleWeight=10;var matchInTagsWeight=2;var getMatchCount=function(s,re){var m=s.match(re);return m?m.length:0};var standardRankFunction=function(tiddler,query){var markRE=query.getMarkRegExp();if(!markRE){return 1}var matchesInTitle=tiddler.title.match(markRE);var nMatchesInTitle=matchesInTitle?matchesInTitle.length:0;var nMatchesInTags=getMatchCount(tiddler.getTags(),markRE);var lengthOfMatchesInTitle=matchesInTitle?matchesInTitle.join(&quot;&quot;).length:0;var precisionInTitle=tiddler.title.length&gt;0?lengthOfMatchesInTitle/tiddler.title.length:0;var rank=nMatchesInTitle*matchInTitleWeight+nMatchesInTags*matchInTagsWeight+precisionInTitle*precisionInTitleWeight+1;return rank};var findMatches=function(store,searchText,caseSensitive,useRegExp,sortField,excludeTag){lastQuery=null;var candidates=store.reverseLookup(&quot;tags&quot;,excludeTag,false);try{var defaultFields=[];if(config.options.chkSearchInTitle){defaultFields.push(&quot;title&quot;)}if(config.options.chkSearchInText){defaultFields.push(&quot;text&quot;)}if(config.options.chkSearchInTags){defaultFields.push(&quot;tags&quot;)}lastQuery=new abego.TiddlerQuery(searchText,caseSensitive,useRegExp,defaultFields,config.options.chkSearchExtendedFields)}catch(e){return[]}var results=lastQuery.filter(candidates);var rankFunction=abego.YourSearch.getRankFunction();for(var i=0;i&lt;results.length;i++){var tiddler=results[i];var rank=rankFunction(tiddler,lastQuery);tiddler.searchRank=rank}if(!sortField){sortField=&quot;title&quot;}var sortFunction=function(a,b){var searchRankDiff=a.searchRank-b.searchRank;if(searchRankDiff==0){if(a[sortField]==b[sortField]){return(0)}else{return(a[sortField]&lt;b[sortField])?-1:+1}}else{return(searchRankDiff&gt;0)?-1:+1}};results.sort(sortFunction);return results};var maxCharsInTitle=80;var maxCharsInTags=50;var maxCharsInText=250;var maxCharsInField=50;var itemsPerPageDefault=25;var itemsPerPageWithPreviewDefault=10;var yourSearchResultID=&quot;yourSearchResult&quot;;var yourSearchResultItemsID=&quot;yourSearchResultItems&quot;;var lastSearchText=null;var resultElement=null;var searchInputField=null;var searchButton=null;var lastNewTiddlerButton=null;var initStylesheet=function(){if(version.extensions.YourSearchPlugin.styleSheetInited){return}version.extensions.YourSearchPlugin.styleSheetInited=true;setStylesheet(store.getTiddlerText(&quot;YourSearchStyleSheet&quot;),&quot;yourSearch&quot;)};var isResultOpen=function(){return resultElement!=null&amp;&amp;resultElement.parentNode==document.body};var closeResult=function(){if(isResultOpen()){document.body.removeChild(resultElement)}};var closeResultAndDisplayTiddler=function(e){closeResult();var title=this.getAttribute(&quot;tiddlyLink&quot;);if(title){var withHilite=this.getAttribute(&quot;withHilite&quot;);var oldHighlightHack=highlightHack;if(withHilite&amp;&amp;withHilite==&quot;true&quot;&amp;&amp;lastQuery){highlightHack=lastQuery.getMarkRegExp()}story.displayTiddler(this,title);highlightHack=oldHighlightHack}return(false)};var adjustResultPositionAndSize=function(){if(!searchInputField){return}var root=searchInputField;var rootLeft=findPosX(root);var rootTop=findPosY(root);var rootHeight=root.offsetHeight;var popupLeft=rootLeft;var popupTop=rootTop+rootHeight;var winWidth=findWindowWidth();if(winWidth&lt;resultElement.offsetWidth){resultElement.style.width=(winWidth-100)+&quot;px&quot;;winWidth=findWindowWidth()}var popupWidth=resultElement.offsetWidth;if(popupLeft+popupWidth&gt;winWidth){popupLeft=winWidth-popupWidth-30}if(popupLeft&lt;0){popupLeft=0}resultElement.style.left=popupLeft+&quot;px&quot;;resultElement.style.top=popupTop+&quot;px&quot;;resultElement.style.display=&quot;block&quot;};var scrollVisible=function(){if(resultElement){window.scrollTo(0,ensureVisible(resultElement))}if(searchInputField){window.scrollTo(0,ensureVisible(searchInputField))}};var ensureResultIsDisplayedNicely=function(){adjustResultPositionAndSize();scrollVisible()};var indexInPage=undefined;var currentTiddler=undefined;var pager=new abego.PageWiseRenderer();var MyItemRenderer=function(parent){this.itemHtml=store.getTiddlerText(&quot;YourSearchItemTemplate&quot;);if(!this.itemHtml){alertAndThrow(&quot;YourSearchItemTemplate not found&quot;)}this.place=document.getElementById(yourSearchResultItemsID);if(!this.place){this.place=createTiddlyElement(parent,&quot;div&quot;,yourSearchResultItemsID)}};merge(MyItemRenderer.prototype,{render:function(pager,object,index,indexOnPage){indexInPage=indexOnPage;currentTiddler=object;var item=createTiddlyElement(this.place,&quot;div&quot;,null,&quot;yourSearchItem&quot;);item.innerHTML=this.itemHtml;applyHtmlMacros(item,null);refreshElements(item,null)},endRendering:function(pager){currentTiddler=null}});var refreshResult=function(){if(!resultElement||!searchInputField){return}var html=store.getTiddlerText(&quot;YourSearchResultTemplate&quot;);if(!html){html=&quot;&lt;b&gt;Tiddler YourSearchResultTemplate not found&lt;/b&gt;&quot;}resultElement.innerHTML=html;applyHtmlMacros(resultElement,null);refreshElements(resultElement,null);var itemRenderer=new MyItemRenderer(resultElement);pager.renderPage(itemRenderer);ensureResultIsDisplayedNicely()};pager.getItemsPerPage=function(){var n=(config.options.chkPreviewText)?abego.toInt(config.options.txtItemsPerPageWithPreview,itemsPerPageWithPreviewDefault):abego.toInt(config.options.txtItemsPerPage,itemsPerPageDefault);return(n&gt;0)?n:1};pager.onPageChanged=function(){refreshResult()};var reopenResultIfApplicable=function(){if(searchInputField==null||!config.options.chkUseYourSearch){return}if((searchInputField.value==lastSearchText)&amp;&amp;lastSearchText&amp;&amp;!isResultOpen()){if(resultElement&amp;&amp;(resultElement.parentNode!=document.body)){document.body.appendChild(resultElement);ensureResultIsDisplayedNicely()}else{abego.YourSearch.onShowResult(true)}}};var invalidateResult=function(){closeResult();resultElement=null;lastSearchText=null};var isDescendantOrSelf=function(self,e){while(e!=null){if(self==e){return true}e=e.parentNode}return false};var onDocumentClick=function(e){if(e.target==searchInputField){return}if(e.target==searchButton){return}if(resultElement&amp;&amp;isDescendantOrSelf(resultElement,e.target)){return}closeResult()};var onDocumentKeyup=function(e){if(e.keyCode==27){closeResult()}};addEvent(document,&quot;click&quot;,onDocumentClick);addEvent(document,&quot;keyup&quot;,onDocumentKeyup);var myStorySearch=function(text,useCaseSensitive,useRegExp){lastSearchText=text;setLastResults(findMatches(store,text,useCaseSensitive,useRegExp,&quot;title&quot;,&quot;excludeSearch&quot;));abego.YourSearch.onShowResult()};var myMacroSearchHandler=function(place,macroName,params,wikifier,paramString,tiddler){initStylesheet();lastSearchText=&quot;&quot;;var searchTimeout=null;var doSearch=function(txt){if(config.options.chkUseYourSearch){myStorySearch(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch)}else{story.search(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch)}lastSearchText=txt.value};var clickHandler=function(e){doSearch(searchInputField);return false};var keyHandler=function(e){if(!e){e=window.event}searchInputField=this;switch(e.keyCode){case 27:if(isResultOpen()){closeResult()}else{this.value=&quot;&quot;;clearMessage()}break}if(String.fromCharCode(e.keyCode)==this.accessKey||e.altKey){reopenResultIfApplicable()}if(this.value.length&lt;3&amp;&amp;searchTimeout){clearTimeout(searchTimeout)}if(this.value.length&gt;2){if(this.value!=lastSearchText){if(!config.options.chkUseYourSearch||config.options.chkSearchAsYouType){if(searchTimeout){clearTimeout(searchTimeout)}var txt=this;searchTimeout=setTimeout(function(){doSearch(txt)},500)}}else{if(searchTimeout){clearTimeout(searchTimeout)}}}if(this.value.length==0){closeResult()}};var focusHandler=function(e){this.select();clearMessage();reopenResultIfApplicable()};var args=paramString.parseParams(&quot;list&quot;,null,true);var buttonAtRight=getFlag(args,&quot;buttonAtRight&quot;);var sizeTextbox=getParam(args,&quot;sizeTextbox&quot;,this.sizeTextbox);var txt=createTiddlyElement(null,&quot;input&quot;,null,&quot;txtOptionInput searchField&quot;,null);if(params[0]){txt.value=params[0]}txt.onkeyup=keyHandler;txt.onfocus=focusHandler;txt.setAttribute(&quot;size&quot;,sizeTextbox);txt.setAttribute(&quot;accessKey&quot;,this.accessKey);txt.setAttribute(&quot;autocomplete&quot;,&quot;off&quot;);if(config.browser.isSafari){txt.setAttribute(&quot;type&quot;,&quot;search&quot;);txt.setAttribute(&quot;results&quot;,&quot;5&quot;)}else{if(!config.browser.isIE){txt.setAttribute(&quot;type&quot;,&quot;text&quot;)}}var btn=renderTiddlyButton(null,this.label,this.hint,clickHandler);if(place){if(!buttonAtRight){place.appendChild(btn)}place.appendChild(txt);if(buttonAtRight){place.appendChild(btn)}}searchInputField=txt;searchButton=btn};var openAllFoundTiddlers=function(){closeResult();var results=getLastResults();var n=results.length;if(n){var titles=[];for(var i=0;i&lt;n;i++){titles.push(results[i].title)}story.displayTiddlers(null,titles)}};var createOptionWithRefresh=function(place,optionParams,wikifier,tiddler){invokeMacro(place,&quot;option&quot;,optionParams,wikifier,tiddler);var elem=place.lastChild;var oldOnClick=elem.onclick;elem.onclick=function(e){var result=oldOnClick.apply(this,arguments);refreshResult();return result};return elem};var removeTextDecoration=function(s){var removeThis=[&quot;''&quot;,&quot;{{{&quot;,&quot;}}}&quot;,&quot;//&quot;,&quot;&lt;&lt;&lt;&quot;,&quot;/***&quot;,&quot;***/&quot;];var reText=&quot;&quot;;for(var i=0;i&lt;removeThis.length;i++){if(i!=0){reText+=&quot;|&quot;}reText+=&quot;(&quot;+removeThis[i].escapeRegExp()+&quot;)&quot;}return s.replace(new RegExp(reText,&quot;mg&quot;),&quot;&quot;).trim()};var getShortCutNumber=function(){var i=indexInPage;return(i&gt;=0&amp;&amp;i&lt;=9)?(i&lt;9?(i+1):0):-1};var limitedTextRenderer=new abego.LimitedTextRenderer();var renderLimitedText=function(place,s,maxLen){limitedTextRenderer.render(place,s,maxLen,lastQuery.getMarkRegExp())};var oldTiddlyWikiSaveTiddler=TiddlyWiki.prototype.saveTiddler;TiddlyWiki.prototype.saveTiddler=function(title,newTitle,newBody,modifier,modified,tags,fields){oldTiddlyWikiSaveTiddler.apply(this,arguments);invalidateResult()};var oldTiddlyWikiRemoveTiddler=TiddlyWiki.prototype.removeTiddler;TiddlyWiki.prototype.removeTiddler=function(title){oldTiddlyWikiRemoveTiddler.apply(this,arguments);invalidateResult()};config.macros.yourSearch={label:&quot;yourSearch&quot;,hint:&quot;Gives access to the current/last YourSearch result&quot;,handler:function(place,macroName,params,wikifier,paramString,tiddler){if(params.length==0){return}var name=params[0];var func=config.macros.yourSearch.funcs[name];if(func){func(place,macroName,params,wikifier,paramString,tiddler)}},tests:{&quot;true&quot;:function(){return true},&quot;false&quot;:function(){return false},found:function(){return getLastResultsCount()&gt;0},previewText:function(){return config.options.chkPreviewText}},funcs:{itemRange:function(place){if(getLastResultsCount()){var lastIndex=pager.getLastIndexOnPage();var s=&quot;%0 - %1&quot;.format([pager.getFirstIndexOnPage()+1,lastIndex+1]);createTiddlyText(place,s)}},count:function(place){createTiddlyText(place,getLastResultsCount().toString())},query:function(place){if(lastQuery){createTiddlyText(place,lastQuery.toString())}},version:function(place){var t=&quot;YourSearch %0.%1.%2&quot;.format([version.extensions.YourSearchPlugin.major,version.extensions.YourSearchPlugin.minor,version.extensions.YourSearchPlugin.revision]);var e=createTiddlyElement(place,&quot;a&quot;);e.setAttribute(&quot;href&quot;,&quot;http://tiddlywiki.abego-software.de/#YourSearchPlugin&quot;);e.innerHTML='&lt;font color=&quot;black&quot; face=&quot;Arial, Helvetica, sans-serif&quot;&gt;'+t+&quot;&lt;font&gt;&quot;},copyright:function(place){var e=createTiddlyElement(place,&quot;a&quot;);e.setAttribute(&quot;href&quot;,&quot;http://www.abego-software.de&quot;);e.innerHTML='&lt;font color=&quot;black&quot; face=&quot;Arial, Helvetica, sans-serif&quot;&gt;&amp;copy; 2005-2008 &lt;b&gt;&lt;font color=&quot;red&quot;&gt;abego&lt;/font&gt;&lt;/b&gt; Software&lt;font&gt;'},newTiddlerButton:function(place){if(lastQuery){var r=abego.parseNewTiddlerCommandLine(lastQuery.getQueryText());var btn=config.macros.newTiddler.createNewTiddlerButton(place,r.title,r.params,&quot;new tiddler&quot;,&quot;Create a new tiddler based on search text. (Shortcut: Ctrl-Enter; Separators: '.', '#')&quot;,null,&quot;text&quot;);var oldOnClick=btn.onclick;btn.onclick=function(){closeResult();oldOnClick.apply(this,arguments)};lastNewTiddlerButton=btn}},linkButton:function(place,macroName,params,wikifier,paramString,tiddler){if(params&lt;2){return}var tiddlyLink=params[1];var text=params&lt;3?tiddlyLink:params[2];var tooltip=params&lt;4?text:params[3];var accessKey=params&lt;5?null:params[4];var btn=renderTiddlyButton(place,text,tooltip,closeResultAndDisplayTiddler,null,null,accessKey);btn.setAttribute(&quot;tiddlyLink&quot;,tiddlyLink)},closeButton:function(place,macroName,params,wikifier,paramString,tiddler){renderTiddlyButton(place,&quot;close&quot;,&quot;Close the Search Results (Shortcut: ESC)&quot;,closeResult)},openAllButton:function(place,macroName,params,wikifier,paramString,tiddler){var n=getLastResultsCount();if(n==0){return}var title=n==1?&quot;open tiddler&quot;:&quot;open all %0 tiddlers&quot;.format([n]);var button=renderTiddlyButton(place,title,&quot;Open all found tiddlers (Shortcut: Alt-O)&quot;,openAllFoundTiddlers);button.setAttribute(&quot;accessKey&quot;,&quot;O&quot;)},naviBar:function(place,macroName,params,wikifier,paramString,tiddler){pager.addPageNavigation(place)},&quot;if&quot;:function(place,macroName,params,wikifier,paramString,tiddler){if(params.length&lt;2){return}var testName=params[1];var negate=(testName==&quot;not&quot;);if(negate){if(params.length&lt;3){return}testName=params[2]}var test=config.macros.yourSearch.tests[testName];var showIt=false;try{if(test){showIt=test(place,macroName,params,wikifier,paramString,tiddler)!=negate}else{showIt=(!eval(testName))==negate}}catch(ex){}if(!showIt){place.style.display=&quot;none&quot;}},chkPreviewText:function(place,macroName,params,wikifier,paramString,tiddler){var elem=createOptionWithRefresh(place,&quot;chkPreviewText&quot;,wikifier,tiddler);elem.setAttribute(&quot;accessKey&quot;,&quot;P&quot;);elem.title=&quot;Show text preview of found tiddlers (Shortcut: Alt-P)&quot;;return elem}}};config.macros.foundTiddler={label:&quot;foundTiddler&quot;,hint:&quot;Provides information on the tiddler currently processed on the YourSearch result page&quot;,handler:function(place,macroName,params,wikifier,paramString,tiddler){var name=params[0];var func=config.macros.foundTiddler.funcs[name];if(func){func(place,macroName,params,wikifier,paramString,tiddler)}},funcs:{title:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}var shortcutNumber=getShortCutNumber();var tooltip=shortcutNumber&gt;=0?&quot;Open tiddler (Shortcut: Alt-%0)&quot;.format([shortcutNumber.toString()]):&quot;Open tiddler&quot;;var btn=renderTiddlyButton(place,null,tooltip,closeResultAndDisplayTiddler,null);btn.setAttribute(&quot;tiddlyLink&quot;,currentTiddler.title);btn.setAttribute(&quot;withHilite&quot;,&quot;true&quot;);renderLimitedText(btn,currentTiddler.title,maxCharsInTitle);if(shortcutNumber&gt;=0){btn.setAttribute(&quot;accessKey&quot;,shortcutNumber.toString())}},tags:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}renderLimitedText(place,currentTiddler.getTags(),maxCharsInTags)},text:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}renderLimitedText(place,removeTextDecoration(currentTiddler.text),maxCharsInText)},field:function(place,macroName,params,wikifier,paramString,tiddler){if(!currentTiddler){return}var name=params[1];var len=params.length&gt;2?abego.toInt(params[2],maxCharsInField):maxCharsInField;var v=store.getValue(currentTiddler,name);if(v){renderLimitedText(place,removeTextDecoration(v),len)}},number:function(place,macroName,params,wikifier,paramString,tiddler){var numberToDisplay=getShortCutNumber();if(numberToDisplay&gt;=0){var text=&quot;%0)&quot;.format([numberToDisplay.toString()]);createTiddlyElement(place,&quot;span&quot;,null,&quot;shortcutNumber&quot;,text)}}}};var opts={chkUseYourSearch:true,chkPreviewText:true,chkSearchAsYouType:true,chkSearchInTitle:true,chkSearchInText:true,chkSearchInTags:true,chkSearchExtendedFields:true,txtItemsPerPage:itemsPerPageDefault,txtItemsPerPageWithPreview:itemsPerPageWithPreviewDefault};for(var n in opts){if(config.options[n]==undefined){config.options[n]=opts[n]}}config.shadowTiddlers[&quot;YourSearch Help&quot;]=&quot;!Field Search\nWith the Field Search you can restrict your search to certain fields of a tiddler, e.g only search the tags or only the titles. The general form is //fieldname//'':''//textToSearch// (e.g. {{{title:intro}}}). In addition one-character shortcuts are also supported for the standard fields {{{title}}}, {{{text}}} and {{{tags}}}:\n|!What you want|!What you type|!Example|\n|Search ''titles only''|start word with ''!''|{{{!jonny}}} (shortcut for {{{title:jonny}}})|\n|Search ''contents/text only''|start word with ''%''|{{{%football}}} (shortcut for {{{text:football}}})|\n|Search ''tags only''|start word with ''#''|{{{#Plugin}}} (shortcut for {{{tags:Plugin}}})|\n\nUsing this feature you may also search the extended fields (\&quot;Metadata\&quot;) introduced with TiddlyWiki 2.1, e.g. use {{{priority:1}}} to find all tiddlers with the priority field set to \&quot;1\&quot;.\n\nYou may search a word in more than one field. E.g. {{{!#Plugin}}} (or {{{title:tags:Plugin}}} in the \&quot;long form\&quot;) finds tiddlers containing \&quot;Plugin\&quot; either in the title or in the tags (but does not look for \&quot;Plugin\&quot; in the text). \n\n!Boolean Search\nThe Boolean Search is useful when searching for multiple words.\n|!What you want|!What you type|!Example|\n|''All words'' must exist|List of words|{{{jonny jeremy}}} (or {{{jonny and jeremy}}})|\n|''At least one word'' must exist|Separate words by ''or''|{{{jonny or jeremy}}}|\n|A word ''must not exist''|Start word with ''-''|{{{-jonny}}} (or {{{not jonny}}})|\n\n''Note:'' When you specify two words, separated with a space, YourSearch finds all tiddlers that contain both words, but not necessarily next to each other. If you want to find a sequence of word, e.g. '{{{John Brown}}}', you need to put the words into quotes. I.e. you type: {{{\&quot;john brown\&quot;}}}.\n\nUsing parenthesis you may change the default \&quot;left to right\&quot; evaluation of the boolean search. E.g. {{{not (jonny or jeremy)}}} finds all tiddlers that contain neither \&quot;jonny\&quot; nor \&quot;jeremy. In contrast to this {{{not jonny or jeremy}}} (i.e. without parenthesis) finds all tiddlers that either don't contain \&quot;jonny\&quot; or that contain \&quot;jeremy\&quot;.\n\n!'Exact Word' Search\nBy default a search result all matches that 'contain' the searched text. E.g. if you search for {{{Task}}} you will get all tiddlers containing 'Task', but also '~CompletedTask', '~TaskForce' etc.\n\nIf you only want to get the tiddlers that contain 'exactly the word' you need to prefix it with a '='. E.g. typing '=Task' will find the tiddlers that contain the word 'Task', ignoring words that just contain 'Task' as a substring.\n\n!~CaseSensitiveSearch and ~RegExpSearch\nThe standard search options ~CaseSensitiveSearch and ~RegExpSearch are fully supported by YourSearch. However when ''~RegExpSearch'' is on Filtered and Boolean Search are disabled.\n\nIn addition you may do a \&quot;regular expression\&quot; search even with the ''~RegExpSearch'' set to false by directly entering the regular expression into the search field, framed with {{{/.../}}}. \n\nExample: {{{/m[ae][iy]er/}}} will find all tiddlers that contain either \&quot;maier\&quot;, \&quot;mayer\&quot;, \&quot;meier\&quot; or \&quot;meyer\&quot;.\n\n!~JavaScript Expression Filtering\nIf you are familiar with JavaScript programming and know some TiddlyWiki internals you may also use JavaScript expression for the search. Just enter a JavaScript boolean expression into the search field, framed with {{{ { ... } }}}. In the code refer to the variable tiddler and evaluate to {{{true}}} when the given tiddler should be included in the result. \n\nExample: {{{ { tiddler.modified &gt; new Date(\&quot;Jul 4, 2005\&quot;)} }}} returns all tiddler modified after July 4th, 2005.\n\n!Combined Search\nYou are free to combine the various search options. \n\n''Examples''\n|!What you type|!Result|\n|{{{!jonny !jeremy -%football}}}|all tiddlers with both {{{jonny}}} and {{{jeremy}}} in its titles, but no {{{football}}} in content.|\n|{{{#=Task}}}|All tiddlers tagged with 'Task' (the exact word). Tags named '~CompletedTask', '~TaskForce' etc. are not considered.|\n\n!Access Keys\nYou are encouraged to use the access keys (also called \&quot;shortcut\&quot; keys) for the most frequently used operations. For quick reference these shortcuts are also mentioned in the tooltip for the various buttons etc.\n\n|!Key|!Operation|\n|{{{Alt-F}}}|''The most important keystroke'': It moves the cursor to the search input field so you can directly start typing your query. Pressing {{{Alt-F}}} will also display the previous search result. This way you can quickly display multiple tiddlers using \&quot;Press {{{Alt-F}}}. Select tiddler.\&quot; sequences.|\n|{{{ESC}}}|Closes the [[YourSearch Result]]. When the [[YourSearch Result]] is already closed and the cursor is in the search input field the field's content is cleared so you start a new query.|\n|{{{Alt-1}}}, {{{Alt-2}}},... |Pressing these keys opens the first, second etc. tiddler from the result list.|\n|{{{Alt-O}}}|Opens all found tiddlers.|\n|{{{Alt-P}}}|Toggles the 'Preview Text' mode.|\n|{{{Alt-'&lt;'}}}, {{{Alt-'&gt;'}}}|Displays the previous or next page in the [[YourSearch Result]].|\n|{{{Return}}}|When you have turned off the 'as you type' search mode pressing the {{{Return}}} key actually starts the search (as does pressing the 'search' button).|\n\n//If some of these shortcuts don't work for you check your browser if you have other extensions installed that already \&quot;use\&quot; these shortcuts.//&quot;;config.shadowTiddlers[&quot;YourSearch Options&quot;]=&quot;|&gt;|!YourSearch Options|\n|&gt;|&lt;&lt;option chkUseYourSearch&gt;&gt; Use 'Your Search'|\n|!|&lt;&lt;option chkPreviewText&gt;&gt; Show Text Preview|\n|!|&lt;&lt;option chkSearchAsYouType&gt;&gt; 'Search As You Type' Mode (No RETURN required to start search)|\n|!|Default Search Filter:&lt;&lt;option chkSearchInTitle&gt;&gt;Title ('!')     &lt;&lt;option chkSearchInText&gt;&gt;Text ('%')     &lt;&lt;option chkSearchInTags&gt;&gt;Tags ('#')    &lt;&lt;option chkSearchExtendedFields&gt;&gt;Extended Fields&lt;html&gt;&lt;br&gt;&lt;font size=\&quot;-2\&quot;&gt;The fields of a tiddlers that are searched when you don't explicitly specify a filter in the search text &lt;br&gt;(Explictly specify fields using one or more '!', '%', '#' or 'fieldname:' prefix before the word/text to find).&lt;/font&gt;&lt;/html&gt;|\n|!|Number of items on search result page: &lt;&lt;option txtItemsPerPage&gt;&gt;|\n|!|Number of items on search result page with preview text: &lt;&lt;option txtItemsPerPageWithPreview&gt;&gt;|\n&quot;;config.shadowTiddlers.YourSearchStyleSheet=&quot;/***\n!~YourSearchResult Stylesheet\n***/\n/*{{{*/\n.yourSearchResult {\n\tposition: absolute;\n\twidth: 800px;\n\n\tpadding: 0.2em;\n\tlist-style: none;\n\tmargin: 0;\n\n\tbackground: #ffd;\n\tborder: 1px solid DarkGray;\n}\n\n/*}}}*/\n/***\n!!Summary Section\n***/\n/*{{{*/\n.yourSearchResult .summary {\n\tborder-bottom-width: thin;\n\tborder-bottom-style: solid;\n\tborder-bottom-color: #999999;\n\tpadding-bottom: 4px;\n}\n\n.yourSearchRange, .yourSearchCount, .yourSearchQuery   {\n\tfont-weight: bold;\n}\n\n.yourSearchResult .summary .button {\n\tfont-size: 10px;\n\n\tpadding-left: 0.3em;\n\tpadding-right: 0.3em;\n}\n\n.yourSearchResult .summary .chkBoxLabel {\n\tfont-size: 10px;\n\n\tpadding-right: 0.3em;\n}\n\n/*}}}*/\n/***\n!!Items Area\n***/\n/*{{{*/\n.yourSearchResult .marked {\n\tbackground: none;\n\tfont-weight: bold;\n}\n\n.yourSearchItem {\n\tmargin-top: 2px;\n}\n\n.yourSearchNumber {\n\tcolor: #808080;\n}\n\n\n.yourSearchTags {\n\tcolor: #008000;\n}\n\n.yourSearchText {\n\tcolor: #808080;\n\tmargin-bottom: 6px;\n}\n\n/*}}}*/\n/***\n!!Footer\n***/\n/*{{{*/\n.yourSearchFooter {\n\tmargin-top: 8px;\n\tborder-top-width: thin;\n\tborder-top-style: solid;\n\tborder-top-color: #999999;\n}\n\n.yourSearchFooter a:hover{\n\tbackground: none;\n\tcolor: none;\n}\n/*}}}*/\n/***\n!!Navigation Bar\n***/\n/*{{{*/\n.yourSearchNaviBar a {\n\tfont-size: 16px;\n\tmargin-left: 4px;\n\tmargin-right: 4px;\n\tcolor: black;\n\ttext-decoration: underline;\n}\n\n.yourSearchNaviBar a:hover {\n\tbackground-color: none;\n}\n\n.yourSearchNaviBar .prev {\n\tfont-weight: bold;\n\tcolor: blue;\n}\n\n.yourSearchNaviBar .currentPage {\n\tcolor: #FF0000;\n\tfont-weight: bold;\n\ttext-decoration: none;\n}\n\n.yourSearchNaviBar .next {\n\tfont-weight: bold;\n\tcolor: blue;\n}\n/*}}}*/\n&quot;;config.shadowTiddlers.YourSearchResultTemplate='&lt;!--\n{{{\n--&gt;\n&lt;span macro=&quot;yourSearch if found&quot;&gt;\n&lt;!-- The Summary Header ============================================ --&gt;\n&lt;table class=&quot;summary&quot; border=&quot;0&quot; width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tbody&gt;\n  &lt;tr&gt;\n\t&lt;td align=&quot;left&quot;&gt;\n\t\tYourSearch Result &lt;span class=&quot;yourSearchRange&quot; macro=&quot;yourSearch itemRange&quot;&gt;&lt;/span&gt;\n\t\t&amp;nbsp;of&amp;nbsp;&lt;span class=&quot;yourSearchCount&quot; macro=&quot;yourSearch count&quot;&gt;&lt;/span&gt;\n\t\tfor&amp;nbsp;&lt;span class=&quot;yourSearchQuery&quot; macro=&quot;yourSearch query&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n\t&lt;td class=&quot;yourSearchButtons&quot; align=&quot;right&quot;&gt;\n\t\t&lt;span macro=&quot;yourSearch chkPreviewText&quot;&gt;&lt;/span&gt;&lt;span class=&quot;chkBoxLabel&quot;&gt;preview text&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch newTiddlerButton&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch openAllButton&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Options\' options \'Configure YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Help\' help \'Get help how to use YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch closeButton&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;&lt;/table&gt;\n\n&lt;!-- The List of Found Tiddlers ============================================ --&gt;\n&lt;div id=&quot;yourSearchResultItems&quot; itemsPerPage=&quot;25&quot; itemsPerPageWithPreview=&quot;10&quot;&gt;&lt;/div&gt;\n\n&lt;!-- The Footer (with the Navigation) ============================================ --&gt;\n&lt;table class=&quot;yourSearchFooter&quot; border=&quot;0&quot; width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tbody&gt;\n  &lt;tr&gt;\n\t&lt;td align=&quot;left&quot;&gt;\n\t\tResult page: &lt;span class=&quot;yourSearchNaviBar&quot; macro=&quot;yourSearch naviBar&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n\t&lt;td align=&quot;right&quot;&gt;&lt;span macro=&quot;yourSearch version&quot;&gt;&lt;/span&gt;, &lt;span macro=&quot;yourSearch copyright&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;&lt;/table&gt;\n&lt;!-- end of the \'tiddlers found\' case =========================================== --&gt;\n&lt;/span&gt;\n\n\n&lt;!-- The &quot;No tiddlers found&quot; case =========================================== --&gt;\n&lt;span macro=&quot;yourSearch if not found&quot;&gt;\n&lt;table class=&quot;summary&quot; border=&quot;0&quot; width=&quot;100%&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tbody&gt;\n  &lt;tr&gt;\n\t&lt;td align=&quot;left&quot;&gt;\n\t\tYourSearch Result: No tiddlers found for &lt;span class=&quot;yourSearchQuery&quot; macro=&quot;yourSearch query&quot;&gt;&lt;/span&gt;.\n\t&lt;/td&gt;\n\t&lt;td class=&quot;yourSearchButtons&quot; align=&quot;right&quot;&gt;\n\t\t&lt;span macro=&quot;yourSearch newTiddlerButton&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Options\' options \'Configure YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch linkButton \'YourSearch Help\' help \'Get help how to use YourSearch\'&quot;&gt;&lt;/span&gt;\n\t\t&lt;span macro=&quot;yourSearch closeButton&quot;&gt;&lt;/span&gt;\n\t&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/tbody&gt;&lt;/table&gt;\n&lt;/span&gt;\n\n\n&lt;!--\n}}}\n--&gt;\n';config.shadowTiddlers.YourSearchItemTemplate=&quot;&lt;!--\n{{{\n--&gt;\n&lt;span class='yourSearchNumber' macro='foundTiddler number'&gt;&lt;/span&gt;\n&lt;span class='yourSearchTitle' macro='foundTiddler title'/&gt;&lt;/span&gt;&amp;nbsp;-&amp;nbsp;\n&lt;span class='yourSearchTags' macro='foundTiddler field tags 50'/&gt;&lt;/span&gt;\n&lt;span macro=\&quot;yourSearch if previewText\&quot;&gt;&lt;div class='yourSearchText' macro='foundTiddler field text 250'/&gt;&lt;/div&gt;&lt;/span&gt;\n&lt;!--\n}}}\n--&gt;&quot;;config.shadowTiddlers.YourSearch=&quot;&lt;&lt;tiddler [[YourSearch Help]]&gt;&gt;&quot;;config.shadowTiddlers[&quot;YourSearch Result&quot;]=&quot;The popup-like window displaying the result of a YourSearch query.&quot;;config.macros.search.handler=myMacroSearchHandler;var checkForOtherHijacker=function(){if(config.macros.search.handler!=myMacroSearchHandler){alert(&quot;Message from YourSearchPlugin:\n\n\nAnother plugin has disabled the 'Your Search' features.\n\n\nYou may disable the other plugin or change the load order of \nthe plugins (by changing the names of the tiddlers)\nto enable the 'Your Search' features.&quot;)}};setTimeout(checkForOtherHijacker,5000);abego.YourSearch.getStandardRankFunction=function(){return standardRankFunction};abego.YourSearch.getRankFunction=function(){return abego.YourSearch.getStandardRankFunction()};abego.YourSearch.getCurrentTiddler=function(){return currentTiddler};abego.YourSearch.closeResult=function(){closeResult()};abego.YourSearch.getFoundTiddlers=function(){return lastResults};abego.YourSearch.getQuery=function(){return lastQuery};abego.YourSearch.onShowResult=function(useOldResult){highlightHack=lastQuery?lastQuery.getMarkRegExp():null;if(!useOldResult){pager.setItems(getLastResults())}if(!resultElement){resultElement=createTiddlyElement(document.body,&quot;div&quot;,yourSearchResultID,&quot;yourSearchResult&quot;)}else{if(resultElement.parentNode!=document.body){document.body.appendChild(resultElement)}}refreshResult();highlightHack=null}})()};
 //%/
 </pre>
 </div>
@@ -1951,7 +1927,6 @@ config.options = {
 	chkConfirmDelete: true,
 	chkInsertTabs: false,
 	chkUsePreForStorage: true, // Whether to use <pre> format for storage
-	chkDisplayInstrumentation: false,
 	txtBackupFolder: "",
 	txtEditorFocus: "text",		
 	txtMaxEditRows: "30",
@@ -1994,7 +1969,6 @@ config.macros = {
 	tiddler: {},
 	tag: {},
 	tags: {},
-	tagging: {},
 	timeline: {},
 	allTags: {},
 	list: {
@@ -2077,8 +2051,7 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 //-- Shadow tiddlers - these are programmatic, in contrast to those which were collected from the "shadowArea" div. See loadShadowTiddlers()
 //--
 
-config.shadowTiddlers = {
-	StyleSheet: "",
+config.shadowTiddlers = {	
 	MarkupPreHead: "",
 	MarkupPostHead: "",
 	MarkupPreBody: "",
@@ -2191,10 +2164,7 @@ merge(config.messages,{
 config.messages.backstage = {
 	open: {text: "Backstage", tooltip: "Open the backstage area to perform authoring and editing tasks"},
 	close: {text: "Close", tooltip: "Close the backstage area"},
-	prompt: "Backstage: ",
-	decal: {
-		edit: {text: "edit", tooltip: "Edit the tiddler '%0'"}
-	}
+	hint: "Backstage: "
 };
 
 config.messages.dates.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
@@ -2214,10 +2184,7 @@ merge(config.messages.tiddlerPopup,{});
 merge(config.views.wikified.tag,{
 	labelNoTags: "no tags",
 	labelTags: "tags: ",
-	openTag: "Open tag '%0'",
-	tooltip: "Show tiddlers tagged with '%0'",
-	openAllText: "Open all",
-	openAllTooltip: "Open all of these tiddlers",
+	tooltip: "Show tiddlers tagged with '%0'",	
 	popupNone: "No other tiddlers tagged with '%0'"
 });
 
@@ -2226,17 +2193,17 @@ merge(config.views.wikified,{
 	defaultModifier: "(missing)",
 	shadowModifier: "(built-in shadow tiddler)",
 	dateFormat: "DD MMM YYYY",
-	createdPrompt: "created"}
-);
+	createdPrompt: "created"
+});
 
 merge(config.views.editor,{
-	tagPrompt: "Type tags separated with spaces, [[use double square brackets]] if necessary, or add existing ",
-	defaultText: "Type the text for '%0'"}
-);
+	tagHint: "Type tags separated with spaces, [[use double square brackets]] if necessary, or add existing ",
+	defaultText: "Type the text for '%0'"
+});
 
 merge(config.views.editor.tagChooser,{
 	text: "tags",
-	tooltip: "Choose existing tags to add to this tiddler",
+	hint: "Choose existing tags to add to this tiddler",
 	popupNone: "There are no tags defined",
 	tagTooltip: "Add the tag '%0'"
 });
@@ -2247,22 +2214,16 @@ merge(config.messages,{
 		{unit: 1024*1024, template: "%0\u00a0MB"},
 		{unit: 1024, template: "%0\u00a0KB"},
 		{unit: 1, template: "%0\u00a0B"}
-		]
+	]
 });
 
 merge(config.macros.search,{
 	label: "Search",
-	prompt: "Search this TiddlyWiki",
+	hint: "Search this Wiki",
 	placeholder: "",
 	accessKey: "F",
 	successMsg: "%0 tiddlers found matching %1",
 	failureMsg: "No tiddlers found matching %0"}
-);
-
-merge(config.macros.tagging,{
-	label: "tagging: ",
-	labelNotTag: "not tagging",
-	tooltip: "List of tiddlers tagged with '%0'"}
 );
 
 merge(config.macros.timeline,{
@@ -2276,13 +2237,13 @@ merge(config.macros.allTags,{
 
 merge(config.macros.saveChanges,{
 	label: "save changes",
-	prompt: "Save all tiddlers to create a new TiddlyWiki",
+	hint: "Save all tiddlers to create a new TiddlyWiki",
 	accessKey: "S"
 });
 
 merge(config.macros.newTiddler,{
 	label: "new tiddler",
-	prompt: "Create a new tiddler",
+	hint: "Create a new tiddler",
 	title: "New Tiddler",
 	accessKey: "N"
 });
@@ -2357,7 +2318,7 @@ merge(config.macros.toolbar,{
 
 merge(config.macros.refreshDisplay,{
 	label: "refresh",
-	prompt: "Redraw the entire TiddlyWiki display"
+	hint: "Redraw the entire TiddlyWiki display"
 });
 
 merge(config.macros.importTiddlers,{
@@ -2442,7 +2403,7 @@ merge(config.commands.closeTiddler,{
 
 merge(config.commands.editTiddler,{
 	text: "Edit",
-	tooltip: "Edit this article\n[Ctrl - Enter]",
+	tooltip: "Edit This Article\n[Ctrl - Enter]",
 	readOnlyText: "view",
 	readOnlyTooltip: "View the source of this article"
 });
@@ -2454,7 +2415,7 @@ merge(config.commands.saveTiddler,{
 
 merge(config.commands.cancelTiddler,{
 	text: "Cancel",
-	tooltip: "Undo changes to this article",
+	tooltip: "Undo Changes to This Article",
 	warning: "Are you sure you want to abandon your changes to '%0'?",
 	readOnlyText: "done",
 	readOnlyTooltip: "View this article normally"
@@ -2462,7 +2423,7 @@ merge(config.commands.cancelTiddler,{
 
 merge(config.commands.deleteTiddler,{
 	text: "Delete",
-	tooltip: "Delete this article",
+	tooltip: "Delete This Article",
 	warning: "Are you sure you want to delete '%0'?"
 });
 
@@ -2536,8 +2497,7 @@ if (!window || !window.console) {
 // Starting up
 function main() {
 	window.originalHTML = recreateOriginal();
-
-	var t10, t9, t8, t7, t6, t5, t4, t3, t2, t1, t0 = new Date();
+	
 	startingUp = true;
 	// var doc = jQuery(document);
 	jQuery.noConflict();
@@ -2554,52 +2514,42 @@ function main() {
 	addEvent(document, "click", Popup.onDocumentClick);
 	saveTest();
 	var s;
-	for ( s = 0; s < config.notifyTiddlers.length; s++) {
+	for (s = 0; s < config.notifyTiddlers.length; s++) {
 		store.addNotification(config.notifyTiddlers[s].name, config.notifyTiddlers[s].notify);
 	}
-	t1 = new Date();
+
 	loadShadowTiddlers();	
-	t2 = new Date();
+
 	store.loadFromDiv("storeArea","store",true);
 	// doc.trigger("loadTiddlers");
 	loadOptions();
-	t3 = new Date();
+
 	invokeParamifier(params,"onload");
-	t4 = new Date();
+
 	readOnly = window.isLocal() ? false : config.options.chkHttpReadOnly;
 	var pluginProblem = loadPlugins("systemConfig");
 	// doc.trigger("loadPlugins");
-	t5 = new Date();
+
 	formatter = new Formatter(config.formatters);
 	invokeParamifier(params,"onconfig");
-	story.switchTheme(config.options.txtTheme);	
-	t6 = new Date();
+
 	var m;
 	for (m in config.macros) {
 		if (config.macros[m].init)
 			config.macros[m].init();
 	}
-	t7 = new Date();
+	
 	store.notifyAll();
-	t8 = new Date();
+	
 	restart();
 	refreshDisplay();
-	t9 = new Date();
+	
 	if (pluginProblem) {
 		story.displayTiddler(null, "PluginManager");
 		displayMessage(config.messages.customConfigError);
 	}	
 	backstage.init();
-	t10 = new Date();
-	if (config.options.chkDisplayInstrumentation) {
-		displayMessage("LoadShadows " + (t2-t1) + " ms");
-		displayMessage("LoadFromDiv " + (t3-t2) + " ms");
-		displayMessage("LoadPlugins " + (t5-t4) + " ms");
-		displayMessage("Macro init " + (t7-t6) + " ms");
-		displayMessage("Notify " + (t8-t7) + " ms");
-		displayMessage("Restart " + (t9-t8) + " ms");
-		displayMessage("Total: " + (t10-t0) + " ms");
-	}
+		
 	startingUp = false;
 	// doc.trigger("startup");
 }
@@ -2769,7 +2719,7 @@ config.paramifiers.searchRegExp = {
 
 config.paramifiers.tag = {
 	onstart: function(v) {
-		story.displayTiddlers(null,store.filterTiddlers("[tag["+v+"]]"),null,false,null);
+		story.displayTiddlers(null, store.filterTiddlers("[tag["+v+"]]"), null, false, null);
 	}
 };
 
@@ -2796,12 +2746,6 @@ config.paramifiers.readOnly = {
 	}
 };
 
-config.paramifiers.theme = {
-	onconfig: function(v) {
-		story.switchTheme(v);
-	}
-};
-
 config.paramifiers.upgrade = {
 	onstart: function(v) {
 		upgradeFrom(v);
@@ -2811,16 +2755,16 @@ config.paramifiers.upgrade = {
 config.paramifiers.recent= {
 	onstart: function(v) {
 		var titles=[];
-		var i,tiddlers=store.getTiddlers("modified","excludeLists").reverse();
-		for (i=0; i<v && i<tiddlers.length; i++)
+		var tiddlers = store.getTiddlers("modified", "excludeLists").reverse();
+		for (var i=0; i<v && i<tiddlers.length; i++)
 			titles.push(tiddlers[i].title);
-		story.displayTiddlers(null,titles);
+		story.displayTiddlers(null, titles);
 	}
 };
 
 config.paramifiers.filter = {
 	onstart: function(v) {
-		story.displayTiddlers(null,store.filterTiddlers(v),null,false);
+		story.displayTiddlers(null, store.filterTiddlers(v), null, false);
 	}
 };
 
@@ -3201,8 +3145,7 @@ config.formatters = [
 	name: "prettyLink",
 	match: "\\[\\[",
 	lookaheadRegExp: /\[\[(.*?)(?:\|(~)?(.*?))?\]\]/mg,
-	handler: function(w)
-	{
+	handler: function(w) {
 		this.lookaheadRegExp.lastIndex = w.matchStart;
 		var lookaheadMatch = this.lookaheadRegExp.exec(w.source);
 		if (lookaheadMatch && lookaheadMatch.index == w.matchStart) {
@@ -3212,13 +3155,13 @@ config.formatters = [
 				// Pretty bracketted link
 				var link = lookaheadMatch[3];
 				e = (!lookaheadMatch[2] && config.formatterHelpers.isExternalLink(link)) ?
-						renderExternalLink(w.output,link) : renderTiddlyLink(w.output,link,false,null,w.isStatic,w.tiddler);
+						renderExternalLink(w.output,link) : renderTiddlyLink(w.output, link, false, null, w.isStatic, w.tiddler);
 			} else {
 				// Simple bracketted link
-				e = renderTiddlyLink(w.output,text,false,null,w.isStatic,w.tiddler);
+				e = renderTiddlyLink(w.output, text, false, null, w.isStatic, w.tiddler);
 			}
 			if (text.substring(0, 2) == "##") text = text.substring(2); // patched by Vodi
-			createTiddlyText(e,text);
+			createTiddlyText(e, text);
 			w.nextMatch = this.lookaheadRegExp.lastIndex;
 		}
 	}
@@ -3243,7 +3186,7 @@ config.formatters = [
 			var e = w.output;
 			if (lookaheadMatch[5]) {
 				var link = lookaheadMatch[5];
-				e = config.formatterHelpers.isExternalLink(link) ? renderExternalLink(w.output,link) : renderTiddlyLink(w.output,link,false,null,w.isStatic,w.tiddler);
+				e = config.formatterHelpers.isExternalLink(link) ? renderExternalLink(w.output,link) : renderTiddlyLink(w.output, link, false, null, w.isStatic, w.tiddler);
 				jQuery(e).addClass("imageLink");
 			}
 			var img = createTiddlyElement(e,"img");
@@ -3546,11 +3489,8 @@ Wikifier.prototype.outputText = function(place, startPos, endPos) {
 
 function wikify(articleSource, targetDomElement, highlightRegExp, tiddler) {
 	if (articleSource) {
-		var wikifier = new Wikifier(articleSource, getParser(tiddler), highlightRegExp, tiddler);
-		var t0 = new Date();
-		wikifier.subWikify(targetDomElement);
-		if (tiddler && config.options.chkDisplayInstrumentation)
-			displayMessage("wikify:" + tiddler.title + " in " + (new Date()-t0) + " ms");
+		var wikifier = new Wikifier(articleSource, getParser(tiddler), highlightRegExp, tiddler);		
+		wikifier.subWikify(targetDomElement);		
 	}
 }
 
@@ -3707,8 +3647,8 @@ config.macros.list.refresh = function(list) {
 	if (!template) {
 		template = config.macros.list.template;
 	}
-	if (this[type].prompt)
-		createTiddlyElement(list, "li", null, "listTitle", this[type].prompt);
+	if (this[type].hint)
+		createTiddlyElement(list, "li", null, "listTitle", this[type].hint);
 	var results;
 	if (this[type].handler)
 		results = this[type].handler(params);
@@ -3916,31 +3856,9 @@ config.macros.tags.handler = function(place,macroName,params,wikifier,paramStrin
 		createTiddlyElement(ul,"li",null,"listTitle",lingo.labelNoTags.format([tiddler.title]));
 };
 
-// ToDo: Instead of creating a flat list of tagged articles for ONE tag, create a tree of tags vs. articles (like timeline)
-
-config.macros.tagging.handler = function(place,macroName,params,wikifier,paramString,tiddler) { // Implements IMacroResolver.handler()
-	params = paramString.parseParams("anon",null,true,false,false);
-	var ul = createTiddlyElement(place,"ul");
-	var title = getParam(params,"anon","");
-	if (title == "" && tiddler instanceof Tiddler)
-		title = tiddler.title;
-	var sep = getParam(params,"sep"," ");
-	ul.setAttribute("title", this.tooltip.format([title]));
-	var sortby = getParam(params,"sortBy",false);
-	var tagged = store.getTaggedTiddlers(title,sortby);
-	var prompt = tagged.length == 0 ? this.labelNotTag : this.label;
-	createTiddlyElement(ul,"li",null,"listTitle",prompt.format([title,tagged.length]));
-	var t;
-	for (t=0; t<tagged.length; t++) {
-		renderTiddlyLink(createTiddlyElement(ul,"li"),tagged[t].title,true);
-		if (t < tagged.length-1)
-			createTiddlyText(ul,sep);
-	}
-};
-
-config.macros.saveChanges.handler = function(place,macroName,params) { // Implements IMacroResolver.handler()
+config.macros.saveChanges.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
 	if (!readOnly)
-		renderTiddlyButton(place, params[0] || this.label, params[1] || this.prompt, this.onClick, null, null, this.accessKey);
+		renderTiddlyButton(place, params[0] || this.label, params[1] || this.hint, this.onClick, null, null, this.accessKey);
 };
 
 config.macros.saveChanges.onClick = function(e) {
@@ -3982,7 +3900,7 @@ config.macros.gradient.handler = function(place, macroName, params, wikifier, pa
 /**
 	* Message macro. Searches the "config" object container for a given message qualifier and renders a span containing the message text.
 	*
-	* @param  {object[]} params - Accepts only two string parameters. 1st has to be a string like "views.editor.tagPrompt" - the fully qualified name of the internal message string. 2nd can be a format string.
+	* @param  {object[]} params - Accepts only two string parameters. 1st has to be a string like "views.editor.tagHint" - the fully qualified name of the internal message string. 2nd can be a format string.
 */
 
 config.macros.message.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
@@ -4014,8 +3932,8 @@ config.macros.view.views = {
 	text: function(value,place,params,wikifier,paramString,tiddler) {
 		highlightify(value, place, highlightHack, tiddler);
 	},
-	link: function(value,place,params,wikifier,paramString,tiddler) {
-		renderTiddlyLink(place,value,true);
+	link: function(value, place, params, wikifier, paramString, tiddler) {
+		renderTiddlyLink(place, value, true);
 	},
 	wikified: function(value,place,params,wikifier,paramString,tiddler) {
 		if (config.macros.view.depth>50)
@@ -4106,6 +4024,11 @@ config.macros.tagChooser.onClick = function(ev) {
 	return false;
 };
 
+/**
+	* Event handler after clicking on a tag - will assign the tag to the article.
+	*
+	* @param  {element} ev - the <a> which represented the tag
+*/
 config.macros.tagChooser.onTagClick = function(ev) { // (do not mix up with onClickTag)
 	var e = ev || window.event;
 	if (e.metaKey || e.ctrlKey) stopEvent(e); //# keep popup open on CTRL-click
@@ -4119,14 +4042,14 @@ config.macros.tagChooser.onTagClick = function(ev) { // (do not mix up with onCl
 config.macros.tagChooser.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
 	if (tiddler instanceof Tiddler) {
 		var lingo = config.views.editor.tagChooser;
-		var btn = renderTiddlyButton(place, lingo.text, lingo.tooltip, this.onClick);
+		var btn = renderTiddlyButton(place, lingo.text, lingo.hint, this.onClick);
 		btn.setAttribute("tiddler", tiddler.title);
-		btn.setAttribute("tags",params[0]);
+		btn.setAttribute("tags", params[0]);
 	}
 };
 
 config.macros.refreshDisplay.handler = function(place) { // Implements IMacroResolver.handler()
-	renderTiddlyButton(place,this.label,this.prompt,this.onClick);
+	renderTiddlyButton(place, this.label, this.hint, this.onClick);
 };
 
 config.macros.refreshDisplay.onClick = function(e) {
@@ -4138,21 +4061,19 @@ config.macros.refreshDisplay.onClick = function(e) {
 //-- NewTiddler macros
 //--
 
-config.macros.newTiddler.createNewTiddlerButton = function(place, title, params, label, prompt, accessKey, newFocus) {
+config.macros.newTiddler.createNewTiddlerButton = function(place, title, params, label, hint, accessKey, newFocus) {
 	var tags = [];
 	var t;
-	for (t=1; t<params.length; t++) {
-		if ((params[t].name == "anon" && t != 1) || (params[t].name == "tag"))
-			tags.push(params[t].value);
+	for (t = 1; t < params.length; t++) {
+		if ((params[t].name == "anon" && t != 1) || (params[t].name == "tag")) tags.push(params[t].value);
 	}
-	label = getParam(params,"label",label);
-	prompt = getParam(params,"prompt",prompt);
-	accessKey = getParam(params,"accessKey",accessKey);
+	label = getParam(params, "label", label);
+	hint = getParam(params, "prompt", hint);
+	accessKey = getParam(params, "accessKey", accessKey);
 	newFocus = getParam(params, "focus", newFocus);
-	var customFields = getParam(params,"fields","");
-	if (!customFields && !store.isShadowTiddler(title))
-		customFields = String.encodeHashMap(config.defaultCustomFields);
-	var btn = renderTiddlyButton(place,label,prompt,this.onClickNewTiddler,null,null,accessKey);
+	var customFields = getParam(params, "fields", "");
+	if (!customFields && !store.isShadowTiddler(title)) customFields = String.encodeHashMap(config.defaultCustomFields);
+	var btn = renderTiddlyButton(place, label, hint, this.onClickNewTiddler, null, null, accessKey);
 	btn.setAttribute("newTitle", title);	
 	if (tags.length > 0)
 		btn.setAttribute("params",tags.join("|"));
@@ -4189,12 +4110,12 @@ config.macros.newTiddler.onClickNewTiddler = function() {
 	return false;
 };
 
-config.macros.newTiddler.handler = function(place,macroName,params,wikifier,paramString) { // Implements IMacroResolver.handler()
+config.macros.newTiddler.handler = function(place, macroName, params, wikifier, paramString) { // Implements IMacroResolver.handler()
 	if (!readOnly) {
 		params = paramString.parseParams("anon",null,true,false,false);
 		var title = params[1] && params[1].name == "anon" ? params[1].value : this.title;
 		title = getParam(params,"title",title);
-		this.createNewTiddlerButton(place, title, params, this.label, this.prompt, this.accessKey, "title");
+		this.createNewTiddlerButton(place, title, params, this.label, this.hint, this.accessKey, "title");
 	}
 };
 
@@ -4204,7 +4125,7 @@ config.macros.newTiddler.handler = function(place,macroName,params,wikifier,para
 
 config.macros.search.handler = function(place,macroName,params,wikifier,paramString,tiddler) { // Implements IMacroResolver.handler()
 	params = paramString.parseParams("anon",null,false,false,false);
-	renderTiddlyButton(place,this.label,this.prompt,this.onClick,"searchButton");
+	renderTiddlyButton(place, this.label, this.hint, this.onClick, "searchButton");
 	var txt = createTiddlyElement(null,"input",null,"txtOptionInput searchField");
 	txt.value = getParam(params,"anon","");
 	if (config.browser.isSafari) {
@@ -4287,19 +4208,18 @@ config.macros.tabs.handler = function(place, macroName, params) { // Implements 
 	var t;
 	for (t = 0; t < numTabs; t++) {
 		var label = params[t * 3 + 1];
-		var prompt = params[t * 3 + 2];
+		var tooltip = params[t * 3 + 2];
 		var content = params[t * 3 + 3];
-		var tab = renderTiddlyButton(tabset, label, prompt, this.onClickTab, "tab tabUnselected");		
+		var tab = renderTiddlyButton(tabset, label, tooltip, this.onClickTab, "tab tabUnselected");		
 		tab.setAttribute("tab", label);
 		tab.setAttribute("content", content);
-		tab.title = prompt;		
 	}	
 	place.appendChild(wrapper);
 	this.switchTab(tabset, params[1]);
 };
 
 config.macros.tabs.onClickTab = function(e) {
-	config.macros.tabs.switchTab(this.parentNode,this.getAttribute("tab"));
+	config.macros.tabs.switchTab(this.parentNode, this.getAttribute("tab"));
 	return false;
 };
 
@@ -4346,7 +4266,7 @@ config.macros.toolbar.createCommand = function(place, commandName, tiddler, clas
 			var text = command.getText ? command.getText(tiddler) : this.getCommandText(command,tiddler);
 			var tooltip = command.getTooltip ? command.getTooltip(tiddler) : this.getCommandTooltip(command,tiddler);
 			var cmd = command.type == "popup" ? this.onClickPopup : this.onClickCommand;
-			var btn = renderTiddlyButton(null,text,tooltip,cmd);
+			var btn = renderTiddlyButton(null, text, tooltip, cmd);
 			btn.setAttribute("commandName",commandName);
 			btn.setAttribute("tiddler",tiddler.title);
 			jQuery(btn).addClass("command_" + commandName);
@@ -4496,11 +4416,11 @@ config.commands.closeTiddler.handler = function(event, src, title) {
 	return false;
 };
 
-config.commands.editTiddler.handler = function(event,src,title) {
+config.commands.editTiddler.handler = function(event, src, title) {
 	clearMessage();
 	var tiddlerElem = story.getTiddler(title);
 	var fields = tiddlerElem.getAttribute("tiddlyFields");
-	story.displayTiddler(null,title,DEFAULT_EDIT_TEMPLATE,false,null,fields);
+	story.displayTiddler(null, title, DEFAULT_EDIT_TEMPLATE, false, null, fields);
 	var e = story.getTiddlerField(title,config.options.txtEditorFocus||"text");
 	if (e) {
 		setCaretPosition(e,0);
@@ -4511,27 +4431,27 @@ config.commands.editTiddler.handler = function(event,src,title) {
 config.commands.saveTiddler.handler = function(event, src, title) {
 	var newTitle = story.saveTiddler(title);
 	if (newTitle)
-		story.displayTiddler(null,newTitle);
+		story.displayTiddler(null, newTitle);
 	return false;
 };
 
-config.commands.cancelTiddler.handler = function(event,src,title) {
+config.commands.cancelTiddler.handler = function(event, src, title) {
 	if (story.hasChanges(title) && !readOnly) {
 		if (!confirm(this.warning.format([title])))
 			return false;
 	}
 	story.setDirty(title,false);
-	story.displayTiddler(null,title);
+	story.displayTiddler(null, title);
 	return false;
 };
 
-config.commands.deleteTiddler.handler = function(event,src,title) {
+config.commands.deleteTiddler.handler = function(event, src, title) {
 	var deleteIt = true;
 	if (config.options.chkConfirmDelete)
 		deleteIt = confirm(this.warning.format([title]));
 	if (deleteIt) {
 		store.removeTiddler(title);
-		story.closeTiddler(title,true);
+		story.closeTiddler(title, true);
 		autoSaveChanges();
 	}
 	return false;
@@ -4544,13 +4464,13 @@ config.commands.permalink.handler = function(event,src,title) {
 	return false;
 };
 
-config.commands.references.handlePopup = function(popup,title) {
+config.commands.references.handlePopup = function(popup, title) {
 	var references = store.getReferringTiddlers(title);
 	var c = false;
 	var r;
-	for (r=0; r<references.length; r++) {
+	for (r = 0; r < references.length; r++) {
 		if (references[r].title != title && !references[r].isTagged("excludeLists")) {
-			renderTiddlyLink(createTiddlyElement(popup,"li"),references[r].title,true);
+			renderTiddlyLink(createTiddlyElement(popup,"li"), references[r].title, true);
 			c = true;
 		}
 	}
@@ -4558,10 +4478,10 @@ config.commands.references.handlePopup = function(popup,title) {
 		createTiddlyElement(popup, "li", null, "disabled", this.popupNone);
 };
 
-config.commands.jump.handlePopup = function(popup,title) {
+config.commands.jump.handlePopup = function(popup, title) {
 	story.forEachTiddler(function(title,element) {
-		renderTiddlyLink(createTiddlyElement(popup,"li"),title,true,null,false,null,true);
-		});
+		renderTiddlyLink(createTiddlyElement(popup,"li"), title, true, null, false, null, true);
+	});
 };
 
 config.commands.fields.handlePopup = function(popup,title) {
@@ -4604,8 +4524,7 @@ Tiddler.prototype.getLinks = function() {
 // Returns the fields that are inherited in string field:"value" field2:"value2" format
 Tiddler.prototype.getInheritedFields = function() {
 	var f = {};
-	var i;
-	for (i in this.fields) {
+	for (var i in this.fields) {
 		if (i=="server.host" || i=="server.workspace" || i=="wikiformat"|| i=="server.type") {
 			f[i] = this.fields[i];
 		}
@@ -5615,74 +5534,35 @@ Story.prototype.forEachTiddler = function(fn) {
 };
 
 Story.prototype.displayDefaultTiddlers = function() { // todo: instead of having a "DefaultTiddlers" tiddler, make an option!
-	this.displayTiddlers(null,store.filterTiddlers(store.getTiddlerText("DefaultTiddlers")));
+	this.displayTiddlers(null, store.filterTiddlers(store.getTiddlerText("DefaultTiddlers")));
 };
 
-Story.prototype.displayTiddlers = function(srcElement,titles,template,animate,unused,customFields,toggle) {
-	var t;
-	for (t = titles.length-1;t>=0;t--)
-		this.displayTiddler(srcElement,titles[t],template,animate,unused,customFields);
+Story.prototype.displayTiddlers = function(unused, titles, template, unused, unused, customFields) {
+	for (var t = titles.length - 1; t >= 0; t--) this.displayTiddler(null, titles[t], template, null, null, customFields);
 };
 
-Story.prototype.displayTiddler = function(srcElement,tiddler,template,animate,unused,customFields,toggle,animationSrc) {
+Story.prototype.displayTiddler = function(unused, tiddler, template, unused, unused, customFields) {
 	var title = (tiddler instanceof Tiddler) ? tiddler.title : tiddler;
 	var tiddlerElem = this.getTiddler(title);
 	if (tiddlerElem) {
-		if (toggle) {
-			if (tiddlerElem.getAttribute("dirty") != "true")
-				this.closeTiddler(title,true);
-		} else {
-			this.refreshTiddler(title,template,false,customFields);
-		}
+		this.refreshTiddler(title, template, false, customFields);
 	} else {
-		var place = this.getContainer();
-		var before = this.positionTiddler(srcElement);
-		tiddlerElem = this.createTiddler(place,before,title,template,customFields);
-	}
-	if (animationSrc && typeof animationSrc !== "string") {
-		srcElement = animationSrc;
-	}
-	if (srcElement && typeof srcElement !== "string") {		
-		window.scrollTo(0,ensureVisible(tiddlerElem));
-	}
+		var place = this.getContainer();		
+		tiddlerElem = this.createTiddler(place, null, title, template, customFields);
+	}	
 	return tiddlerElem;
-};
-
-Story.prototype.positionTiddler = function(srcElement) {
-	var place = this.getContainer();
-	var before = null;
-	if (typeof srcElement == "string") {
-		switch(srcElement) {
-		case "top":
-			before = place.firstChild;
-			break;
-		case "bottom":
-			before = null;
-			break;
-		}
-	} else {
-		var after = this.findContainingTiddler(srcElement);
-		if (after == null) {
-			before = place.firstChild;
-		} else if (after.nextSibling) {
-			before = after.nextSibling;
-			if (before.nodeType != 1)
-				before = null;
-		}
-	}
-	return before;
 };
 
 Story.prototype.createTiddler = function(place, before, title, template, customFields) {
 	var tiddlerElem = createTiddlyElement(null, "div", this.createIdFromTitle(title), "tiddler");
 	tiddlerElem.setAttribute("refresh","tiddler");
 	if (customFields)
-		tiddlerElem.setAttribute("tiddlyFields",customFields);
-	place.insertBefore(tiddlerElem,before);
+		tiddlerElem.setAttribute("tiddlyFields", customFields);
+	place.insertBefore(tiddlerElem, before);
 	var defaultText = null;
 	if (!store.tiddlerExists(title) && !store.isShadowTiddler(title))
 		defaultText = this.loadMissingTiddler(title,customFields);
-	this.refreshTiddler(title,template,false,customFields,defaultText);
+	this.refreshTiddler(title, template, false, customFields, defaultText);
 	return tiddlerElem;
 };
 
@@ -5700,7 +5580,7 @@ Story.prototype.loadMissingTiddler = function(title,fields,callback) {
 				store.setDirty(dirty);
 			autoSaveChanges();
 		} else {
-			story.refreshTiddler(context.title,null,true);
+			story.refreshTiddler(context.title, null, true);
 		}
 		context.adaptor.close();
 		if (callback) {
@@ -5715,7 +5595,7 @@ Story.prototype.loadMissingTiddler = function(title,fields,callback) {
 	context.host = tiddler.fields['server.host'];
 	context.workspace = tiddler.fields['server.workspace'];
 	var adaptor = new config.adaptors[context.serverType]();
-	adaptor.getTiddler(title,context,null,getTiddlerCallback);
+	adaptor.getTiddler(title, context, null, getTiddlerCallback);
 	return config.messages.loadingMissingTiddler.format([title,context.serverType,context.host,context.workspace]);
 };
 
@@ -5731,24 +5611,26 @@ Story.prototype.getTemplateForTiddler = function(title, template, tiddler) {
 	return store.getRecursiveTiddlerText(template,null,10);
 };
 
-Story.prototype.refreshTiddler = function(title,template,force,customFields,defaultText) {
+// Renders an article viewer / editor - for existing articles as well as for non-existing articles
+Story.prototype.refreshTiddler = function(title, template, force, customFields, defaultText) {
 	var tiddlerElem = this.getTiddler(title);
 	if (tiddlerElem) {
 		if (tiddlerElem.getAttribute("dirty") == "true" && !force)
 			return tiddlerElem;
-		template = this.chooseTemplateForTiddler(title,template);
+		
+		template = this.chooseTemplateForTiddler(title, template);
+		
 		var currTemplate = tiddlerElem.getAttribute("template");
 		if ((template != currTemplate) || force) {
 			var tiddler = store.getTiddler(title);
-			if (!tiddler) {
+			
+			if (! tiddler) {
 				tiddler = new Tiddler();
 				if (store.isShadowTiddler(title)) {
 					var tags = [];
 					tiddler.set(title, store.getTiddlerText(title), config.views.wikified.shadowModifier, version.date, tags, version.date);
 				} else {
-					var text = template=="EditTemplate" ?
-								config.views.editor.defaultText.format([title]) :
-								config.views.wikified.defaultText.format([title]);
+					var text = (template == "EditTemplate") ? config.views.editor.defaultText.format([title]) : config.views.wikified.defaultText.format([title]);
 					text = defaultText || text;
 					var fields = customFields ? customFields.decodeHashMap() : null;
 					tiddler.set(title, text, config.views.wikified.defaultModifier, version.date, [], version.date, fields);
@@ -6087,7 +5969,7 @@ Story.prototype.switchTheme = function(theme) { // todo: remove theming
 	var et = config.tiddlerTemplates[ei];
 
 	var i;
-	for ( i = 0; i < config.notifyTiddlers.length; i++) {
+	for (i = 0; i < config.notifyTiddlers.length; i++) {
 		var name = config.notifyTiddlers[i].name;
 		switch(name) {		
 		case "StyleSheet":
@@ -6149,7 +6031,7 @@ var backstage = {
 		
 		this.panelBody = createTiddlyElement(this.panel, "div", null, "backstagePanelBody");
 		
-		createTiddlyText(this.tabBar, cmb.prompt);
+		createTiddlyText(this.tabBar, cmb.hint);
 		for (t = 0; t < config.backstageTasks.length; t++) {
 			var taskName = config.backstageTasks[t];
 			var task = config.tasks[taskName];
@@ -6254,7 +6136,7 @@ config.macros.backstage = {};
 config.macros.backstage.handler = function(place,macroName,params) { // Implements IMacroResolver.handler()
 	var backstageTask = config.tasks[params[0]];
 	if (backstageTask)
-		renderTiddlyButton(place,backstageTask.text,backstageTask.tooltip,function(e) {backstage.switchTab(params[0]); return false;});
+		renderTiddlyButton(place, backstageTask.text, backstageTask.tooltip, function(e) {backstage.switchTab(params[0]); return false;});
 };
 
 //--
@@ -6586,7 +6468,7 @@ config.macros.importTiddlers.doImport = function(e) {
 	wizard.addStep(me.step4Title.format([rowNames.length]),me.step4Html);
 	for (t=0; t<rowNames.length; t++) {
 		var link = document.createElement("div");
-		renderTiddlyLink(link,rowNames[t],true);
+		renderTiddlyLink(link, rowNames[t], true);
 		var place = wizard.getElement("markReport");
 		place.parentNode.insertBefore(link,place);
 	}
@@ -7466,8 +7348,7 @@ function recreateOriginal() {
 function saveChanges(onlyIfDirty, tiddlers) {
 	if (onlyIfDirty && !store.isDirty())
 		return;
-	clearMessage();
-	var t0 = new Date();
+	clearMessage();	
 	var msg = config.messages;
 	var originalPath = document.location.toString();
 	if (!window.allowSave()) {
@@ -7500,9 +7381,7 @@ function saveChanges(onlyIfDirty, tiddlers) {
 			saveEmpty(localPath,original,posDiv);
 		if (co.chkGenerateAnRssFeed && saveRss instanceof Function)
 			saveRss(localPath);
-	}
-	if (co.chkDisplayInstrumentation)
-		displayMessage("saveChanges " + (new Date()-t0) + " ms");
+	}	
 }
 
 function saveMain(localPath,original,posDiv) {
@@ -7674,8 +7553,7 @@ window.saveFile = window.saveFile || function(fileUrl,content) {
 }
 
 // Load a file from filesystem [Preemption]
-window.loadFile = window.loadFile || function(fileUrl)
-{
+window.loadFile = window.loadFile || function(fileUrl) {
 	var r = mozillaLoadFile(fileUrl);
 	if ((r == null) || (r == false))
 		r = ieLoadFile(fileUrl);
@@ -7947,14 +7825,15 @@ function encodeBase64(data) {
 		chr1=chr2=chr3=enc1=enc2=enc3=enc4="";
 	}
 	return out;
-}//--
+}
+
+//--
 //-- Filesystem utilities
 //--
 
 function convertUTF8ToUnicode(u) {
 	return config.browser.isOpera || !window.netscape ? manualConvertUTF8ToUnicode(u) : mozConvertUTF8ToUnicode(u);
 }
-
 
 function manualConvertUTF8ToUnicode(utf) {
 	var uni = utf;
@@ -8035,6 +7914,7 @@ function convertUriToUTF8(uri,charSet) {
 	}
 	return converter.convertURISpecToUTF8(uri,charSet);
 }
+
 //--
 //-- Server adaptor base class
 //--
@@ -8137,7 +8017,7 @@ FileAdaptor.prototype.getWorkspaceList = function(context,userParams,callback)
 };
 
 // Gets the list of tiddlers within a given workspace
-FileAdaptor.prototype.getTiddlerList = function(context,userParams,callback,filter) {
+FileAdaptor.prototype.getTiddlerList = function(context, userParams, callback, filter) {
 	context = this.setContext(context,userParams,callback);
 	if (!context.filter)
 		context.filter = filter;
@@ -8243,8 +8123,7 @@ config.defaultAdaptor = FileAdaptor.serverType;
 //-- HTTP request code
 //--
 
-function ajaxReq(args)
-{
+function ajaxReq(args) {
 	if (args.file || args.url.startsWith("file"))  // LOCAL FILE
 		return localAjax(args);
 	return jQuery.ajax(args);
@@ -8317,6 +8196,7 @@ function httpReq(type,url,callback,params,headers,data,contentType,username,pass
 	}
 	return jQuery.ajax(options);
 }
+
 //--
 //-- TiddlyWiki-specific utility functions
 //--
@@ -8417,28 +8297,40 @@ function createTiddlyElement(parent, tagName, id, className, text, attribs) {
 	return e;
 }
 
+/**
+	* Renders a link.
+	*
+	* @param  {element}   parent    - Optional. The newly created link will be appended as new child to the parent element.
+	* @param  {string}    text      - Optional. The text will become the inner html of the <a>...</a>.
+	* @param  {string}    tooltip   - Optional.
+	* @param  {function}  action    - Optional. This delegate will be called when the link is invoked.
+	* @param  {string}    className - Optional. A CSS class name. If omitted, "button" will be used as default.
+	* @param  {string}    id        - Optional.
+	* @param  {string}    accessKey - Optional.
+	* @param  {hashtable} attribs   - Optional. These attributes will be added to the <a> tag.
+*/
 function renderTiddlyButton(parent, text, tooltip, action, className, id, accessKey, attribs) {
-	var i, btn = document.createElement("a");
-	btn.setAttribute("href","javascript:;");
+	var btn = document.createElement("a");
+	btn.setAttribute("href", "javascript:;");
 	if (action) {
 		btn.onclick = action;
 	}
 	if (tooltip)
-		btn.setAttribute("title",tooltip);
+		btn.setAttribute("title", tooltip);
 	if (text)
 		btn.appendChild(document.createTextNode(text));
 	btn.className = className || "button";
 	if (id)
 		btn.id = id;
 	if (attribs) {
-		for (i in attribs) {
+		for (var i in attribs) {
 			btn.setAttribute(i, attribs[i]);
 		}
 	}
 	if (parent)
 		parent.appendChild(btn);
 	if (accessKey)
-		btn.setAttribute("accessKey",accessKey);
+		btn.setAttribute("accessKey", accessKey);
 	return btn;
 }
 
@@ -8488,33 +8380,36 @@ function onClickTiddlerLink(ev) {
 	var target = resolveTarget(e);
 	var link = target;
 	var title = null;
-	var fields = null;
-	var noToggle = null;
+	var fields = null;	
 	do {
 		title = link.getAttribute("tiddlyLink");
 		fields = link.getAttribute("tiddlyFields");
-		noToggle = link.getAttribute("noToggle");
 		link = link.parentNode;
 	} while (title == null && link != null);
 	if (!store.isShadowTiddler(title)) {
 		var f = fields ? fields.decodeHashMap() : {};
 		fields = String.encodeHashMap(merge(f,config.defaultCustomFields,true));
 	}
-	if (title) {
-		var toggling = e.metaKey || e.ctrlKey;
-		if (config.options.chkToggleLinks)
-			toggling = !toggling;
-		if (noToggle)
-			toggling = false;
+	if (title) {		
 		if (store.getTiddler(title))
 			fields = null;
-		story.displayTiddler(target,title,null,true,null,fields,toggling);
+		story.displayTiddler(target, title, null, true, null, fields);
 	}
 	clearMessage();
 	return false;
 }
 
-function renderTiddlyLink(place, titleAndSection, useTitleAsLabel, className, isStatic, linkedFromTiddler, noToggle) {	
+/**
+	* Renders a link.
+	*
+	* @param  {element} place - ???
+	* @param  {string}  titleAndSection - ???
+	* @param  {boolean} useTitleAsLabel - If true, the title will become the inner html of the <a>...</a> tag. Otherwise it'll be left empty, so one has to insert stuff afterwards.
+	*
+	* @return {element} - An <a> element.
+*/
+
+function renderTiddlyLink(place, titleAndSection, useTitleAsLabel, className, isStatic, linkedFromTiddler) {	
 	var t = story.findContainingTiddler(place); 
 	var tid = t ? t.getAttribute('tiddler') : '';
 	var parts = titleAndSection.split(config.textPrimitives.sectionSeparator);
@@ -8525,13 +8420,11 @@ function renderTiddlyLink(place, titleAndSection, useTitleAsLabel, className, is
 	title = title.trim();
 	var label = useTitleAsLabel ? title : null;
 	var i = getTiddlyLinkInfo(title, className);
-	var btn = isStatic ? renderExternalLink(place,store.getTiddlerText("SiteUrl",null) + "#" + title) : renderTiddlyButton(place, label, i.subTitle, onClickTiddlerLink, i.classes);
+	var btn = isStatic ? renderExternalLink(place, store.getTiddlerText("SiteUrl", null) + "#" + title) : renderTiddlyButton(place, label, i.subTitle, onClickTiddlerLink, i.classes);
 	if (isStatic)
 		btn.className += ' ' + className;
 	btn.setAttribute("refresh", "link");
-	btn.setAttribute("tiddlyLink", title);
-	if (noToggle)
-		btn.setAttribute("noToggle", "true");
+	btn.setAttribute("tiddlyLink", title);	
 	if (linkedFromTiddler) {
 		var fields = linkedFromTiddler.getInheritedFields();
 		if (fields)
@@ -8540,7 +8433,7 @@ function renderTiddlyLink(place, titleAndSection, useTitleAsLabel, className, is
 	if (section) {
 		btn.setAttribute('section', section);
 		if (! store.getTiddlerText(title + config.textPrimitives.sectionSeparator + section))
-			addClass(btn,'tiddlyLinkNonExistingSection');
+			addClass(btn, 'tiddlyLinkNonExistingSection');
 	}
 	return btn;
 }
@@ -8568,19 +8461,12 @@ function createTiddlyDropDown(place, onchange, options, defaultValue) {
 //-- TiddlyWiki-specific popup utility functions
 //--
 
-// Event handler for 'open all' on a tiddler popup
-function onClickTagOpenAll(ev) {
-	var tiddlers = store.getTaggedTiddlers(this.getAttribute("tag"));
-	var sortby = this.getAttribute("sortby");
-	if (sortby&&sortby.length) {
-		store.sortTiddlers(tiddlers,sortby);
-	}
-	story.displayTiddlers(this,tiddlers);
-	return false;
-}
-
-// Event handler for clicking on a tiddler tag (do not mix up with onTagClick)
-function onClickTag(ev) {
+/**
+	* Event handler after clicking on a tag - will pop up a list of articles matching the clicked tag.
+	*
+	* @param  {element} ev - the <a> which represented the tag
+*/
+function onClickTag(ev) { // (do not mix up with onTagClick)
 	var e = ev || window.event;
 	var popup = Popup.create(this);
 	jQuery(popup).addClass("taggedTiddlerList");
@@ -8600,19 +8486,13 @@ function onClickTag(ev) {
 		}
 		var lingo = config.views.wikified.tag;
 		if (titles.length > 0) {
-			var openAll = renderTiddlyButton(createTiddlyElement(popup, "li"), lingo.openAllText.format([tag]), lingo.openAllTooltip, onClickTagOpenAll); // "open all"
-			openAll.setAttribute("tag", tag);
-			openAll.setAttribute("sortby", sortby);
 			createTiddlyElement(createTiddlyElement(popup, "li", null, "listBreak"), "div");
 			for (r = 0; r < titles.length; r++) {
-				renderTiddlyLink(createTiddlyElement(popup,"li"),titles[r],true);
+				renderTiddlyLink(createTiddlyElement(popup,"li"), titles[r], true);
 			}
 		} else {
-			createTiddlyElement(popup, "li", null, "disabled", lingo.popupNone.format([tag]));
-		}
-		createTiddlyElement(createTiddlyElement(popup, "li", null, "listBreak"), "div");
-		var h = renderTiddlyLink(createTiddlyElement(popup, "li"), tag, false);
-		createTiddlyText(h, lingo.openTag.format([tag])); // "open tag 'foo'"
+			createTiddlyElement(popup, "li", null, "disabled", lingo.popupNone.format([tag])); // HACK: Kann theoretisch niemals vorkommen, dass tags aufgelistet werden, für die es keine Artikel gibt.
+		}		
 	}
 	Popup.show();
 	e.cancelBubble = true;
@@ -8621,7 +8501,7 @@ function onClickTag(ev) {
 }
 
 // Create a button for a tag with a popup listing all the tiddlers that it tags
-function createTagButton(place,tag,excludeTiddler,title,tooltip) {
+function createTagButton(place, tag, excludeTiddler, title, tooltip) {
 	var btn = renderTiddlyButton(place, title || tag, (tooltip || config.views.wikified.tag.tooltip).format([tag]), onClickTag);
 	btn.setAttribute("tag", tag);
 	if (excludeTiddler)
@@ -8773,13 +8653,13 @@ Wizard.prototype.clear = function() {
 	jQuery(this.bodyElem).empty();
 };
 
-Wizard.prototype.setButtons = function(buttonInfo,status) {
+Wizard.prototype.setButtons = function(buttonInfo, status) {
 	jQuery(this.footElem).empty();
 	var t;
 	for (t=0; t<buttonInfo.length; t++) {
-		renderTiddlyButton(this.footElem,buttonInfo[t].caption,buttonInfo[t].tooltip,buttonInfo[t].onClick);
+		renderTiddlyButton(this.footElem, buttonInfo[t].caption, buttonInfo[t].tooltip, buttonInfo[t].onClick);
 		insertSpacer(this.footElem);
-		}
+	}
 	if (typeof status == "string") {
 		createTiddlyElement(this.footElem,"span",null,"status",status);
 	}
@@ -8904,9 +8784,9 @@ ListView.forEachSelector = function(view,callback) {
 ListView.getSelectedRows = function(view) {
 	var rowNames = [];
 	ListView.forEachSelector(view,function(e,rowName) {
-				if (e.checked)
-					rowNames.push(rowName);
-				});
+		if (e.checked)
+			rowNames.push(rowName);
+	});
 	return rowNames;
 };
 
@@ -9044,8 +8924,8 @@ ListView.columnTypes.TiddlerLink = {
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
 		if (v != undefined) {
-			var link = renderTiddlyLink(place,listObject[columnTemplate.tiddlerLink],false,null);
-			createTiddlyText(link,listObject[field]);
+			var link = renderTiddlyLink(place, listObject[columnTemplate.tiddlerLink], false, null);
+			createTiddlyText(link, listObject[field]);
 		}
 	}
 };
@@ -9247,9 +9127,9 @@ String.prototype.parseParams = function(defaultName, defaultValue, allowEval, no
 			} catch(ex) {
 				throw "Unable to evaluate {{" + match[p+3] + "}}: " + exceptionText(ex);
 			}
-		else if (match[p+4]) // Unquoted
+		else if (match[p + 4]) // Unquoted
 			n = match[p+4];
-		else if (match[p+5]) // empty quote
+		else if (match[p + 5]) // empty quote
 			n = "";
 		return n;
 	};
@@ -9301,10 +9181,9 @@ String.prototype.parseParams = function(defaultName, defaultValue, allowEval, no
 // [[]], {{ }} or left unquoted (and therefore space-separated). Double-braces {{}} results in
 // an *evaluated* parameter: e.g. {{config.options.txtUserName}} results in the current user's name.
 String.prototype.readMacroParams = function(notAllowEval) {
-	var p = this.parseParams("list",null,!notAllowEval,true);
+	var p = this.parseParams("list", null, ! notAllowEval, true);
 	var t,n = [];
-	for (t=1; t<p.length; t++)
-		n.push(p[t].value);
+	for (t = 1; t < p.length; t++) n.push(p[t].value);
 	return n;
 };
 
@@ -9313,8 +9192,7 @@ String.prototype.readBracketedList = function(unique) {
 	var p = this.parseParams("list",null,false,true);
 	var t,n = [];
 	for (t=1; t<p.length; t++) {
-		if (p[t].value)
-			n.pushUnique(p[t].value,unique);
+		if (p[t].value) n.pushUnique(p[t].value,unique);
 	}
 	return n;
 };
@@ -9325,8 +9203,7 @@ String.prototype.getChunkRange = function(start,end) {
 	if (s != -1) {
 		s += start.length;
 		var e = this.indexOf(end,s);
-		if (e != -1)
-			return [s,e];
+		if (e != -1) return [s,e];
 	}
 };
 
@@ -10015,11 +9892,6 @@ Tiddler.prototype.loadFromDiv = function(divRef,title) {
 Tiddler.prototype.saveToDiv = function() {
 	return store.getSaver().externalizeTiddler(store,this);
 };
-
-// @Deprecated: Use story.displayTiddlers instead
-function displayTiddlers(srcElement,titles,template,unused1,unused2,animate,unused3) {
-	story.displayTiddlers(srcElement,titles,template,animate);
-}
 
 // @Deprecated: Use story.displayTiddler instead
 function displayTiddler(srcElement,title,template,unused1,unused2,animate,unused3) {
