@@ -562,179 +562,6 @@ Some dummy text.
 <div title="MenuTree" modifier="YourName" created="201212211816" modified="201701290853" tags="excludeLists excludeSearch" parenttiddler="" changecount="6">
 <pre>{{menuTree{&lt;&lt;tagsTree &quot;.&quot; null 6 &gt;&gt;{{treeButtons{&lt;&lt;newArticleButton &quot;🕀 New Article&quot; true&gt;&gt;&lt;&lt;newArticleButton &quot;🕁 New Sub Article&quot; false&gt;&gt;}}}}}}</pre>
 </div>
-<div title="SectionLinksPlugin" modifier="YourName" created="201501101757" modified="201701301927" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="3">
-<pre>/***
-|Name|SectionLinksPlugin|
-|Source|http://www.TiddlyTools.com/#SectionLinksPlugin|
-|Documentation|http://www.TiddlyTools.com/#SectionLinksPlugin|
-|Version|1.4.2|
-|Author|Eric Shulman (patched by Vodi)|
-|License|http://www.TiddlyTools.com/#LegalStatements|
-|Type|plugin|
-|Description|allow tiddler sections in TiddlyLinks to be used as anchor points|
-This plugin enhances tiddler links so that they can include section references that ''auto-scroll to the indicated section heading'' within a tiddler (i.e., similar to the 'anchor' behavior provided in HTML by {{{&lt;a name=&quot;foo&quot;&gt;}}} and {{{&lt;a href=&quot;#foo&quot;&gt;...&lt;/a&gt;}}}).  The {{{&lt;&lt;tiddler&gt;&gt;}}} macro syntax has also be extended to allow section references without a tiddler name, so that transclusion of //hidden sections from the same tiddler// can be easily accomplished.  The plugin also adds a new macro, &lt;&lt;sectionTOC&gt;&gt; which can auto-generate and embed a 'Table of Contents' outline view into a tiddler to enable quick navigation to sections within that tiddler.
-!!!Usage
-&lt;&lt;&lt;
-!!!!~TiddlyLink syntax
-You can link to a section of a tiddler by adding the &quot;##sectionname&quot; syntax to the tiddlername:
-{{{
-[[SomeTiddler##SomeSection]]
-}}}
-When clicked, the tiddler is displayed and the specified section heading is automatically scrolled into view. If the tiddler title is omitted, e.g.,
-{{{
-[[##SomeSection]]&gt;&gt;
-}}}
-then the current containing tiddler is implied by default.
-!!!!HTML anchor syntax
-You can use HTML syntax to create a scrollable 'anchor' location within a tiddler without use of the standard TW section heading syntax:
-{{{
-&lt;html&gt;&lt;a name=&quot;sectionname&quot; /&gt;&lt;/html&gt;
-}}}
-You can then link to that section using the enhanced TiddlyLink syntax as above.
-!!!!{{{&lt;&lt;tiddler&gt;&gt;}}} macro 
-The {{{&lt;&lt;tiddler&gt;&gt;}}} syntax has been extended so that when the tiddler title is omitted, e.g.,
-{{{
-&lt;&lt;tiddler ##SomeSection&gt;&gt;
-}}}
-then the current containing tiddler is implied by default.
-!!!!&quot;&quot;&quot;&lt;&lt;sectionTOC&gt;&gt;&quot;&quot;&quot; macro
-This macro generates a 'Table of Contents' outline-style bullet list with links to all sections within the current tiddler.  Simply place the following macro at the //end of the tiddler content// (i.e., following all section headings).  Important note: //''The {{{&lt;&lt;sectionTOC&gt;&gt;}}} macro must occur at the end of the tiddler in order to locate the rendered section headings that precede it.''//
-{{{
-&lt;&lt;sectionTOC&gt;&gt; or &lt;&lt;sectionTOC className&gt;&gt;
-}}}
-To position the macro's //output// within the tiddler, you must create a special 'target element' that uses a specific classname (default='sectionTOC'), like this:
-{{{
-{{sectionTOC{}}}
-}}}
-When the {{{&lt;&lt;sectionTOC&gt;&gt;}}} macro is rendered, it will find the matching 'sectionTOC'-classed element and writes it's output there.  You can also add the macro and/or target elements directly to the [[ViewTemplate]] definition, so that every tiddler can automatically display the table of contents:
-{{{
-&lt;span class='sectionTOC'&gt;&lt;/span&gt; &lt;!-- target element --&gt;
-...
-&lt;span macro='sectionTOC'&gt;&lt;/span&gt; &lt;!-- must be at end of tiddler --&gt;
-}}}
-&lt;&lt;&lt;
-!!!Configuration
-&lt;&lt;&lt;
-You can change the {{{&lt;&lt;SectionTOC&gt;&gt;}}} output link format by adding the following statement to a tiddler tagged with &lt;&lt;tag systemConfig&gt;&gt;
-{{{
-config.macros.sectionTOC.linkFormat='[[%0|##%0]]';
-}}}
-The default value (shown above) produces a link to each section within the tiddler, using &quot;%0&quot; to insert the section name into the link.  You can add extra formatting to generate additional output to suit your purposes.  For example, if you have EditSectionPlugin installed, you could include a link that invokes that plugin's popup editor directly from each item in the TOC display, like this:
-{{{
-config.macros.sectionTOC.linkFormat='[[%0|##%0]] &lt;&lt;editSection [[##%0]] [[(edit)]]&gt;&gt;';
-}}}
-&lt;&lt;&lt;
-!!!Revisions
-&lt;&lt;&lt;
-2011.12.21 1.4.2 refactor sectionTOCformat to permit customization
-2011.02.08 1.4.1 in isExternalLink() hijack, strip section references before testing for external link
-2010.08.09 1.4.0 in scrollToSection(), added support for using HTML &lt;a name=&quot;...&quot;&gt; anchor elements
-2009.08.21 1.3.4 added handling to ignore leading/trailing whitespace in section references
-2009.08.21 1.3.3 in renderLinkElement(), add tiddlyLinkNonExistingSection class if matching section is not found
-2009.08.14 1.3.2 in renderLinkElement(), don't override core value for ~TiddlyLink attribute
-2009.08.02 1.3.1 in sectionTOC.handler(), trim leading/trailing whitespace from generated section links
-2009.08.01 1.3.0 in scrollToSection(), apply 3-tier section matching (exact, startsWith, contains)
-2009.07.06 1.2.2 fixed displayTiddler() hijack
-2009.07.03 1.2.1 in {{{&lt;&lt;sectionTOC&gt;&gt;}}}, suppress output if target is not found
-2009.04.09 1.1.1 in sectionTOC macro, make target visible when TOC is rendered.
-2009.01.18 1.1.0 added {{{&lt;&lt;sectionTOC&gt;&gt;}}} macro to generate numbered-bullet links to sections of current tiddler
-2009.01.06 1.0.0 converted to stand-alone plugin
-2008.10.14 0.0.0 initial release (as [[CoreTweaks]] #784 - http://trac.tiddlywiki.org/ticket/784)
-&lt;&lt;&lt;
-!!!Code
-***/
-//{{{
-version.extensions.SectionLinksPlugin= {major: 1, minor: 4, revision: 2, date: new Date(2011,12,21)};
-
-Story.prototype.scrollToSection = function(title, sectionName) {
-	
-	if (! title|| ! sectionName) return;
-	
-	var t = this.getArticleViewByTitle(title);
-	if (! t) return null;
-	
-	var elems = t.getElementsByTagName('*');
-	var heads = [];
-	var anchors = [];
-	var cells = [];
-	
-	for (var i = 0; i &lt; elems.length; i++)
-		if (['H1','H2','H3','H4','H5'].contains(elems[i].nodeName)) heads.push(elems[i]); // todo: optimize this - don't create unnecessary collections
-	
-	for (var i = 0; i &lt; elems.length; i++)
-		if (elems[i].nodeName == 'A' &amp;&amp; (elems[i].getAttribute('name')||'').length) anchors.push(elems[i]);
-	
-	for (var i = 0; i &lt; elems.length; i++)
-		if (elems[i].nodeName == 'TD') cells.push(elems[i]);
-	
-	var foundElement = null;
-	
-	for (var i = 0; i &lt; heads.length; i++)
-		if (getPlainText(heads[i]).trim() == sectionName) { foundElement = heads[i]; break; }
-	
-	if (!foundElement) for (var i = 0; i &lt; anchors.length; i++)
-		if (anchors[i].getAttribute('name') == sectionName) { foundElement = anchors[i]; break; }
-	
-	if (!foundElement) for (var i = 0; i &lt; cells.length; i++)
-		if (getPlainText(cells[i]).trim() == sectionName) { foundElement = cells[i]; break; }
-	
-	if (foundElement) {
-		story.currentTiddler.scrollTop = findPosY(foundElement) - story.currentTiddler.clientHeight / 2;
-		return foundElement;
-	}
-}
-//}}}
-/***
-!!!!core hijacks
-***/
-/***
-&lt;html&gt;&lt;a name=&quot;sampleanchorlink&quot; /&gt;&lt;/html&gt;This is a sample ''anchor link'': {{{&lt;html&gt;&lt;a name=&quot;sampleanchorlink&quot; /&gt;&lt;/html&gt;}}}
-!!!!!tiddler.handler
-***/
-/***
-!!!!sectionTOC macro
-***/
-//{{{
-config.macros.sectionTOC = {
-	targetClass: 'sectionTOC',
-	linkFormat: '[[%0|##%0]]',
-	handler: function(place,macroName,params, wikifier, paramString,tiddler) {
-		var out = [];
-		var targetClass = params[0]||this.targetClass;
-		var t = story.getArticleViewByChild(place);
-		if (! t) return;
-		var elems = t.getElementsByTagName('*');
-		var level = 5; // topmost heading level
-		for (var i = 0; i &lt; elems.length; i++) {
-			var txt = getPlainText(elems[i]).trim();
-			var link = this.linkFormat.format([txt]);
-			switch (elems[i].nodeName) {
-				case 'H1': out.push('#'+link);		level = 1; break;
-				case 'H2': out.push('##'+link);		level = level &lt; 2 ? level : 2; break;
-				case 'H3': out.push('###'+link);	level = level &lt; 3 ? level : 3; break;
-				case 'H4': out.push('####'+link);	level = level &lt; 4 ? level : 4; break;
-				case 'H5': out.push('#####'+link); level = level &lt; 5 ? level : 5; break;
-				default: if (hasClass(elems[i], targetClass)) var target = elems[i];
-			}
-		}
-		// trim excess bullet levels
-		if (level &gt; 1) for (var i = 0; i &lt; out.length; i++) out[i] = out[i].substr(level - 1);
-		// show numbered list
-		if (out.length &amp;&amp; target) {
-			if (target.style.display == 'none') target.style.display = 'block';
-			wikify(out.join('\n'), target);
-		}
-	}
-}
-//}}}
-/***
-!!!Invoke macro
-{{{
-&lt;&lt;sectionTOC&gt;&gt;
-}}}
-***/
-// //&lt;&lt;sectionTOC&gt;&gt;</pre>
-</div>
 <div title="SinglePageModeByVodi" modifier="YourName" created="201304041401" modified="201910120916" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="22">
 <pre>/***
 |''Name:''|SinglePageModeByVodi|
@@ -770,14 +597,14 @@ story.history = {
 		if (index &lt; 0) index = this.limit - 1;
 		if (index == this.backStopper || this.titles[index] == undefined) return;
 		this.currentIdx = index;
-		story.displayTiddler(null, this.titles[index]);
+		story.displayTiddler(this.titles[index]);
 	},
 	forward: function() {
 		if (this.currentIdx == this.fowardStopper) return;
 		var index = this.currentIdx + 1;
 		if (index &gt;= this.limit) index = 0;
 		this.currentIdx = index;
-		story.displayTiddler(null, this.titles[index]);
+		story.displayTiddler(this.titles[index]);
 	}
 }
 
@@ -805,40 +632,6 @@ config.macros.navigate.handler = function(place, macroName, params) { // Impleme
 	renderTiddlyButton(place, '←', "Navigate Backwards", function() {config.commands.navigateBack.handler();},	null, null, null);
 	renderTiddlyButton(place, '→', "Navigate Foward", function() {config.commands.navigateForward.handler();},	null, null, null);
 };
-
-if (Story.prototype._DisplayTiddlerFunction == undefined) Story.prototype._DisplayTiddlerFunction = Story.prototype.displayTiddler;
-
-// Navigation
-Story.prototype.displayTiddler = function(srcElement, titleOrTiddler, templateNameOrNumber, animate, slowly) { // todo: instead of hijacking kung-fu make one function of it
-	var upcomingTitle = (titleOrTiddler instanceof Tiddler) ? titleOrTiddler.title : titleOrTiddler;
-	var articleView = story.getArticleViewByTitle(upcomingTitle); // null unless tiddler is already displayed
-	var doNotClose = false;
-	story.forEachArticleElement(function(title, div) {
-		if (title == upcomingTitle) return; // skip current tiddler
-		if (div.getAttribute(&quot;dirty&quot;) == &quot;true&quot;) {
-			if (articleView) {
-				doNotClose = true;
-				return;
-			}
-			var text = &quot;'&quot; + title + &quot;' is currently being edited.\n\nPress OK to save and close this tiddler\nor press Cancel to leave it opened&quot;;
-			if (!confirm(text)) {
-				doNotClose = true;
-				return;
-			} else {
-				story.saveTiddler(title);
-			}
-		}
-		story.closeView(title);
-	});
-	if (doNotClose) return;
-	this._DisplayTiddlerFunction.apply(this, arguments);
-	store.currentTiddler = store.getTiddler(upcomingTitle);
-	story.currentTiddler = story.getArticleViewByTitle(upcomingTitle);
-	if (store.currentTiddler) story.currentTiddler.scrollTop = store.currentTiddler.rescuedScrollTop;
-	story.history.add(upcomingTitle);
-	refreshTreePath();
-	highlightMenuTree();
-}
 
 function highlightMenuTree() {
 	if (typeof _PreviousCurrentMenuTreeElement !== 'undefined') _PreviousCurrentMenuTreeElement.classList.remove('current');
@@ -1948,7 +1741,7 @@ function main() {
 	refreshDisplay();
 	
 	if (pluginProblem) {
-		story.displayTiddler(null, "PluginManager");
+		story.displayTiddler("PluginManager");
 		displayMessage(config.messages.customConfigError);
 	}	
 	backstage.init();
@@ -2089,9 +1882,9 @@ function invokeParamifier(params, handler) {
 config.paramifiers = {};
 
 config.paramifiers.open = {
-	onstart: function(v) {
-		if (!readOnly || store.tiddlerExists(v) || store.isShadowTiddler(v))
-			story.displayTiddler("bottom", v, null, false, null);
+	onstart: function(title) {
+		if (!readOnly || store.tiddlerExists(title) || store.isShadowTiddler(title))
+			story.displayTiddler(title);
 	}
 };
 
@@ -3037,7 +2830,7 @@ config.macros.list.filter.handler = function(params) { // Implements IMacroResol
 	if (filter) {
 		var tiddlers = store.filterTiddlers(filter);
 		var t;
-		for (t=0; t<tiddlers.length; t++)
+		for (t = 0; t < tiddlers.length; t++)
 			results.push(tiddlers[t].title);
 	}
 	return results;
@@ -3090,7 +2883,7 @@ merge(macro, {
 		var tiddlers = args.filter ? store.sortTiddlers(store.filterTiddlers(args.filter[0]), field) :
 			store.reverseLookup("tags", "excludeLists", false, field);
 		var lastGroup = "", ul;
-		var last = params[1] ? tiddlers.length-Math.min(tiddlers.length,parseInt(params[1],10)) : 0;
+		var last = params[1] ? tiddlers.length-Math.min(tiddlers.length, parseInt(params[1], 10)) : 0;
 		var t;
 		for (t=tiddlers.length-1; t>=last; t--) {
 			var tiddler = tiddlers[t];
@@ -3621,7 +3414,7 @@ config.macros.toolbar.customCommand = function(place,command,wikifier,tiddler) {
 
 config.commands.saveTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
 	var newTitle = story.saveTiddler(title); // todo - wieso kann sich title ändern?
-	if (newTitle) story.displayTiddler(null, newTitle);
+	if (newTitle) story.displayTiddler(newTitle);
 	return false;
 };
 
@@ -3631,7 +3424,7 @@ config.commands.cancelTiddler.handler = function(event, src, title) { // Impleme
 			return false;
 	}
 	story.setDirty(title, false);
-	story.displayTiddler(null, title);
+	story.displayTiddler(title);
 	return false;
 };
 
@@ -3669,7 +3462,7 @@ config.commands.references.handlePopup = function(popup, title) {
 };
 
 config.commands.jump.handlePopup = function(popup, title) {
-	story.forEachArticleElement(function(title, element) {
+	story.forEachArticleView(function(title, element) {
 		renderLinkElement(createTiddlyElement(popup, "li"), title, true, null, false, null, true);
 	});
 };
@@ -4417,35 +4210,35 @@ TiddlyWiki.prototype.sortTiddlers = function(tiddlers,field) {
 //--
 
 config.filters = {
-	tiddler: function(results,match) {
-		var title = match[1]||match[4];
+	tiddler: function(results, match) {
+		var title = match[1] || match[4];
 		var tiddler = this.fetchTiddler(title);
 		if (tiddler) {
 			results.pushUnique(tiddler);
 		} else if (this.isShadowTiddler(title)) {
 			tiddler = new Tiddler();
-			tiddler.set(title,this.getTiddlerText(title));
+			tiddler.set(title, this.getTiddlerText(title));
 			results.pushUnique(tiddler);
 		} else {
 			results.pushUnique(new Tiddler(title));
 		}
 		return results;
 	},
-	tag: function(results,match) {
-		var m,matched = this.getTaggedTiddlers(match[3]);
-		for (m=0; m<matched.length; m++) {
+	tag: function(results, match) {
+		var matched = this.getTaggedTiddlers(match[3]);
+		for (var m=0; m < matched.length; m++) {
 			results.pushUnique(matched[m]);
 		}
 		return results;
 	},
-	sort: function(results,match) {
-		return this.sortTiddlers(results,match[3]);
+	sort: function(results, match) {
+		return this.sortTiddlers(results, match[3]);
 	},
-	limit: function(results,match) {
-		return results.slice(0,parseInt(match[3],10));
+	limit: function(results, match) {
+		return results.slice(0, parseInt(match[3], 10));
 	},
-	field: function(results,match) {
-		var m,matched = this.getValueTiddlers(match[2],match[3]);
+	field: function(results, match) {
+		var m,matched = this.getValueTiddlers(match[2], match[3]);
 		for (m = 0; m < matched.length; m++) {
 			results.pushUnique(matched[m]);
 		}
@@ -4453,7 +4246,9 @@ config.filters = {
 	}
 };
 
-// Filter a list of tiddlers
+// Fetches a filtered list of articles from the store.
+//#   filter - filter expression (eg "title [[multi word title]] [tag[systemConfig]]")
+//# Returns an array of articles that match the filter expression
 TiddlyWiki.prototype.filterTiddlers = function(filter) {
 	var re = /([^\s\[\]]+)|(?:\[([ \w\.\-]+)\[([^\]]+)\]\])|(?:\[\[([^\]]+)\]\])/mg;
 
@@ -4461,13 +4256,14 @@ TiddlyWiki.prototype.filterTiddlers = function(filter) {
 	if (filter) {
 		var match = re.exec(filter);
 		while (match) {
-			var handler = (match[1]||match[4])?'tiddler':config.filters[match[2]]?match[2]:'field';
-			results = config.filters[handler].call(this,results,match);
+			var handler = (match[1] || match[4]) ? 'tiddler' : config.filters[match[2]] ? match[2] : 'field';
+			results = config.filters[handler].call(this, results, match);
 			match = re.exec(filter);
 		}
 	}
 	return results;
 };
+
 // Returns true if path is a valid field name (path),
 // i.e. a sequence of identifiers, separated by "."
 TiddlyWiki.isValidFieldName = function(name) {
@@ -4761,17 +4557,30 @@ Story.prototype.getArticleWrapper = function() {
 	return document.getElementById(this.articleWrapperId);
 };
 
-Story.prototype.forEachArticleElement = function(fn) {
+Story.prototype.getArticleViewByAttribute = function(attributeName, value){
+	var foundElement;
+	story.forEachArticleView(function(title, element) {
+		if (element.getAttribute(attributeName) == value){
+			foundElement = element;
+			return true; // true => "cancel loop"
+		}
+	});
+	return foundElement;
+}
+
+Story.prototype.forEachArticleView = function(callbackFunction) {
 	var place = this.getArticleWrapper();
-	if (!place)
+	if (! place)
 		return;
 	var e = place.firstChild;
+	var cancel = false;
 	while (e) {
 		var n = e.nextSibling;
 		var title = e.getArticleTitle();
 		if (title) {
-			fn.call(this, title, e);
+			cancel= callbackFunction.call(this, title, e);
 		}
+		if (cancel) return;
 		e = n;
 	}
 };
@@ -4780,26 +4589,61 @@ Story.prototype.displayDefaultTiddlers = function() { // todo: instead of having
 	this.displayTiddlers(null, store.filterTiddlers(store.getTiddlerText("DefaultTiddlers")));
 };
 
-Story.prototype.displayTiddlers = function(unused, titles, templateNameOrNumber, unused, unused, customFields) {
-	for (var t = titles.length - 1; t >= 0; t--) this.displayTiddler(null, titles[t], templateNameOrNumber, null, null, customFields);
+Story.prototype.displayTiddlers = function(unused, articles, templateNameOrNumber, unused, unused, customFields) {
+	for (var t = articles.length - 1; t >= 0; t--) this.displayTiddler(articles[t].title, templateNameOrNumber, customFields);
 };
 
-// Original
-Story.prototype.displayTiddler = function(unused, titleOrArticle, templateNameOrNumber, unused, unused, customFields) { // todo: instead of hijacking kung-fu make one function of it
-	var title = (titleOrArticle instanceof Tiddler) ? titleOrArticle.title : titleOrArticle;
+Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFields) {
 	var parts = title.split(config.textPrimitives.sectionSeparator);
 	title = parts[0]; 
 	var sectionName = parts[1];
 	if (sectionName) sectionName = sectionName.trim();
-	var articleView = this.getArticleViewByTitle(title);
-	if (articleView) {
+
+	// Handle situation when currently editing
+
+	var desiredView, returningView;
+	var closingTitles = [];
+	
+	// close all views - part 1: Collect permissions...
+
+	story.forEachArticleView(function(t, element) {
+		if (element.getAttribute("dirty") == "true") {
+			if (t == title){
+				returningView = element;
+				return true; // break loop;
+			}
+			var text = "'" + title + "' is currently being edited.\n\nPress OK to save and close this tiddler\nor press Cancel to leave it opened";
+			if (! confirm(text)) {
+				returningView = element;
+				return true; // break loop;
+			} else {
+				story.saveTiddler(t);
+			}
+		}
+		if (t == title) {
+			desiredView = element;
+		} else {
+			closingTitles.push(t);
+		}
+	});
+
+	if (returningView) return returningView; // abort, because we're currently editing and the user chose to cancel the navigation action
+
+	// close all views - part 2: Actually close views
+
+	closingTitles.forEach(function(t) {story.closeView(t);})
+	
+	// open or refresh the desired article
+	
+	if (desiredView) {
+		returningView = desiredView;
 		this.refreshTiddler(title, templateNameOrNumber, false, customFields);
 	} else {
 		var place = this.getArticleWrapper();
-		articleView = this.renderArticleView(place, title, templateNameOrNumber, customFields);
+		returningView = this.renderArticleView(place, title, templateNameOrNumber, customFields);
 	}
 	story.scrollToSection(title, sectionName);
-	return articleView;
+	return returningView;
 };
 
 //# Create a tiddler frame at the appropriate place in a story column. If the tiddler doesn't exist,
@@ -4953,6 +4797,44 @@ Story.prototype.refreshAllTiddlers = function(force) {
 	}
 };
 
+Story.prototype.scrollToSection = function(title, sectionName) {
+	
+	if (! title|| ! sectionName) return;
+	
+	var t = this.getArticleViewByTitle(title);
+	if (! t) return null;
+	
+	var elems = t.getElementsByTagName('*');
+	var heads = [];
+	var anchors = [];
+	var cells = [];
+	
+	for (var i = 0; i < elems.length; i++)
+		if (['H1','H2','H3','H4','H5'].contains(elems[i].nodeName)) heads.push(elems[i]); // todo: optimize this - don't create unnecessary collections
+	
+	for (var i = 0; i < elems.length; i++)
+		if (elems[i].nodeName == 'A' && (elems[i].getAttribute('name')||'').length) anchors.push(elems[i]);
+	
+	for (var i = 0; i < elems.length; i++)
+		if (elems[i].nodeName == 'TD') cells.push(elems[i]);
+	
+	var foundElement = null;
+	
+	for (var i = 0; i < heads.length; i++)
+		if (getPlainText(heads[i]).trim() == sectionName) { foundElement = heads[i]; break; }
+	
+	if (!foundElement) for (var i = 0; i < anchors.length; i++)
+		if (anchors[i].getAttribute('name') == sectionName) { foundElement = anchors[i]; break; }
+	
+	if (!foundElement) for (var i = 0; i < cells.length; i++)
+		if (getPlainText(cells[i]).trim() == sectionName) { foundElement = cells[i]; break; }
+	
+	if (foundElement) {
+		story.currentTiddler.scrollTop = findPosY(foundElement) - story.currentTiddler.clientHeight / 2;
+		return foundElement;
+	}
+}
+
 Story.prototype.onTiddlerMouseOver = function(e) {
 	jQuery(this).addClass("selected");
 };
@@ -4999,7 +4881,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 		}
 		case 75: { // [Ctrl]-[K]
 			if (e.ctrlKey) {
-				story.forEachArticleElement(
+				story.forEachArticleView(
 					function(title, tiddler) {
 						if (hasClass(tiddler, 'selected') && story.isDirty(title)) story.editLink();
 					}
@@ -5123,7 +5005,7 @@ Story.prototype.isDirty = function(title) {
 
 Story.prototype.areAnyDirty = function() {
 	var r = false;
-	this.forEachArticleElement(function(title, element) {
+	this.forEachArticleView(function(title, element) {
 		if (this.isDirty(title))
 			r = true;
 	});
@@ -6459,9 +6341,41 @@ config.macros.newArticleButton.onClick = function(createRoot) {
 	}
 	var newTiddler = store.createArticle("Untitled");
 	newTiddler.fields['parenttiddler'] = currentTiddlerTitle;
-	story.displayTiddler(null, "Untitled", DEFAULT_EDIT_TEMPLATE);
+	story.displayTiddler("Untitled", DEFAULT_EDIT_TEMPLATE);
 	story.focusTiddler("Untitled", "title");
 };
+
+config.macros.sectionTOC = { // todo: this only works when the user positions the macro at the end of the article - this should be fixed.
+	targetClass: 'sectionTOC',
+	linkFormat: '[[%0|##%0]]',
+	handler: function(place,macroName,params, wikifier, paramString,tiddler) { // search for h-elements and create local links
+		var out = [];
+		var targetClass = params[0]||this.targetClass;
+		var t = story.getArticleViewByChild(place);
+		if (! t) return;
+		var elems = t.getElementsByTagName('*');
+		var level = 5; // topmost heading level
+		for (var i = 0; i < elems.length; i++) {
+			var txt = getPlainText(elems[i]).trim();
+			var link = this.linkFormat.format([txt]);
+			switch (elems[i].nodeName) {
+				case 'H1': out.push('#'+link);		level = 1; break;
+				case 'H2': out.push('##'+link);		level = level < 2 ? level : 2; break;
+				case 'H3': out.push('###'+link);	level = level < 3 ? level : 3; break;
+				case 'H4': out.push('####'+link);	level = level < 4 ? level : 4; break;
+				case 'H5': out.push('#####'+link); level = level < 5 ? level : 5; break;
+				default: if (hasClass(elems[i], targetClass)) var target = elems[i]; // search for element with 'sectionTOC' class like {{sectionTOC{}}}
+			}
+		}
+		// trim excess bullet levels
+		if (level > 1) for (var i = 0; i < out.length; i++) out[i] = out[i].substr(level - 1);
+		// show numbered list
+		if (out.length && target) {
+			if (target.style.display == 'none') target.style.display = 'block';
+			wikify(out.join('\n'), target);
+		}
+	}
+}
 
 function recurseViewer(node, anchor, needle) {
 	for (var i = 0; i < node.childNodes.length; i++) {
@@ -6516,7 +6430,7 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 	if (tiddlerSource) tiddlerSource.rescuedScrollTop = articleView.scrollTop;
 	var fields = articleView.getAttribute("tiddlyFields"); // tiddlyFields
 	
-	story.displayTiddler(null, title, DEFAULT_EDIT_TEMPLATE, false, null, fields);
+	story.displayTiddler(title, DEFAULT_EDIT_TEMPLATE, fields);
 	
 	var textAreaElement = story.getTiddlerField(title,"text");
 	
@@ -7752,7 +7666,7 @@ var closeResult = function() {
 // Closes the Search Result window and displays the tiddler 
 // defined by the "tiddlyLink" attribute of this element
 //
-var closeResultAndDisplayTiddler = function(e) {
+var closeResultAndDisplayTiddler = function(e) { // xxx remove old search implementation
 	closeResult();
 	
 	var title = this.getAttribute("tiddlyLink");
@@ -7762,7 +7676,7 @@ var closeResultAndDisplayTiddler = function(e) {
 		if (withHilite && withHilite=="true" && lastQuery) {
 			highlightHack = lastQuery.getMarkRegExp();
 		}
-		story.displayTiddler(this, title);
+		story.displayTiddler(title);
 		highlightHack = oldHighlightHack;
 	}
 	return(false);
@@ -8462,7 +8376,7 @@ window.onkeydown = function(e) {
 				if (e.keyCode == 13) {
 					// document.getElementsByClassName('yourSearchTitle')[0].firstChild.focus();
 					var foundTiddlers = abego.YourSearch.getFoundTiddlers();
-					story.displayTiddler(null, foundTiddlers[0].title);
+					story.displayTiddler(foundTiddlers[0].title);
 					abego.YourSearch.closeResult();
 					return false;
 				};
@@ -9589,7 +9503,7 @@ function onLinkElementClicked(ev) {
 	var senderTitle = articleView ? articleView.getAttribute('tiddler') : '';
 	
 	if (title != senderTitle || ! sectionName) { // link target is not on the current page
-		story.displayTiddler(sender, title, null, true);
+		story.displayTiddler(title);
 	}
 	
 	clearMessage();
@@ -9683,16 +9597,16 @@ function onClickTag(ev) { // (do not mix up with onTagClick)
 	var tag = this.getAttribute("tag");
 	var title = this.getArticleTitle();
 	if (popup && tag) {
-		var tagged = tag.indexOf("[") == -1 ? store.getTaggedTiddlers(tag) : store.filterTiddlers(tag);
+		var foundArticles = tag.indexOf("[") == -1 ? store.getTaggedTiddlers(tag) : store.filterTiddlers(tag);
 		var sortby = this.getAttribute("sortby");
 		if (sortby && sortby.length) {
-			store.sortTiddlers(tagged,sortby);
+			store.sortTiddlers(foundArticles, sortby);
 		}
 		var titles = [];
 		var r;
-		for (r = 0; r < tagged.length; r++) {
-			if (tagged[r].title != title)
-				titles.push(tagged[r].title);
+		for (r = 0; r < foundArticles.length; r++) {
+			if (foundArticles[r].title != title)
+				titles.push(foundArticles[r].title);
 		}
 		var lingo = config.views.wikified.tag;
 		if (titles.length > 0) {
