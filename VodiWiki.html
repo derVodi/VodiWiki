@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <script id="versionArea" type="text/javascript">
@@ -433,7 +433,7 @@ This real new line is not.
 The following code...
 
 {{{
-&lt;&lt;tiddler 'Embedding Parts Of Other Pages##What Is A &quot;Section&quot;?'&gt;&gt;
+&lt;&lt;tiddler '##What Is A &quot;Section&quot;?'&gt;&gt;
 &lt;&lt;tiddler 'Embedding Parts Of Other Pages##InvisibleSection'&gt;&gt;
 &lt;&lt;tiddler [[Embedding Parts Of Other Pages::FirstTableCell]]&gt;&gt;
 &lt;&lt;tiddler [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;
@@ -441,7 +441,7 @@ The following code...
 
 ...generates this output:
 
-|&lt;&lt;tiddler 'Embedding Parts Of Other Pages##What Is A &quot;Section&quot;?'&gt;&gt;|
+|&lt;&lt;tiddler '##What Is A &quot;Section&quot;?'&gt;&gt;|
 |&lt;&lt;tiddler 'Embedding Parts Of Other Pages##InvisibleSection'&gt;&gt;|
 |&lt;&lt;tiddler [[Embedding Parts Of Other Pages::FirstTableCell]]&gt;&gt;|
 |&lt;&lt;tiddler [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;|
@@ -580,9 +580,9 @@ You can link to a section of a tiddler by adding the &quot;##sectionname&quot; s
 {{{
 [[SomeTiddler##SomeSection]]
 }}}
-When clicked, the tiddler is displayed and the specified section heading is automatically scrolled into view. If the tiddler title is omitted or the 'here' keyword is used, e.g.,
+When clicked, the tiddler is displayed and the specified section heading is automatically scrolled into view. If the tiddler title is omitted, e.g.,
 {{{
-[[##SomeSection]] or [[here##SomeSection]]&gt;&gt;
+[[##SomeSection]]&gt;&gt;
 }}}
 then the current containing tiddler is implied by default.
 !!!!HTML anchor syntax
@@ -592,9 +592,9 @@ You can use HTML syntax to create a scrollable 'anchor' location within a tiddle
 }}}
 You can then link to that section using the enhanced TiddlyLink syntax as above.
 !!!!{{{&lt;&lt;tiddler&gt;&gt;}}} macro 
-The {{{&lt;&lt;tiddler&gt;&gt;}}} syntax has been extended so that when the tiddler title is omitted or the 'here' keyword is used, e.g.,
+The {{{&lt;&lt;tiddler&gt;&gt;}}} syntax has been extended so that when the tiddler title is omitted, e.g.,
 {{{
-&lt;&lt;tiddler ##SomeSection&gt;&gt; or &lt;&lt;tiddler here##SomeSection&gt;&gt;
+&lt;&lt;tiddler ##SomeSection&gt;&gt;
 }}}
 then the current containing tiddler is implied by default.
 !!!!&quot;&quot;&quot;&lt;&lt;sectionTOC&gt;&gt;&quot;&quot;&quot; macro
@@ -691,25 +691,6 @@ Story.prototype.scrollToSection = function(title, sectionName) {
 &lt;html&gt;&lt;a name=&quot;sampleanchorlink&quot; /&gt;&lt;/html&gt;This is a sample ''anchor link'': {{{&lt;html&gt;&lt;a name=&quot;sampleanchorlink&quot; /&gt;&lt;/html&gt;}}}
 !!!!!tiddler.handler
 ***/
-//{{{
-if (! config.macros.tiddler.handler_section)	config.macros.tiddler.handler_section = config.macros.tiddler.handler;
-
-config.macros.tiddler.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
-	if (! params[0]) return;
-	var sep = config.textPrimitives.sectionSeparator;
-	var parts = params[0].split(sep);
-	var tid = parts[0];
-	var sec = parts[1];
-	if (sec) sec = sec.trim();
-	if ((! tid.length) &amp;&amp; sec) { // fixup for '##section'
-		var here = story.getArticleViewByChild(place);
-		var tid = here ? here.getAttribute('tiddler') : tiddler ? tiddler.title : '';
-		arguments[2][0] = tid + sep + sec;
-		arguments[4] = paramString.replace(new RegExp('(here)?' + sep + sec), tid + sep + sec);
-	}
-	config.macros.tiddler.handler_section.apply(this, arguments); // xxx
-}
-//}}}
 /***
 !!!!sectionTOC macro
 ***/
@@ -3121,7 +3102,7 @@ merge(macro, {
 				createTiddlyElement(ul, "li", null, "listTitle", theGroup);
 				lastGroup = theGroup;
 			}
-			var item = createTiddlyElement(ul,"li",null,"listLink");
+			var item = createTiddlyElement(ul, "li", null, "listLink");
 			wikify(itemTemplate,item,null,tiddler);
 		}
 	},
@@ -3129,62 +3110,73 @@ merge(macro, {
 	itemTemplate: "<<view title link>>"
 });
 
-
 /**
-		* Renders an article (or parts of it) into another article (called "transclusion").
-		* Optionally resolves placeholders like string.format() would do: 
-		* The included article may contain numbered placeholders like "$1, $2" which will be replaced by arguments after the keyword "with:"
-		*
-		* Examples: <<tiddler 'PageTitle##SectionName'>>
-		*           <<tiddler [[PageTitle::SliceName]]>>
-		*           <<tiddler book with: "Dan Brown" "The DaVinci Code">> => would replace "$1" by "Dan Brown" and "$2" by "The DaVinci Code"
-	*/
+	* Renders an article (or parts of it) into another article (called "transclusion").
+	* Optionally resolves placeholders like string.format() would do:
+	* The included article may contain numbered placeholders like "$1, $2" which will be replaced by arguments after the keyword "with:"
+	*
+	* Examples: <<tiddler 'PageTitle##SectionName'>>
+	*           <<tiddler [[PageTitle::SliceName]]>>
+	*           <<tiddler book with: "Dan Brown" "The DaVinci Code">> => would replace "$1" by "Dan Brown" and "$2" by "The DaVinci Code"
+*/
 config.macros.tiddler.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
 	var allowEval = true;
 	var stack = config.macros.tiddler.tiddlerStack;
 	if (stack.length > 0 && config.evaluateMacroParameters == "system") {
 		// included tiddler and "system" evaluation required, so check tiddler tagged appropriately
-		var title = stack[stack.length-1];
+		var title = stack[stack.length - 1];
 		var pos = title.indexOf(config.textPrimitives.sectionSeparator);
 		if (pos != -1) {
-			title = title.substr(0,pos); // get the base tiddler title
+			title = title.substr(0, pos); // get the base tiddler title
 		}
 		var t = store.getTiddler(title);
-		if (!t || t.tags.indexOf("systemAllowEval") == -1) {
+		if (! t || t.tags.indexOf("systemAllowEval") == -1) {
 			allowEval = false;
 		}
 	}
 	params = paramString.parseParams("name", null, allowEval, false, true);
 	var names = params[0]["name"];
-	var tiddlerName = names[0];
+	var titleAndSection = names[0]; // e.g. "foo", "foo##bar", "##bar"
+
+	// Complete '##section' to 'thisTitle##section'
+	var sep = config.textPrimitives.sectionSeparator;
+	var parts = titleAndSection.split(sep);
+	var title = parts[0];
+	var sectionName = parts[1];
+	if (sectionName) sectionName = sectionName.trim();
+	if ((! title.length) && sectionName) {
+		var articleView = story.getArticleViewByChild(place);
+		title = articleView ? articleView.getAttribute('tiddler') : tiddler ? tiddler.title : '';
+		titleAndSection = title + sep + sectionName;
+	}
+
 	var className = names[1] || null;
 	var args = params[0]["with"];
-	var wrapper = createTiddlyElement(place,"span",null,className,null,{
-		refresh: "content", tiddler: tiddlerName
+	var wrapper = createTiddlyElement(place, "span", null, className, null, {
+		refresh: "content", tiddler: titleAndSection
 	});
-	if (args!==undefined)
+	if (args !== undefined)
 		wrapper.setAttribute("args", "[[" + args.join("]] [[") + "]]");
-	this.transclude(wrapper, tiddlerName, args);
+	this.transclude(wrapper, titleAndSection, args);
 };
 
-config.macros.tiddler.transclude = function(wrapper, tiddlerName, args) {
-	var text = store.getTiddlerText(tiddlerName);
-	if (!text)
+config.macros.tiddler.transclude = function(wrapper, titleAndSection, args) {
+	var text = store.getTiddlerText(titleAndSection);
+	if (! text)
 		return;
 	var stack = config.macros.tiddler.tiddlerStack;
-	if (stack.indexOf(tiddlerName) !== -1)
+	if (stack.indexOf(titleAndSection) !== -1)
 		return;
-	stack.push(tiddlerName);
+	stack.push(titleAndSection);
 	try {
 		if (typeof args == "string")
 			args = args.readBracketedList();
-		var n = args ? Math.min(args.length,9) : 0;
-		var i;
-		for (i=0; i<n; i++) {
+		var n = args ? Math.min(args.length, 9) : 0;
+		for (var i = 0; i < n; i++) {
 			var placeholderRE = new RegExp("\\$" + (i + 1),"mg");
-			text = text.replace(placeholderRE,args[i]);
+			text = text.replace(placeholderRE, args[i]);
 		}
-		config.macros.tiddler.renderText(wrapper,text,tiddlerName);
+		config.macros.tiddler.renderText(wrapper, text, titleAndSection);
 	} finally {
 		stack.pop();
 	}
