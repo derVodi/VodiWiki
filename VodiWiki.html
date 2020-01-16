@@ -120,8 +120,7 @@ blockquote::before {position:absolute;top:0.3em;left:0.2em;content:'\275D'; font
 /* Interactivity */
 
 .button {border-width:1px; border-style: solid; border-radius: 3px; padding: 0.1em 0.5em; font-weight: bold;}
-input:not([type]) {width:  11em; border:0;} /* These are nested in table cells */
-/*input[type=file], input[type=checkbox] {width:  auto;}*/
+.listView input:not([type=checkbox]) {width:  11em; border:0;} /* These are nested in table cells */
 .tiddlerPopupButton {padding: 0.2em;}
 .branch .button {position: absolute; left: -1.3em; padding: 0;}
 .tab {margin: 0 1pt 0 0; padding: 2px 0.6em; border-radius: 0.4em 0.4em 0 0;}
@@ -347,8 +346,9 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 <div title="- Home -" modifier="YourName" created="201904232038" modified="201904232156" parenttiddler="." changecount="6">
 <pre>!Welcome to VodiWiki
 
-* This is a monolithic (= single HTML file) wiki with built-in viewer and editor.
+* This is a freeware open source monolithic (= single HTML file) wiki with built-in viewer and editor.
 * It's purpose is to make any kind of documentation accessible, portable, publishable, platform independent.
+* Although it's running in a browser you can work completely offline (using a local file)
 
 !! Usage scenarios
 
@@ -358,6 +358,14 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 !Get Started
 
 * Just go here: [[Anatomy Of The Main Window]] (and following pages)
+
+!Some Words on Data Protection
+
+When working with sensual data consider the following advice:
+
+* Disable all browser plugins - they can read everything in a browser (even password fields, single key strokes, etc.).
+* If you can't get around using Microsoft Windows, at least make sure you turned off the &quot;cloud clipboard&quot; (= copy &amp; paste contents will be transferred to Microsoft).
+* Consider blocking your browser using a firewall
 
 !License
 
@@ -382,119 +390,8 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 * At the top right border of the Search Field there's a &quot;Backstage&quot; button for some internal functions
 * At the top right border beside the Page there's a collapse button for some internal filters/navigation.</pre>
 </div>
-<div title="AnchorMacro" creator="YourName" modifier="YourName" created="201701292045" modified="201906090817" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="13">
-<pre>/***
-|''Name:''|AnchorMacro|
-|''Version:''|2019.06.09|
-|''Description:''|Renders a HTML anchor (without text) which can be targeted from SectionLinksPlugin|
-|''Author:''|Mark Vodicka|
-!Code
-***/
-
-//{{{
-
-config.macros.anchor = {};
-
-config.macros.anchor.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
-	var e =	createTiddlyElement(place,&quot;a&quot;);
-	e.name = params[0];
-	e.text = params[1];
-	e.className = &quot;anchor&quot;;
-};
-
-//}}}</pre>
-</div>
 <div title="DefaultTiddlers" modifier="YourName" created="201208271046" modified="201904232039" tags="excludeLists" parenttiddler="" changecount="1">
 <pre>[[- Home -]]
-</pre>
-</div>
-<div title="EditingHelperPlugin" modifier="YourName" created="201303171003" modified="201601071504" tags="excludeLists excludeSearch systemConfig" parenttiddler="" changecount="6">
-<pre>/***
-|''Name:''|EditingHelperPlugin|
-|''Version:''|2016.01.08|
-|''Author:''|Mark Vodicka|
-!Code
-***/
-//{{{
-
-function recurseViewer(node, anchor, needle) {
-	for (var i = 0; i &lt; node.childNodes.length; i++) {
-		var child = node.childNodes[i];
-		if (child.nodeType == Node.TEXT_NODE) {
-		  if (child.nodeValue.indexOf(needle) &gt;= 0) {
-				recurseViewerOccurance++;
-				if (child == anchor) {
-					return false;
-				}
-			}
-		}
-		var cont = recurseViewer(child, anchor, needle);
-		if (!cont) {
-			return false;
-		}	
-	}
-	return true;
-}
-
-config.commands.editTiddler.handler = function(event, src, title) { // Implements IMacroResolver.handler()
-
-	clearMessage();
-	
-	var articleDiv = story.getTiddler(title);
-	
-	recurseViewerOccurance = 0;
-	var found = -1;
-	var selectedText = window.getSelection().toString();
-	if (selectedText.length) {
-		var viewer = null;
-		for (var i = 0; i &lt; articleDiv.childNodes.length; i++) {
-			if (articleDiv.childNodes[i].className == &quot;articleContentContainer&quot;) { // HACK: Code dependency to CSS class name!
-				viewer = articleDiv.childNodes[i];
-				break;
-			}
-		}		
-		recurseViewer(viewer, window.getSelection().anchorNode, selectedText);
-	}
-
-	var tiddlerSource = store.getTiddler(title);
-	if (tiddlerSource) tiddlerSource.rescuedScrollTop = articleDiv.scrollTop;
-	var fields = articleDiv.getAttribute(&quot;tiddlyFields&quot;);
-	story.displayTiddler(null, title, DEFAULT_EDIT_TEMPLATE, false, null, fields);
-	var textAreaElement = story.getTiddlerField(title,&quot;text&quot;);
-	if (recurseViewerOccurance) {		
-		found = -1;
-		do {
-			recurseViewerOccurance--;
-			found = textAreaElement.value.indexOf(selectedText, found + 1);
-		} while (recurseViewerOccurance &amp;&amp; found&gt;=0)
-	}
-	if (found&gt;=0) {
-		setCaretPosition(textAreaElement, found);
-	} else {
-		setCaretPosition(textAreaElement, (articleDiv.rescuedCaretPosition ? articleDiv.rescuedCaretPosition : 0));
-	}	
-	return false;
-}
-
-config.commands.cancelTiddler.handlerBase = config.commands.cancelTiddler.handler;
-
-config.commands.cancelTiddler.handler = function(event,src,title) { // Implements IMacroResolver.handler()
-	var pos = story.getTiddlerField(title,&quot;text&quot;).selectionStart;
-	var baseResult = config.commands.cancelTiddler.handlerBase(event,src,title);
-	story.getTiddler(title).rescuedCaretPosition = pos;
-	return baseResult;
-};
-
-config.commands.saveTiddler.handlerBase = config.commands.saveTiddler.handler; // ToDo: patch the base method instead of hijacking
-
-config.commands.saveTiddler.handler = function(event, src, title) { // Implements IMacroResolver.handler()
-	var pos = story.getTiddlerField(title,&quot;text&quot;).selectionStart;
-	var baseResult = config.commands.saveTiddler.handlerBase(event,src,title);
-	story.getTiddler(title).rescuedCaretPosition = pos;
-	return baseResult;
-};
-
-//}}}
 </pre>
 </div>
 <div title="Embedding Parts Of Other Pages" modifier="YourName" created="201906080811" modified="201906081653" parenttiddler="​Advanced Use Cases" changecount="53">
@@ -585,11 +482,11 @@ The following code...
 <div title="How to Write Content" modifier="YourName" created="201904232018" modified="201904241458" parenttiddler="Getting Started" changecount="14">
 <pre>!Adding a New Page
 
-* Click on &quot;New Root Page&quot; to add a page on the root level
-* Click on &quot;New Sub Page&quot; to add a page below the current page
+* Click on &quot;New Article&quot; to add a page on the root level
+* Click on &quot;New Sub Article&quot; to add a page below the current page
 ** The parent of a page can also be changed afterwards (by typing another page title into the &quot;Parent&quot; field)
 * Type your text (using [[wiki syntax|Syntax Reference]])
-*Commit your edits by pressing the &quot;done&quot; button or Ctrl+Enter.
+*Commit your edits by pressing the &quot;Done&quot; button or [Ctrl]-[Enter].
 ** The whole wiki is auto-saved now - some browsers might alert you to acknowledge the saving action.
 
 !Editing an Existing Page
@@ -601,7 +498,7 @@ The following code...
 !Deleting a Page
 
 * Navigate to the desired page
-* Click on the &quot;delete&quot; button (upper right area)
+* Click on the &quot;Delete&quot; button (upper right area)
 
 !Embedding Images
 
@@ -617,223 +514,11 @@ Here is a non printing space you can copy &amp; paste:
 
 |Double click into the right table cell to select and copy to clipboard -&gt;|​|</pre>
 </div>
-<div title="InputDialogPlugin" modifier="YourName" created="201504190817" modified="201904232241" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="12">
-<pre>/***
-|''Name:''|InputDialogPlugin|
-|''Version:''|2019.04.24|
-|''Author:''|Mark Vodicka|
-!Code
-***/
-//{{{
-
-inputDialog = {
-	createElement: function(tag, innerHtml) {
-		var element = document.createElement(tag);
-		element.innerHTML = innerHtml;
-		return element;
-	},
-	close: function(isOk) {
-		this.cloak.style.display = 'none';
-		document.body.removeChild(this.inputPanel);		
-		if (isOk) this.okHandler(this.labelsAndValues);
-	},
-	cloak: document.getElementById(&quot;backstageCloak&quot;),
-	rescuedCloakClickHandler: null,
-	inputPanel:null,
-	labelsAndValues: null,
-	okHandler:null,
-	keyPressed: function(e) {		
-		var allFields = this.inputPanel.getElementsByClassName('inputDialogPanel-field');		
-		for (i=0; i &lt; allFields.length; i++) {
-			this.labelsAndValues[allFields[i].getAttribute('name')] = allFields[i].value;
-		}
-		switch(e.keyCode) {
-			case 13:
-				inputDialog.close(true);
-				break;
-			case 27: // Escape
-				inputDialog.close(false);
-				break;
-			}
-	},
-	awaitUserInput: function(labelsAndValues, focusingIndex, okHandler) {
-		this.rescuedCloakClickHandler = this.cloak.onmousedown;
-		this.cloak.onmousedown = null;
-		
-		var inputPanel = document.createElement(&quot;div&quot;);
-		inputPanel.onkeydown = this.keyPressed.bind(this);
-		inputPanel.setAttribute('class','inputDialogPanel');
-		document.body.appendChild(inputPanel);
-		
-		var title = this.createElement(&quot;h1&quot;, 'Edit link');
-		inputPanel.appendChild(title);
-		
-		var focusingField;
-		var i=0;
-		for (labelText in labelsAndValues) {
-			var label = this.createElement(&quot;div&quot;, labelText);
-			label.setAttribute('class','inputDialogPanel-label');
-			inputPanel.appendChild(label);
-			
-			var field = document.createElement(&quot;input&quot;);
-			field.setAttribute('name', labelText);
-			field.setAttribute('class','inputDialogPanel-field');
-			field.value = labelsAndValues[labelText];
-			if (i == focusingIndex) focusingField = field;
-			//field.onkeypress = this.keyPressed;
-			
-			inputPanel.appendChild(field);
-			i++;			
-		}
-					
-		var buttonsPanel = document.createElement(&quot;div&quot;);
-		buttonsPanel.setAttribute('class','inputDialogPanel-buttonsPanel');
-		
-		var okButton = this.createElement('button', 'Ok');
-		okButton.onclick = function() {inputDialog.close(true);}
-		buttonsPanel.appendChild(okButton);
-		
-		var cancelButton = this.createElement('button', 'Cancel');
-		cancelButton.onclick = function() {inputDialog.close(false);}
-		buttonsPanel.appendChild(cancelButton);
-		
-		inputPanel.appendChild(buttonsPanel);
-		
-		this.cloak.style.display = 'block';
-
-		this.inputPanel = inputPanel;
-		this.labelsAndValues = labelsAndValues;
-		this.okHandler = okHandler;
-
-		focusingField.focus();
-		focusingField.select();
-	}
-}
-
-//}}}</pre>
-</div>
 <div title="Keyboard Shortcuts" modifier="YourName" created="201303170925" modified="201906080808" parenttiddler="​Reference" changecount="7">
 <pre>|Keys|Function|Available|h
 |Ctrl-E|Search|Always|
 |Ctrl-Enter|Toggle editing|Always|
 |Ctrl-K|Edit link|When editing|</pre>
-</div>
-<div title="KeyboardCommandsPlugin" modifier="YourName" created="201212212042" modified="201904232240" tags="excludeLists excludeSearch systemConfig" parenttiddler="" changecount="6">
-<pre>/***
-|''Name:''|KeyboardCommandsPlugin|
-|''Version:''|2019.04.24|
-|''Author:''|Mark Vodicka|
-!Code
-***/
-//{{{
-
-window.onkeydown = function(e) {
-	if (e.ctrlKey &amp;&amp; e.keyCode == 69) {
-		var searchField = document.getElementsByClassName('searchField')[0];
-		if (! searchField.onkeypress) {
-			searchField.onkeypress = function(e) { // todo patch this directly into search code
-				if (e.keyCode == 13) {
-					// document.getElementsByClassName('yourSearchTitle')[0].firstChild.focus();
-					var foundTiddlers = abego.YourSearch.getFoundTiddlers();
-					story.displayTiddler(null, foundTiddlers[0]);
-					abego.YourSearch.closeResult();
-					return false;
-				};
-			};
-		}
-		searchField.focus();
-		searchField.select();
-		return false;
-	}
-	if (e.ctrlKey &amp;&amp; e.keyCode==75) {
-		story.forEachTiddler(
-      function(title,tiddler) {
-        if (hasClass(tiddler,'selected') &amp;&amp; story.isDirty(title)) story.editLink();
-      }
-    );
-		return false;
-  }
-	if (e.ctrlKey &amp;&amp; e.keyCode==13) {
-    story.forEachTiddler(
-      function(title, tiddler) {
-        if (hasClass(tiddler, 'selected') &amp;&amp; !story.isDirty(title)) config.commands.editTiddler.handler(e, null, title);
-      }
-    );
-    return false;
-  };
-};
-
-story.editLink = function() {	
-	story.linkInfo = this.getLinkUnderCursor();
-  var okHandler = function(labelsAndValues) {
-		var textAreaElement = story.getTiddlerField(store.currentTiddler.title, &quot;text&quot;);
-		var newExpression;		
-		if (labelsAndValues.Link.length &gt; 0) {			
-			newExpression = '[[' + labelsAndValues.Text + '|'+ labelsAndValues.Link + ']]';
-		} else {
-			newExpression = labelsAndValues.Text;
-		}
-		textAreaElement.value = (
-			textAreaElement.value.substring(0, story.linkInfo.expressionStart) + 
-			newExpression + 
-			textAreaElement.value.substring(story.linkInfo.expressionEnd + 1)
-		);		
-	};	
-	inputDialog.awaitUserInput({Text: story.linkInfo.displayText, Link: story.linkInfo.link}, 1, okHandler);
-}
-
-story.getLinkUnderCursor = function() {
-	// ToDo: getWordUnderCursor
-	var textAreaElement = this.getTiddlerField(store.currentTiddler.title,&quot;text&quot;);
-	var left = textAreaElement.selectionStart;
-	var right = textAreaElement.selectionEnd;
-	var leftLinkSeparator = left;
-	var rightLinkSeparator = right;
-	var linkInfo = {link: ''};
-	if (left === right) {
-  	while (leftLinkSeparator &gt;= 0 &amp;&amp; textAreaElement.value[leftLinkSeparator] != &quot;[&quot; &amp;&amp; textAreaElement.value[leftLinkSeparator] != &quot;\n&quot;) {
-			leftLinkSeparator--;
-		}
-		while (rightLinkSeparator &lt; textAreaElement.textLength &amp;&amp; textAreaElement.value[rightLinkSeparator] != &quot;]&quot; &amp;&amp; textAreaElement.value[rightLinkSeparator] != &quot;\n&quot;) {
-			rightLinkSeparator++;
-		}
-    if (textAreaElement.value[leftLinkSeparator] != &quot;[&quot; || textAreaElement.value[rightLinkSeparator] != &quot;]&quot;) {
-			while (left &gt;= 0 &amp;&amp; textAreaElement.value[left] != &quot; &quot; &amp;&amp; textAreaElement.value[left] != &quot;\n&quot;) {
-				left--;
-			}
-			while (right &lt; textAreaElement.textLength &amp;&amp; textAreaElement.value[right] != &quot; &quot; &amp;&amp; textAreaElement.value[right] != &quot;\n&quot;) {
-				right++;
-			}
-			left++;
-			linkInfo.expressionStart = left;
-			linkInfo.expressionEnd = right - 1;
-			linkInfo.displayText = textAreaElement.value.substring(left,right);
-		} else {
-			linkInfo.expressionStart = leftLinkSeparator -1;
-			linkInfo.expressionEnd = rightLinkSeparator +1;
-			left = leftLinkSeparator + 1;
-			right = rightLinkSeparator;
-			var innerExpression = textAreaElement.value.substring(left,right);
-			var splitPos = innerExpression.indexOf('|');
-			if (splitPos &lt; 0) {
-				linkInfo.displayText = textAreaElement.value.substring(left,right);
-				linkInfo.link = textAreaElement.value.substring(left,right);	
-			} else {
-				linkInfo.displayText = innerExpression.substring(0,splitPos);
-				linkInfo.link = innerExpression.substring(splitPos + 1);
-			}			
-		}
-	} else {
-		linkInfo.expressionStart = left;
-		linkInfo.expressionEnd = right - 1;
-		linkInfo.displayText = textAreaElement.value.substring(left,right);
-	}
-	
-	return linkInfo;
-}
-
-//}}}
-</pre>
 </div>
 <div title="Link Variations" modifier="YourName" created="201701242104" modified="201911231541" changecount="42" parenttiddler="​Reference">
 <pre>|Code|Demo|h
@@ -875,45 +560,7 @@ Some dummy text.
 </pre>
 </div>
 <div title="MenuTree" modifier="YourName" created="201212211816" modified="201701290853" tags="excludeLists excludeSearch" parenttiddler="" changecount="6">
-<pre>{{menuTree{&lt;&lt;tagsTree &quot;.&quot; null 6 &gt;&gt;{{treeButtons{&lt;&lt;newSubTiddler &quot;New Root Page&quot; true&gt;&gt;&lt;&lt;newSubTiddler &quot;New Sub Page&quot; false&gt;&gt;}}}}}}</pre>
-</div>
-<div title="NewSubTiddlerMacro" modifier="YourName" created="201208281208" modified="201601071505" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="2">
-<pre>/***
-|''Name:''|NewSubTiddlerMacro|
-|''Version:''|2016.01.08|
-|''Description:''|Renders a button which creates a new Tiddler that has the current tiddler as a tag.|
-|''Author:''|Mark Vodicka|
-!Code
-***/
-//{{{
-
-config.macros.newSubTiddler = {};
-
-config.macros.newSubTiddler.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
-	// process command line parameters
-	var label = params[0];
-	var createRoot = params[1];
-	if (createRoot == &quot;true&quot;) {
-		renderTiddlyButton(place, label, "Create a new root level page", function() {config.macros.newSubTiddler.create(true);},	null, null, null);
-	} else{
-		renderTiddlyButton(place, label, "Create a sub page for the current page", function() {config.macros.newSubTiddler.create(false);},	null, null, null);
-	}
-};
-
-config.macros.newSubTiddler.create = function(createRoot) {
-	if (createRoot) {
-		var currentTiddlerTitle = &quot;.&quot;;
-	} else {
-		var currentTiddlerTitle = store.currentTiddler.title;
-	}
-	if (! currentTiddlerTitle) return;
-	var newTiddler = store.createTiddler(&quot;Untitled&quot;);
-	newTiddler.fields['parenttiddler'] = currentTiddlerTitle;
-	story.displayTiddler(null,&quot;Untitled&quot;, DEFAULT_EDIT_TEMPLATE);
-	story.focusTiddler(&quot;Untitled&quot;, &quot;title&quot;);
-};
-
-//}}}</pre>
+<pre>{{menuTree{&lt;&lt;tagsTree &quot;.&quot; null 6 &gt;&gt;{{treeButtons{&lt;&lt;newArticleButton &quot;New Article&quot; true&gt;&gt;&lt;&lt;newArticleButton &quot;New Sub Article&quot; false&gt;&gt;}}}}}}</pre>
 </div>
 <div title="SectionLinksPlugin" modifier="YourName" created="201501101757" modified="201701301927" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="3">
 <pre>/***
@@ -992,8 +639,8 @@ links to anchors defined by ''HTML syntax'' (e.g., {{{&lt;html&gt;&lt;a href=&qu
 2011.02.08 1.4.1 in isExternalLink() hijack, strip section references before testing for external link
 2010.08.09 1.4.0 in scrollToSection(), added support for using HTML &lt;a name=&quot;...&quot;&gt; anchor elements
 2009.08.21 1.3.4 added handling to ignore leading/trailing whitespace in section references
-2009.08.21 1.3.3 in renderTiddlyLink(), add tiddlyLinkNonExistingSection class if matching section is not found
-2009.08.14 1.3.2 in renderTiddlyLink(), don't override core value for ~TiddlyLink attribute
+2009.08.21 1.3.3 in renderLinkElement(), add tiddlyLinkNonExistingSection class if matching section is not found
+2009.08.14 1.3.2 in renderLinkElement(), don't override core value for ~TiddlyLink attribute
 2009.08.02 1.3.1 in sectionTOC.handler(), trim leading/trailing whitespace from generated section links
 2009.08.01 1.3.0 in scrollToSection(), apply 3-tier section matching (exact, startsWith, contains)
 2009.07.06 1.2.2 fixed displayTiddler() hijack
@@ -1009,7 +656,7 @@ links to anchors defined by ''HTML syntax'' (e.g., {{{&lt;html&gt;&lt;a href=&qu
 //{{{
 version.extensions.SectionLinksPlugin= {major: 1, minor: 4, revision: 2, date: new Date(2011,12,21)};
 
-Story.prototype.scrollToSection = function(title,section) {
+Story.prototype.scrollToSection = function(title, section) {
 	if (!title||!section) return; var t=this.getTiddler(title); if (!t) return null;
 	var elems=t.getElementsByTagName('*');
 	var heads=[]; var anchors=[]; var cells=[];
@@ -1050,22 +697,22 @@ Story.prototype.scrollToSection = function(title,section) {
 ***/
 //{{{
 
-if (!window.onClickTiddlerLink_section)	window.onClickTiddlerLink_section=window.onClickTiddlerLink;
+if (! window.onClickTiddlerLink_section)	window.onClickTiddlerLink_section = window.onClickTiddlerLink;
 
-window.onClickTiddlerLink = function(ev) {
+window.onClickTiddlerLink = function(ev) { // xxx
 	var e = ev || window.event;
-	var target = resolveTarget(e);
+	var sender = resolveSender(e);
 	var title = null;
 	var section = null;
 	
-	while (target != null &amp;&amp; title == null) {
-		title = target.getAttribute('tiddlyLink');
-		section = target.getAttribute('section');
-		target = target.parentNode;
+	while (sender != null &amp;&amp; title == null) {
+		title = sender.getAttribute('tiddlyLink');
+		section = sender.getAttribute('section');
+		sender = sender.parentNode;
 	} 
-	var t = story.findContainingTiddler(target); 
+	var t = story.findContainingTiddler(sender); 
 	var tid = t ? t.getAttribute('tiddler') : '';
-	if (title != tid || !section) onClickTiddlerLink_section.apply(this, arguments); // avoid excess scrolling for intra-tiddler links
+	if (title != tid || ! section) onClickTiddlerLink_section.apply(this, arguments); // avoid excess scrolling for intra-tiddler links
 	// BEGIN patch by Vodi: Select section element
 	if (section) {
 		var el = story.scrollToSection(title, section);
@@ -1089,12 +736,15 @@ if (!Story.prototype.displayTiddler_section)
 Story.prototype.displayTiddler = function(srcElement, tiddler) { // todo: instead of hijacking kung-fu make one function of it
 	var title = (tiddler instanceof Tiddler) ? tiddler.title : tiddler;
 	var parts = title.split(config.textPrimitives.sectionSeparator);
-	var title = parts[0]; var section=parts[1]; if (section) section=section.trim();
-	if (!title.length || title.toLowerCase()=='here') {
-		var t=story.findContainingTiddler(place);
-		title=t?t.getAttribute('tiddler'):'';
+	var title = parts[0]; 
+	var section = parts[1];
+	if (section) section = section.trim();
+	//xxx
+	if (! title.length || title.toLowerCase() == 'here') {
+		var t = story.findContainingTiddler(place);
+		title = t ? t.getAttribute('tiddler'):'';
 	}
-	arguments[1]=title;  // default=current tiddler
+	arguments[1] = title;  // default=current tiddler
 	this.displayTiddler_section.apply(this, arguments);
 	story.scrollToSection(title, section);
 }
@@ -1347,7 +997,7 @@ Story.prototype.closeTiddler = function(title, animate, unused) {
 {{{
 *Bullet list
 **Bullet list
-***Bullet list<br>with line break
+***Bullet list&lt;br&gt;with line break
 ***Bullet list same level
 ****Bullet list
 
@@ -1359,7 +1009,7 @@ Story.prototype.closeTiddler = function(title, animate, unused) {
 
 *Bullet list
 **Bullet list
-***Bullet list<br>with line break
+***Bullet list&lt;br&gt;with line break
 ***Bullet list same level
 ****Bullet list
 
@@ -1561,30 +1211,30 @@ config.macros.tagsTree.createSubTree = function(place, id, root, ancestors, leve
 	if (root &amp;&amp; ancestors.length) {
 		var t = store.getTiddler(root);
 		if (childNodes.length &amp;&amp; depth&gt;0) {
-			var wrapper = createTiddlyElement(place , this.styles[Math.min(Math.max(ancestors.length,1),6)-1],null,&quot;branch&quot;);
+			var wrapper = createTiddlyElement(place , this.styles[Math.min(Math.max(ancestors.length, 1), 6) - 1], null, &quot;branch&quot;);
 			if (showButtons) {
 				if (t.tags.contains(config.macros.tagsTree.collapsedTag)) isOpen = false;
 				if (t.tags.contains(config.macros.tagsTree.expandedTag)) isOpen = true;
 				b = renderTiddlyButton(wrapper, isOpen ? config.macros.tagsTree.collapse : config.macros.tagsTree.expand, null, config.macros.tagsTree.onClick);
-				b.setAttribute(&quot;treeId&quot;,id);
-				b.setAttribute(&quot;tiddler&quot;,root);					
+				b.setAttribute(&quot;treeId&quot;, id);
+				b.setAttribute(&quot;tiddler&quot;, root);					
 			}
-			createTiddlyText(renderTiddlyLink(wrapper, root),t&amp;&amp;labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
+			createTiddlyText(renderLinkElement(wrapper, root), t &amp;&amp; labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
 		}
 		else 
-			createTiddlyText(renderTiddlyLink(place, root, false, &quot;leaf&quot;),t&amp;&amp;labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
+			createTiddlyText(renderLinkElement(place, root, false, &quot;leaf&quot;), t &amp;&amp; labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
 	}
 	if (childNodes.length &amp;&amp; depth) {
 		var d = createTiddlyElement(place,&quot;div&quot;,null,&quot;subtree&quot;);
 		d.style.display= isOpen ? &quot;block&quot; : &quot;none&quot;;
 		if (sortField)
 			childNodes.sort(function(a, b) {
-				var fa=a.fields[sortField];
-				var fb=b.fields[sortField];
-				return (fa==undefined &amp;&amp; fb==undefined) ? a.title &lt; b.title ? -1 : a.title &gt; b.title ? 1 : 0 : (fa==undefined &amp;&amp; fb!=undefined) ? 1 :(fa!=undefined &amp;&amp; fb==undefined) ? -1 : fa &lt; fb ? -1 : fa &gt; fb ? 1 : 0;
+				var fa = a.fields[sortField];
+				var fb = b.fields[sortField];
+				return (fa == undefined &amp;&amp; fb == undefined) ? a.title &lt; b.title ? -1 : a.title &gt; b.title ? 1 : 0 : (fa == undefined &amp;&amp; fb != undefined) ? 1 :(fa != undefined &amp;&amp; fb == undefined) ? -1 : fa &lt; fb ? -1 : fa &gt; fb ? 1 : 0;
 			})
 		for (var cpt=0; cpt&lt;childNodes.length; cpt++)
-			this.createSubTree(d, id, childNodes[cpt].title, ancestors.concat(root), level-1, depth-1, sortField, labelField, showButtons);	
+			this.createSubTree(d, id, childNodes[cpt].title, ancestors.concat(root), level - 1, depth - 1, sortField, labelField, showButtons);	
 	}	
 }
 
@@ -1744,39 +1394,6 @@ window.displayMessage = function(text,linkText) {
 
 //}}}</pre>
 </div>
-<div title="VodiSavePlugin" modifier="YourName" created="201910120914" modified="201910120915" tags="systemConfig excludeLists excludeSearch" changecount="1" parenttiddler="">
-<pre>/***
-|''Name:''|VodiSavePlugin|
-|''Version:''|2019.10.12|
-|''Description:''|Replaces core saving methods to use blob instead of data link.|
-***/
-//{{{
-
-convertUnicodeToFileFormat = function(s) {
-	return s;
-}
-
-HTML5DownloadSaveFile = function(filePath, content) {	
-	if (document.createElement(&quot;a&quot;).download == undefined) {
-		return null;
-	}	
-	config.saveByDownload=true;
-	var slashpos=filePath.lastIndexOf(&quot;/&quot;);
-	if (slashpos==-1) slashpos=filePath.lastIndexOf(&quot;\\&quot;); 
-	var filename=filePath.substr(slashpos+1);
-	var blob = new Blob([content],{encoding:&quot;UTF-8&quot;,type:&quot;data:text/html;charset=UTF-8&quot;});
-	var uri = window.URL.createObjectURL(blob);
-	var link = document.createElement(&quot;a&quot;);
-	// link.setAttribute(&quot;target&quot;,&quot;_blank&quot;);
-	link.setAttribute(&quot;href&quot;, uri);
-	link.setAttribute(&quot;download&quot;,filename);	
-	document.body.appendChild(link); link.click(); document.body.removeChild(link);    
-	// window.URL.revokeObjectURL(uri); // edge won't save with this
-	return true;
-}
-
-//}}}</pre>
-</div>
 <div title="​Advanced Use Cases" modifier="YourName" created="201906080756" modified="201906080757" parenttiddler="." changecount="1">
 <pre></pre>
 </div>
@@ -1823,9 +1440,6 @@ config.defaultAdaptor = null;
 // Backstage tasks
 config.tasks = {};
 
-// Custom fields to be automatically added to new tiddlers
-config.defaultCustomFields = {};
-
 // Messages
 config.messages = {
 	dates: {},
@@ -1837,7 +1451,6 @@ config.options = {
 	chkRegExpSearch: false,
 	chkCaseSensitiveSearch: false,
 	chkIncrementalSearch: true,	
-	chkSaveBackups: true,
 	chkAutoSave: true,
 	chkGenerateAnRssFeed: false,
 	chkSaveEmptyTemplate: false,
@@ -2015,7 +1628,6 @@ merge(config.optionsDesc, {
 	chkRegExpSearch: "Enable regular expressions for searches",
 	chkCaseSensitiveSearch: "Case-sensitive searching",
 	chkIncrementalSearch: "Incremental key-by-key searching",	
-	chkSaveBackups: "Keep backup file when saving changes",
 	chkAutoSave: "Automatically save changes",
 	chkGenerateAnRssFeed: "Generate an RSS feed when saving changes",
 	chkSaveEmptyTemplate: "Generate an empty template when saving changes",
@@ -2035,10 +1647,6 @@ merge(config.messages,{
 	pluginDisabled: "Not executed because disabled via 'systemConfigDisable' tag",
 	nothingSelected: "Nothing is selected. You must select one or more items first",
 	savedSnapshotError: "It appears that this TiddlyWiki has been incorrectly saved. Please see http://www.tiddlywiki.com/#Download for details",
-	subtitleUnknown: "(unknown)",
-	undefinedTiddlerToolTip: "The article '%0' doesn't yet exist",
-	shadowedTiddlerToolTip: "The tiddler '%0' doesn't yet exist, but has a pre-defined shadow value",
-	tiddlerLinkTooltip: "%0 - %1, %2",
 	externalLinkTooltip: "External link to %0",
 	noTags: "There are no tagged tiddlers",
 	notFileUrlError: "You need to save this TiddlyWiki to a file before you can save changes",
@@ -2060,7 +1668,6 @@ merge(config.messages,{
 	overwriteWarning: "A tiddler named '%0' already exists. Choose OK to overwrite it",
 	unsavedChangesWarning: "WARNING! There are unsaved changes in TiddlyWiki\n\nChoose OK to save\nChoose CANCEL to discard",
 	confirmExit: "--------------------------------\n\nThere are unsaved changes in TiddlyWiki. If you continue you will lose those changes\n\n--------------------------------",
-	saveInstructions: "SaveChanges",
 	unsupportedTWFormat: "Unsupported TiddlyWiki format '%0'",
 	tiddlerSaveError: "Error when saving tiddler '%0'",
 	tiddlerLoadError: "Error when loading tiddler '%0'",
@@ -2839,7 +2446,7 @@ config.formatters = [
 			if (listLevel > currLevel) {
 				for (t=currLevel; t<listLevel; t++) {
 					var target = (currLevel == 0) ? stack[stack.length-1] : stack[stack.length-1].lastChild;
-					stack.push(createTiddlyElement(target,listType));
+					stack.push(createTiddlyElement(target, listType));
 				}
 			} else if (listType!=baseType && listLevel==1) {
 				w.nextMatch -= lookaheadMatch[0].length;
@@ -2970,13 +2577,13 @@ config.formatters = [
 			var text = lookaheadMatch[1];
 			if (lookaheadMatch[3]) { // Pretty bracketted link
 				var link = lookaheadMatch[3];
-				linkElement = (!lookaheadMatch[2] && config.formatterHelpers.isExternalLink(link))
+				linkElement = (! lookaheadMatch[2] && config.formatterHelpers.isExternalLink(link))
 					? renderExternalLink(w.output, link) 
-					: renderTiddlyLink(w.output, link, false, null, w.isStatic, w.tiddler)
+					: renderLinkElement(w.output, link, false, null, w.isStatic)
 				;
 			} else {
 				// Simple bracketted link
-				linkElement = renderTiddlyLink(w.output, text, false, null, w.isStatic, w.tiddler);
+				linkElement = renderLinkElement(w.output, text, false, null, w.isStatic);
 			}
 			if (text.substring(0, 2) == config.textPrimitives.sectionSeparator) text = text.substring(2); // remove leading "##" of local section links.
 			createTiddlyText(linkElement, text); // before, the linkElement has been rendered without innerHtml. We've now inserted the text as innerHtml.
@@ -3004,17 +2611,19 @@ config.formatters = [
 			var e = w.output;
 			if (lookaheadMatch[5]) {
 				var link = lookaheadMatch[5];
-				e = config.formatterHelpers.isExternalLink(link) ? renderExternalLink(w.output,link) : renderTiddlyLink(w.output, link, false, null, w.isStatic, w.tiddler);
+				e = config.formatterHelpers.isExternalLink(link) 
+					? renderExternalLink(w.output, link) 
+					: renderLinkElement(w.output, link, false, null, w.isStatic, w.tiddler);
 				jQuery(e).addClass("imageLink");
 			}
-			var img = createTiddlyElement(e,"img");
+			var img = createTiddlyElement(e, "img");
 			if (lookaheadMatch[1])
 				img.align = "left";
 			else if (lookaheadMatch[2])
 				img.align = "right";
 			if (lookaheadMatch[3]) {
 				img.title = lookaheadMatch[3];
-				img.setAttribute("alt",lookaheadMatch[3]);
+				img.setAttribute("alt", lookaheadMatch[3]);
 			}
 			img.src = lookaheadMatch[4];
 			w.nextMatch = this.lookaheadRegExp.lastIndex;
@@ -3536,9 +3145,9 @@ config.macros.allTags.handler = function(place, macroName, params) { // Implemen
 	var t;
 	for (t = 0; t < tags.length; t++) {
 		var title = tags[t][0];
-		var info = getTiddlyLinkInfo(title);
+		var classNames = buildClassNames(title);
 		var li = createTiddlyElement(ul, "li");
-		var btn = renderTiddlyButton(li, title + " (" + tags[t][1] + ")", this.tooltip.format([title]), onClickTag, info.classes);
+		var btn = renderTiddlyButton(li, title + " (" + tags[t][1] + ")", this.tooltip.format([title]), onClickTag, classNames);
 		btn.setAttribute("tag", title);
 		btn.setAttribute("refresh", "link");
 		btn.setAttribute("tiddlyLink", title);
@@ -3771,7 +3380,7 @@ config.macros.view.views = {
 		highlightify(value, place, highlightHack, tiddler);
 	},
 	link: function(value, place, params, wikifier, paramString, tiddler) {
-		renderTiddlyLink(place, value, true);
+		renderLinkElement(place, value, true);
 	},
 	wikified: function(value,place,params,wikifier,paramString,tiddler) {
 		if (config.macros.view.depth>50)
@@ -4115,30 +3724,18 @@ config.commands.closeTiddler.handler = function(event, src, title) {
 	return false;
 };
 
-config.commands.editTiddler.handler = function(event, src, title) {
-	clearMessage();
-	var tiddlerElem = story.getTiddler(title);
-	var fields = tiddlerElem.getAttribute("tiddlyFields");
-	story.displayTiddler(null, title, DEFAULT_EDIT_TEMPLATE, false, null, fields);
-	var e = story.getTiddlerField(title, "text");
-	if (e) {
-		setCaretPosition(e, 0);
-	}
-	return false;
-};
-
 config.commands.saveTiddler.handler = function(event, src, title) {
-	var newTitle = story.saveTiddler(title);
+	var newTitle = story.saveTiddler(title); // todo - wieso kann sich title ändern?
 	if (newTitle) story.displayTiddler(null, newTitle);
 	return false;
 };
 
 config.commands.cancelTiddler.handler = function(event, src, title) {
-	if (story.hasChanges(title) && !readOnly) {
-		if (!confirm(this.warning.format([title])))
+	if (story.hasChanges(title) && ! readOnly) {
+		if (! confirm(this.warning.format([title])))
 			return false;
 	}
-	story.setDirty(title,false);
+	story.setDirty(title, false);
 	story.displayTiddler(null, title);
 	return false;
 };
@@ -4168,7 +3765,7 @@ config.commands.references.handlePopup = function(popup, title) {
 	var r;
 	for (r = 0; r < references.length; r++) {
 		if (references[r].title != title && !references[r].isTagged("excludeLists")) {
-			renderTiddlyLink(createTiddlyElement(popup,"li"), references[r].title, true);
+			renderLinkElement(createTiddlyElement(popup,"li"), references[r].title, true);
 			c = true;
 		}
 	}
@@ -4178,7 +3775,7 @@ config.commands.references.handlePopup = function(popup, title) {
 
 config.commands.jump.handlePopup = function(popup, title) {
 	story.forEachTiddler(function(title,element) {
-		renderTiddlyLink(createTiddlyElement(popup,"li"), title, true, null, false, null, true);
+		renderLinkElement(createTiddlyElement(popup, "li"), title, true, null, false, null, true);
 	});
 };
 
@@ -4219,17 +3816,6 @@ Tiddler.prototype.getLinks = function() {
 	return this.links;
 };
 
-// Returns the fields that are inherited in string field:"value" field2:"value2" format
-Tiddler.prototype.getInheritedFields = function() {
-	var f = {};
-	for (var i in this.fields) {
-		if (i=="server.host" || i=="server.workspace" || i=="wikiformat"|| i=="server.type") {
-			f[i] = this.fields[i];
-		}
-	}
-	return String.encodeHashMap(f);
-};
-
 // Increment the changeCount of a tiddler
 Tiddler.prototype.incChangeCount = function() {
 	var c = this.fields['changecount'];
@@ -4242,10 +3828,6 @@ Tiddler.prototype.clearChangeCount = function() {
 	if (this.fields['changecount']) {
 		delete this.fields['changecount'];
 	}
-};
-
-Tiddler.prototype.doNotSave = function() {
-	return this.fields['doNotSave'];
 };
 
 // Returns true if the tiddler has been updated since the tiddler was created or downloaded
@@ -4338,19 +3920,6 @@ Tiddler.prototype.changed = function() {
 	this.linksUpdated = true;
 };
 
-Tiddler.prototype.getSubtitle = function() {
-	var modifier = this.modifier;
-	if (!modifier)
-		modifier = config.messages.subtitleUnknown || "";
-	var modified = this.modified;
-	if (modified)
-		modified = modified.toLocaleString();
-	else
-		modified = config.messages.subtitleUnknown || "";
-	var f = config.messages.tiddlerLinkTooltip || "%0 - %1, %2";
-	return f.format([this.title,modifier,modified]);
-};
-
 Tiddler.prototype.isReadOnly = function() {
 	return readOnly;
 };
@@ -4361,7 +3930,7 @@ Tiddler.prototype.getServerType = function() {
 		serverType = this.fields['server.type'];
 	if (!serverType)
 		serverType = this.fields['wikiformat'];
-	if (serverType && !config.adaptors[serverType])
+	if (serverType && ! config.adaptors[serverType])
 		serverType = null;
 	return serverType;
 };
@@ -4462,7 +4031,7 @@ TiddlyWiki.prototype.getShadowTiddlerText = function(title) {
 };
 
 // Retrieve tiddler contents
-TiddlyWiki.prototype.getTiddlerText = function(title,defaultText) {
+TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
 	if (!title)
 		return defaultText;
 	var pos = title.indexOf(config.textPrimitives.sectionSeparator);
@@ -4504,7 +4073,7 @@ TiddlyWiki.prototype.getTiddlerText = function(title,defaultText) {
 	return null;
 };
 
-TiddlyWiki.prototype.getRecursiveTiddlerText = function(title,defaultText,depth) {
+TiddlyWiki.prototype.getRecursiveTiddlerText = function(title, defaultText, depth) {
 	var bracketRegExp = new RegExp("(?:\\[\\[([^\\]]+)\\]\\])","mg");
 	var text = this.getTiddlerText(title,null);
 	if (text == null)
@@ -4661,7 +4230,6 @@ TiddlyWiki.prototype.saveTiddler = function(title, newTitle, newBody, modifier, 
 	var tiddler;
 	if (title instanceof Tiddler) {
 		tiddler = title;
-		tiddler.fields = merge(merge({},tiddler.fields),config.defaultCustomFields,true);
 		title = tiddler.title;
 		newTitle = title;
 	} else {
@@ -4673,9 +4241,8 @@ TiddlyWiki.prototype.saveTiddler = function(title, newTitle, newBody, modifier, 
 		} else {
 			created = created || modified;
 			tiddler = new Tiddler();
-		}
-		fields = merge(merge({},fields),config.defaultCustomFields,true);
-		tiddler.set(newTitle,newBody,modifier,modified,tags,created,fields,creator);
+		}		
+		tiddler.set(newTitle, newBody, modifier, modified, tags, created, fields, creator);
 	}
 	this.addTiddler(tiddler);
 	if (clearChangeCount)
@@ -4696,14 +4263,12 @@ TiddlyWiki.prototype.incChangeCount = function(title) {
 };
 
 TiddlyWiki.prototype.getLoader = function() {
-	if (!this.loader)
-		this.loader = new TW21Loader();
+	if (! this.loader) this.loader = new TW21Loader();
 	return this.loader;
 };
 
 TiddlyWiki.prototype.getSaver = function() {
-	if (!this.saver)
-		this.saver = new TW21Saver();
+	if (! this.saver) this.saver = new TW21Saver();
 	return this.saver;
 };
 
@@ -4852,15 +4417,22 @@ TiddlyWiki.prototype.reverseLookup = function(lookupField,lookupValue,lookupMatc
 	return this.sortTiddlers(results,sortField);
 };
 
-// Return the tiddlers as a sorted array
-TiddlyWiki.prototype.getTiddlers = function(field,excludeTag) {
+/**
+		* Transforms a user friendly title to an internal id by replacing spaces by underscores.
+		*
+		* @param {string} fieldName  - Sort the result set by this field
+		* @param {string} excludeTag - Filter out articles by this tag
+		*
+		* @return {array} - Array of articles.
+	*/
+TiddlyWiki.prototype.getTiddlers = function(fieldName, excludeTag) {
 	var results = [];
-	this.forEachTiddler(function(title,tiddler) {
-		if (excludeTag == undefined || !tiddler.isTagged(excludeTag))
+	this.forEachTiddler(function(title, tiddler) {
+		if (excludeTag == undefined || ! tiddler.isTagged(excludeTag))
 			results.push(tiddler);
 	});
-	if (field)
-		results.sort(function(a,b) {return a[field] < b[field] ? -1 : (a[field] == b[field] ? 0 : +1);});
+	if (fieldName)
+		results.sort(function(a,b) {return a[fieldName] < b[fieldName] ? -1 : (a[fieldName] == b[fieldName] ? 0 : +1);});
 	return results;
 };
 
@@ -5191,6 +4763,75 @@ function Story(containerId) {
 		return this.container;
 	};
 }
+
+Story.prototype.editLink = function() {	
+	story.linkInfo = this.getLinkUnderCursor();
+  var okHandler = function(labelsAndValues) {
+		var textAreaElement = story.getTiddlerField(store.currentTiddler.title, "text");
+		var newExpression;		
+		if (labelsAndValues.Link.length > 0) {			
+			newExpression = '[[' + labelsAndValues.Text + '|'+ labelsAndValues.Link + ']]';
+		} else {
+			newExpression = labelsAndValues.Text;
+		}
+		textAreaElement.value = (
+			textAreaElement.value.substring(0, story.linkInfo.expressionStart) + 
+			newExpression + 
+			textAreaElement.value.substring(story.linkInfo.expressionEnd + 1)
+		);		
+	};	
+	inputDialog.awaitUserInput({Text: story.linkInfo.displayText, Link: story.linkInfo.link}, 1, okHandler);
+}
+
+Story.prototype.getLinkUnderCursor = function() {
+	// ToDo: getWordUnderCursor
+	var textAreaElement = this.getTiddlerField(store.currentTiddler.title,"text");
+	var left = textAreaElement.selectionStart;
+	var right = textAreaElement.selectionEnd;
+	var leftLinkSeparator = left;
+	var rightLinkSeparator = right;
+	var linkInfo = {link: ''};
+	if (left === right) {
+  	while (leftLinkSeparator >= 0 && textAreaElement.value[leftLinkSeparator] != "[" && textAreaElement.value[leftLinkSeparator] != "\n") {
+			leftLinkSeparator--;
+		}
+		while (rightLinkSeparator < textAreaElement.textLength && textAreaElement.value[rightLinkSeparator] != "]" && textAreaElement.value[rightLinkSeparator] != "\n") {
+			rightLinkSeparator++;
+		}
+    if (textAreaElement.value[leftLinkSeparator] != "[" || textAreaElement.value[rightLinkSeparator] != "]") {
+			while (left >= 0 && textAreaElement.value[left] != " " && textAreaElement.value[left] != "\n") {
+				left--;
+			}
+			while (right < textAreaElement.textLength && textAreaElement.value[right] != " " && textAreaElement.value[right] != "\n") {
+				right++;
+			}
+			left++;
+			linkInfo.expressionStart = left;
+			linkInfo.expressionEnd = right - 1;
+			linkInfo.displayText = textAreaElement.value.substring(left,right);
+		} else {
+			linkInfo.expressionStart = leftLinkSeparator -1;
+			linkInfo.expressionEnd = rightLinkSeparator +1;
+			left = leftLinkSeparator + 1;
+			right = rightLinkSeparator;
+			var innerExpression = textAreaElement.value.substring(left,right);
+			var splitPos = innerExpression.indexOf('|');
+			if (splitPos < 0) {
+				linkInfo.displayText = textAreaElement.value.substring(left,right);
+				linkInfo.link = textAreaElement.value.substring(left,right);	
+			} else {
+				linkInfo.displayText = innerExpression.substring(0,splitPos);
+				linkInfo.link = innerExpression.substring(splitPos + 1);
+			}			
+		}
+	} else {
+		linkInfo.expressionStart = left;
+		linkInfo.expressionEnd = right - 1;
+		linkInfo.displayText = textAreaElement.value.substring(left,right);
+	}
+	
+	return linkInfo;
+}
 	
 /**
 	* Returns the dom element representing an opened article (one could say the 'tab page').
@@ -5242,6 +4883,13 @@ Story.prototype.displayTiddler = function(unused, tiddler, template, unused, unu
 	return tiddlerElem;
 };
 
+//# Create a tiddler frame at the appropriate place in a story column. If the tiddler doesn't exist,
+//# triggers an attempt to load it as a missing tiddler
+//# place - reference to parent element
+//# before - null, or reference to element before which to insert new tiddler
+//# title - title of new tiddler
+//# template - the name of the tiddler containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
+//# customFields - an optional list of name:"value" pairs to be assigned as tiddler fields
 Story.prototype.createTiddler = function(place, before, title, template, customFields) {
 	var tiddlerElem = createTiddlyElement(null, "div", this.createIdFromTitle(title), "tiddler");
 	tiddlerElem.setAttribute("refresh","tiddler");
@@ -5249,13 +4897,17 @@ Story.prototype.createTiddler = function(place, before, title, template, customF
 		tiddlerElem.setAttribute("tiddlyFields", customFields);
 	place.insertBefore(tiddlerElem, before);
 	var defaultText = null;
-	if (!store.tiddlerExists(title) && !store.isShadowTiddler(title))
-		defaultText = this.loadMissingTiddler(title,customFields);
+	if (! store.tiddlerExists(title) && ! store.isShadowTiddler(title))
+		defaultText = this.loadMissingTiddler(title, customFields);
 	this.refreshTiddler(title, template, false, customFields, defaultText);
 	return tiddlerElem;
 };
 
-Story.prototype.loadMissingTiddler = function(title,fields,callback) {
+//# Attempts to load a missing tiddler from the server specified in the custom fields
+//#   title - title of the missing tiddler
+//#   fields - string of name:"value" pairs or hashmap
+//#   callback - optional function invoked with context argument upon completion; context provides context.tiddler if successful
+Story.prototype.loadMissingTiddler = function(title, fields, callback) {
 	var getTiddlerCallback = function(context)	{
 		if (context.status) {
 			var t = context.tiddler;
@@ -5278,7 +4930,7 @@ Story.prototype.loadMissingTiddler = function(title,fields,callback) {
 	};
 	var tiddler = new Tiddler(title);
 	tiddler.fields = typeof fields == "string" ? fields.decodeHashMap() : fields||{};
-	var context = {serverType:tiddler.getServerType()};
+	var context = {serverType: tiddler.getServerType()};
 	if (!context.serverType)
 		return "";
 	context.host = tiddler.fields['server.host'];
@@ -5301,6 +4953,12 @@ Story.prototype.getTemplateForTiddler = function(title, template, tiddler) {
 };
 
 // Renders an article viewer / editor - for existing articles as well as for non-existing articles
+//# Apply a template to an existing tiddler if it is not already displayed using that template
+//# title - title of tiddler to update
+//# template - the name of the tiddler containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
+//# force - if true, forces the refresh even if the template hasn't changed
+//# customFields - an optional list of name/value pairs to be assigned as tiddler fields (for edit templates)
+//# defaultText - an optional string to replace the default text for non-existent tiddlers
 Story.prototype.refreshTiddler = function(title, template, force, customFields, defaultText) {
 	var tiddlerElem = this.getTiddler(title);
 	if (tiddlerElem) {
@@ -5351,7 +5009,7 @@ Story.prototype.refreshTiddler = function(title, template, force, customFields, 
 	return tiddlerElem;
 };
 
-Story.prototype.addCustomFields = function(place,customFields) {
+Story.prototype.addCustomFields = function(place, customFields) {
 	var fields = customFields.decodeHashMap();
 	var w = createTiddlyElement(place,"div",null,"customFields");
 	w.style.display = "none";
@@ -5386,8 +5044,8 @@ Story.prototype.onTiddlerMouseOut = function(e) {
 
 Story.prototype.onTiddlerDblClick = function(ev) { // ToDo: Get rid of the default command
 	var e = ev || window.event;
-	var target = resolveTarget(e);
-	if (target && target.nodeName.toLowerCase() != "input" && target.nodeName.toLowerCase() != "textarea") {
+	var sender = resolveSender(e);
+	if (sender && sender.nodeName.toLowerCase() != "input" && sender.nodeName.toLowerCase() != "textarea") {
 		if (document.selection && document.selection.empty)
 			document.selection.empty();
 		config.macros.toolbar.invokeCommand(this, "defaultCommand", e);
@@ -5398,40 +5056,53 @@ Story.prototype.onTiddlerDblClick = function(ev) { // ToDo: Get rid of the defau
 	return false;
 };
 
+// Handle keyboard events when editing
 Story.prototype.onTiddlerKeyPress = function(ev) {
 	var e = ev || window.event;
 	clearMessage();
 	var consume = false;
 	var title = this.getAttribute("tiddler");
-	var target = resolveTarget(e);
-	switch(e.keyCode) {
-	case 9: // Tab
-		var textAreaElement = story.getTiddlerField(title, "text");
-		if (target.tagName.toLowerCase() == "input" && textAreaElement.value == config.views.editor.defaultText.format([title])) {
-			// moving from input field and editor still contains default text, so select it
-			textAreaElement.focus();
-			textAreaElement.select();
-			consume = true;
+	var sender = resolveSender(e);
+	switch (e.keyCode) {
+		case 9: { // [Tab]
+			var textAreaElement = story.getTiddlerField(title, "text");
+			if (sender.tagName.toLowerCase() == "input" && textAreaElement.value == config.views.editor.defaultText.format([title])) {
+				// moving from input field and editor still contains default text, so select it
+				textAreaElement.focus();
+				textAreaElement.select();
+				consume = true;
+			}
+			if (config.options.chkInsertTabs && sender.tagName.toLowerCase() == "textarea") {
+				replaceSelection(sender, String.fromCharCode(9));
+				consume = true;
+			}
+			break;
 		}
-		if (config.options.chkInsertTabs && target.tagName.toLowerCase() == "textarea") {
-			replaceSelection(target, String.fromCharCode(9));
-			consume = true;
+		case 75: { // [Ctrl]-[K]
+			if (e.ctrlKey) {
+				story.forEachTiddler(
+					function(title, tiddler) {
+						if (hasClass(tiddler, 'selected') && story.isDirty(title)) story.editLink();
+					}
+				);
+				consume = true;
+			}
+			break;
 		}
-		break;
-	case 13: // Ctrl-Enter
-	case 10: // Ctrl-Enter on IE PC
-	case 77: // Ctrl-Enter is "M" on some platforms
-		if (e.ctrlKey) {
+		case 10: case 13: case 77: { // LF, CR, M => [Ctrl]-[Enter] (on different browsers)
+			if (e.ctrlKey) {
+				blurElement(this);
+				config.macros.toolbar.invokeCommand(this, "defaultCommand", e);
+				consume = true;
+			}
+			break;
+		}
+		case 27: { // [Esc]
 			blurElement(this);
-			config.macros.toolbar.invokeCommand(this, "defaultCommand", e);
+			config.macros.toolbar.invokeCommand(this, "cancelCommand", e);
 			consume = true;
+			break;
 		}
-		break;
-	case 27: // Escape
-		blurElement(this);
-		config.macros.toolbar.invokeCommand(this, "cancelCommand", e);
-		consume = true;
-		break;
 	}
 	e.cancelBubble = consume;
 	if (consume) {
@@ -5619,8 +5290,6 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 		var t = store.fetchTiddler(title);
 		var extendedFields = t.fields;
 		creator = t.creator;
-	} else {
-		extendedFields = merge({},config.defaultCustomFields);
 	}
 	var n;
 	for (n in fields) {
@@ -6153,9 +5822,9 @@ config.macros.importTiddlers.doImport = function(e) {
 			return false;
 	}
 	wizard.addStep(me.step4Title.format([rowNames.length]),me.step4Html);
-	for (t=0; t<rowNames.length; t++) {
+	for (t = 0; t < rowNames.length; t++) {
 		var link = document.createElement("div");
-		renderTiddlyLink(link, rowNames[t], true);
+		renderLinkElement(link, rowNames[t], true);
 		var place = wizard.getElement("markReport");
 		place.parentNode.insertBefore(link,place);
 	}
@@ -6454,11 +6123,12 @@ config.notifyTiddlers = [
 ];
 
 config.refreshers = {
-	link: function(e,changeList)		{
+	link: function(e, changeList) {
 		var title = e.getAttribute("tiddlyLink");
-		refreshTiddlyLink(e,title);
+		var classNames = buildClassNames(title, e.className);
+		e.className = classNames;
 		return true;
-		},
+	},
 
 	tiddler: function(e,changeList)	{
 		var title = e.getAttribute("tiddler");
@@ -6468,7 +6138,7 @@ config.refreshers = {
 		else
 			refreshElements(e,changeList);
 		return true;
-		},
+	},
 
 	content: function(e,changeList)	{
 		var title = e.getAttribute("tiddler");
@@ -6480,7 +6150,7 @@ config.refreshers = {
 			return true;
 		} else
 			return false;
-		},
+	},
 
 	macro: function(e,changeList)	{
 		var macro = e.getAttribute("macroName");
@@ -6490,7 +6160,7 @@ config.refreshers = {
 		if (macro && macro.refresh)
 			macro.refresh(e,params);
 		return true;
-		}
+	}
 };
 
 config.refresherData = {
@@ -6673,7 +6343,7 @@ function commitSystemSettings(storeWasDirty) {
 	}, 1000);
 }
 
-function saveSystemSetting(name,saveFile) {
+function saveSystemSetting(name, saveFile) {
 	var title = 'SystemSettings';
 	var slice = store.getTiddlerSlice(title,name);
 	if (readOnly || slice === getOption(name)) {
@@ -6689,7 +6359,7 @@ function saveSystemSetting(name,saveFile) {
 	}
 	var text = [];
 	for (key in slices) {
-		text.push('%0: %1'.format([key,slices[key]]));
+		text.push('%0: %1'.format([key, slices[key]]));
 	}
 	text = text.sort().join('\n');
 	var storeWasDirty = store.isDirty();
@@ -6698,7 +6368,7 @@ function saveSystemSetting(name,saveFile) {
 		tiddler.text = text;
 		tiddler = store.saveTiddler(tiddler);
 	} else {
-		tiddler = store.saveTiddler(title,title,text,'System',new Date(),['excludeLists'],config.defaultCustomFields);
+		tiddler = store.saveTiddler(title, title, text, 'System', new Date(), ['excludeLists'], null);
 	}
 	if (saveFile) {
 		commitSystemSettings(storeWasDirty);
@@ -6764,7 +6434,7 @@ config.macros.option.types = { // Dictionary(Of OptionTypeName, OptionTypeInfo)
 	}
 };
 
-config.macros.option.propagateOption = function(opt,valueField,value,elementType,elem) {
+config.macros.option.propagateOption = function(opt, valueField, value, elementType, elem) {
 	config.options[opt] = value;
 	saveOption(opt);
 	var t,nodes = document.getElementsByTagName(elementType);
@@ -6846,6 +6516,117 @@ config.macros.options.onChangeUnknown = function(e) {
 
 // Vodi
 
+config.macros.anchor = {};
+
+config.macros.anchor.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
+	var e =	createTiddlyElement(place, "a");
+	e.name = params[0];
+	e.text = params[1];
+	e.className = "anchor";
+};
+
+config.macros.newArticleButton = {};
+
+// This will render the button
+config.macros.newArticleButton.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
+	// process command line parameters
+	var label = params[0];
+	var createRoot = params[1];
+	if (createRoot == "true") {
+		renderTiddlyButton(place, label, "Create a new root level page", function() {config.macros.newArticleButton.onClick(true);},	null, null, null);
+	} else{
+		renderTiddlyButton(place, label, "Create a sub page for the current page", function() {config.macros.newArticleButton.onClick(false);},	null, null, null);
+	}
+};
+
+config.macros.newArticleButton.onClick = function(createRoot) {
+	var currentTiddlerTitle = store.currentTiddler.title;	
+	if (createRoot || ! currentTiddlerTitle || currentTiddlerTitle == "Untitled"){
+		currentTiddlerTitle = ".";
+	}
+	var newTiddler = store.createTiddler("Untitled");
+	newTiddler.fields['parenttiddler'] = currentTiddlerTitle;
+	story.displayTiddler(null, "Untitled", DEFAULT_EDIT_TEMPLATE);
+	story.focusTiddler("Untitled", "title");
+};
+
+function recurseViewer(node, anchor, needle) {
+	for (var i = 0; i < node.childNodes.length; i++) {
+		var child = node.childNodes[i];
+		if (child.nodeType == Node.TEXT_NODE) {
+		  if (child.nodeValue.indexOf(needle) >= 0) {
+				recurseViewerOccurance++;
+				if (child == anchor) {
+					return false;
+				}
+			}
+		}
+		var cont = recurseViewer(child, anchor, needle);
+		if (!cont) {
+			return false;
+		}	
+	}
+	return true;
+}
+
+config.commands.editTiddler.handler = function(event, src, title) { // Implements IMacroResolver.handler()
+
+	clearMessage();
+	
+	var articleElement = story.getTiddler(title);
+	
+	recurseViewerOccurance = 0;
+	var found = -1;
+	var selectedText = window.getSelection().toString();
+	if (selectedText.length) {
+		var viewer = null;
+		for (var i = 0; i < articleElement.childNodes.length; i++) {
+			if (articleElement.childNodes[i].className == "articleContentContainer") { // HACK: Code dependency to CSS class name!
+				viewer = articleElement.childNodes[i];
+				break;
+			}
+		}		
+		recurseViewer(viewer, window.getSelection().anchorNode, selectedText);
+	}
+
+	var tiddlerSource = store.getTiddler(title);
+	if (tiddlerSource) tiddlerSource.rescuedScrollTop = articleElement.scrollTop;
+	var fields = articleElement.getAttribute("tiddlyFields"); // tiddlyFields
+	story.displayTiddler(null, title, DEFAULT_EDIT_TEMPLATE, false, null, fields);
+	var textAreaElement = story.getTiddlerField(title,"text");
+	if (recurseViewerOccurance) {		
+		found = -1;
+		do {
+			recurseViewerOccurance--;
+			found = textAreaElement.value.indexOf(selectedText, found + 1);
+		} while (recurseViewerOccurance && found>=0)
+	}
+	if (found>=0) {
+		setCaretPosition(textAreaElement, found);
+	} else {
+		setCaretPosition(textAreaElement, (articleElement.rescuedCaretPosition ? articleElement.rescuedCaretPosition : 0));
+	}	
+	return false;
+}
+
+config.commands.cancelTiddler.handlerBase = config.commands.cancelTiddler.handler;
+
+config.commands.cancelTiddler.handler = function(event,src,title) { // Implements IMacroResolver.handler()
+	var pos = story.getTiddlerField(title,"text").selectionStart;
+	var baseResult = config.commands.cancelTiddler.handlerBase(event,src,title);
+	story.getTiddler(title).rescuedCaretPosition = pos;
+	return baseResult;
+};
+
+config.commands.saveTiddler.handlerBase = config.commands.saveTiddler.handler; // ToDo: patch the base method instead of hijacking
+
+config.commands.saveTiddler.handler = function(event, src, title) { // Implements IMacroResolver.handler()
+	var pos = story.getTiddlerField(title,"text").selectionStart;
+	var baseResult = config.commands.saveTiddler.handlerBase(event,src,title);
+	story.getTiddler(title).rescuedCaretPosition = pos;
+	return baseResult;
+};
+
 function refreshTreePath() {
 	var place = document.getElementById('treePath');
 	while (place.firstChild) {
@@ -6864,11 +6645,95 @@ function refreshTreePath() {
 	} while (parent && tiddler);
 	
 	for (var i = parents.length - 2; i >= 0; i--) {		
-	 renderTiddlyLink(place, parents[i], parents[i]);
+	 renderLinkElement(place, parents[i], parents[i]);
 	 createTiddlyText(place, " ▸ ");
 	}	
 	createTiddlyText(place, store.currentTiddler.title);
 };
+
+inputDialog = {
+	createElement: function(tag, innerHtml) { // todo: better UX, focus handling (especially after closing the dialog), default selection...
+		var element = document.createElement(tag);
+		element.innerHTML = innerHtml;
+		return element;
+	},
+	close: function(isOk) {
+		this.cloak.style.display = 'none';
+		document.body.removeChild(this.inputPanel);
+		if (isOk) this.okHandler(this.labelsAndValues);
+	},
+	cloak: document.getElementById("backstageCloak"),
+	rescuedCloakClickHandler: null,
+	inputPanel:null,
+	labelsAndValues: null,
+	okHandler:null,
+	keyPressed: function(e) {		
+		var allFields = this.inputPanel.getElementsByClassName('inputDialogPanel-field');		
+		for (i = 0; i < allFields.length; i++) {
+			this.labelsAndValues[allFields[i].getAttribute('name')] = allFields[i].value;
+		}
+		switch(e.keyCode) {
+			case 13:
+				inputDialog.close(true);
+				break;
+			case 27: // Escape
+				inputDialog.close(false);
+				break;
+			}
+	},
+	awaitUserInput: function(labelsAndValues, focusingIndex, okHandler) {
+		this.rescuedCloakClickHandler = this.cloak.onmousedown;
+		this.cloak.onmousedown = null;
+		
+		var inputPanel = document.createElement("div");
+		inputPanel.onkeydown = this.keyPressed.bind(this);
+		inputPanel.setAttribute('class','inputDialogPanel');
+		document.body.appendChild(inputPanel);
+		
+		var title = this.createElement("h1", 'Edit link');
+		inputPanel.appendChild(title);
+		
+		var focusingField;
+		var i = 0;
+		for (labelText in labelsAndValues) {
+			var label = this.createElement("div", labelText);
+			label.setAttribute('class','inputDialogPanel-label');
+			inputPanel.appendChild(label);
+			
+			var field = document.createElement("input");
+			field.setAttribute('name', labelText);
+			field.setAttribute('class', 'inputDialogPanel-field');
+			field.value = labelsAndValues[labelText];
+			if (i == focusingIndex) focusingField = field;
+			//field.onkeypress = this.keyPressed;
+			
+			inputPanel.appendChild(field);
+			i++;			
+		}
+					
+		var buttonsPanel = document.createElement("div");
+		buttonsPanel.setAttribute('class', 'inputDialogPanel-buttonsPanel');
+		
+		var okButton = this.createElement('button', 'Ok');
+		okButton.onclick = function() {inputDialog.close(true);}
+		buttonsPanel.appendChild(okButton);
+		
+		var cancelButton = this.createElement('button', 'Cancel');
+		cancelButton.onclick = function() {inputDialog.close(false);}
+		buttonsPanel.appendChild(cancelButton);
+		
+		inputPanel.appendChild(buttonsPanel);
+		
+		this.cloak.style.display = 'block';
+
+		this.inputPanel = inputPanel;
+		this.labelsAndValues = labelsAndValues;
+		this.okHandler = okHandler;
+
+		focusingField.focus();
+		focusingField.select();
+	}
+}
 
 // YourSearch
 
@@ -7967,7 +7832,7 @@ var closeResultAndDisplayTiddler = function(e) {
 		if (withHilite && withHilite=="true" && lastQuery) {
 			highlightHack = lastQuery.getMarkRegExp();
 		}
-		story.displayTiddler(this,title);
+		story.displayTiddler(this, title);
 		highlightHack = oldHighlightHack;
 	}
 	return(false);
@@ -8400,9 +8265,9 @@ config.macros.foundTiddler = {
 					? "Open tiddler (Shortcut: Alt-%0)".format([shortcutNumber.toString()])
 					: "Open tiddler";
 		
-			var btn = renderTiddlyButton(place,null,tooltip,closeResultAndDisplayTiddler,null);
-			btn.setAttribute("tiddlyLink",currentTiddler.title);
-			btn.setAttribute("withHilite","true");
+			var btn = renderTiddlyButton(place, null, tooltip, closeResultAndDisplayTiddler,null);
+			btn.setAttribute("tiddlyLink", currentTiddler.title);
+			btn.setAttribute("withHilite", "true");
 			
 			renderLimitedText(btn, currentTiddler.title, maxCharsInTitle);
 		
@@ -8411,13 +8276,13 @@ config.macros.foundTiddler = {
 			}
 		},
 		
-		tags: function(place,macroName,params,wikifier,paramString,tiddler) {
+		tags: function(place, macroName, params, wikifier, paramString, tiddler) {
 			if (!currentTiddler) return;
 		
 			renderLimitedText(place, currentTiddler.getTagsTuple(), maxCharsInTags);
 		},
 		
-		text: function(place,macroName,params,wikifier,paramString,tiddler) {
+		text: function(place, macroName, params, wikifier, paramString, tiddler) {
 			if (!currentTiddler) return;
 		
 			renderLimitedText(place, removeTextDecoration(currentTiddler.text), maxCharsInText);
@@ -8657,6 +8522,36 @@ abego.YourSearch.onShowResult = function(useOldResult) {
 })();  // abego_closure
 } // // Ensure_that_the_Plugin_is_only_installed_once.
 
+// Global Keyboard Handling
+
+window.onkeydown = function(e) {
+	if (e.ctrlKey && e.keyCode == 69) { // [Ctrl]-[E]
+		var searchField = document.getElementsByClassName('searchField')[0];
+		if (! searchField.onkeypress) {
+			searchField.onkeypress = function(e) { // todo patch this directly into search code
+				if (e.keyCode == 13) {
+					// document.getElementsByClassName('yourSearchTitle')[0].firstChild.focus();
+					var foundTiddlers = abego.YourSearch.getFoundTiddlers();
+					story.displayTiddler(null, foundTiddlers[0].title);
+					abego.YourSearch.closeResult();
+					return false;
+				};
+			};
+		}
+		searchField.focus();
+		searchField.select();
+		return false;
+	}	
+	if (e.ctrlKey && e.keyCode==13) {
+    story.forEachTiddler(
+      function(title, tiddler) {
+        if (hasClass(tiddler, 'selected') && !story.isDirty(title)) config.commands.editTiddler.handler(e, null, title);
+      }
+    );
+    return false;
+  };
+};
+
 //--
 //-- Saving
 //--
@@ -8702,27 +8597,27 @@ function updateMarkupBlock(s,blockName,tiddlerName) {
 	return s.replaceChunk(
 		"<!--%0-START-->".format([blockName]),
 		"<!--%0-END-->".format([blockName]),
-		"\n" + convertUnicodeToFileFormat(store.getRecursiveTiddlerText(tiddlerName,"")) + "\n"
+		"\n" + store.getRecursiveTiddlerText(tiddlerName, "") + "\n"
 	);
 }
 
-function updateOriginal(original,posDiv,localPath) {
+function updateOriginal(original, posDiv, localPath) {
 	if (!posDiv) posDiv = locateStoreArea(original);
 	if (!posDiv) {
 		alert(config.messages.invalidFileError.format([localPath]));
 		return null;
 	}
-	var revised = original.substr(0,posDiv[0] + startSaveArea.length) + "\n" +
-								convertUnicodeToFileFormat(store.allTiddlersAsHtml()) + "\n" +
+	var revised = original.substr(0, posDiv[0] + startSaveArea.length) + "\n" +
+								store.allTiddlersAsHtml() + "\n" +
 								original.substr(posDiv[1]);
 								
-	var newSiteTitle = convertUnicodeToFileFormat(getPageTitle()).htmlEncode();
-	revised = revised.replaceChunk("<title"+">","</title"+">"," " + newSiteTitle + " ");
+	var newSiteTitle = getPageTitle().htmlEncode();
+	revised = revised.replaceChunk("<title"+">", "</title"+">", " " + newSiteTitle + " ");
 	revised = updateLanguageAttribute(revised);
-	revised = updateMarkupBlock(revised,"PRE-HEAD","MarkupPreHead");
-	revised = updateMarkupBlock(revised,"POST-HEAD","MarkupPostHead");
-	revised = updateMarkupBlock(revised,"PRE-BODY","MarkupPreBody");
-	revised = updateMarkupBlock(revised,"POST-SCRIPT","MarkupPostBody");
+	revised = updateMarkupBlock(revised, "PRE-HEAD", "MarkupPreHead");
+	revised = updateMarkupBlock(revised, "POST-HEAD", "MarkupPostHead");
+	revised = updateMarkupBlock(revised, "PRE-BODY", "MarkupPreBody");
+	revised = updateMarkupBlock(revised, "POST-SCRIPT", "MarkupPostBody");
 	return revised;
 }
 
@@ -8740,7 +8635,7 @@ function locateStoreArea(original) {
 	return (posOpeningDiv != -1 && posClosingDiv != -1) ? [posOpeningDiv,posClosingDiv] : null;
 }
 
-function autoSaveChanges(onlyIfDirty,tiddlers) {
+function autoSaveChanges(onlyIfDirty, tiddlers) {
 	if (config.options.chkAutoSave) saveChanges(onlyIfDirty, tiddlers);
 }
 
@@ -8786,17 +8681,13 @@ function saveChanges(onlyIfDirty, tiddlers) {
 	var msg = config.messages;
 	var originalPath = document.location.toString();
 	if (!window.allowSave()) {
-		alert(msg.notFileUrlError);
-		if (store.tiddlerExists(msg.saveInstructions))
-			story.displayTiddler(null,msg.saveInstructions);
+		alert(msg.notFileUrlError);		
 		return;
 	}
 	var localPath = getLocalPath(originalPath);
 	var original = loadOriginal(localPath);
 	if (original == null) {
 		alert(msg.cantSaveError);
-		if (store.tiddlerExists(msg.saveInstructions))
-			story.displayTiddler(null,msg.saveInstructions);
 		return;
 	}
 	var posDiv = locateStoreArea(original);
@@ -8805,20 +8696,18 @@ function saveChanges(onlyIfDirty, tiddlers) {
 		return;
 	}
 	var co = config.options; //# abbreviation
-	config.saveByDownload=false;
-	config.saveByManualDownload=false;
-	saveMain(localPath,original,posDiv);
-	if (!config.saveByDownload && !config.saveByManualDownload) {
-		if (co.chkSaveBackups)
-			saveBackup(localPath,original);
+	config.saveByDownload = false;
+	config.saveByManualDownload = false;
+	saveMain(localPath, original, posDiv);
+	if (! config.saveByDownload && ! config.saveByManualDownload) {
 		if (co.chkSaveEmptyTemplate)
-			saveEmpty(localPath,original,posDiv);
+			saveEmpty(localPath, original, posDiv);
 		if (co.chkGenerateAnRssFeed && saveRss instanceof Function)
 			saveRss(localPath);
 	}	
 }
 
-function saveMain(localPath,original,posDiv) {
+function saveMain(localPath, original, posDiv) {
 	var save;
 	try {
 		var revised = updateOriginal(original, posDiv, localPath);
@@ -8845,8 +8734,8 @@ function saveBackup(localPath,original) {
 		alert(config.messages.backupFailed);
 }
 
-function saveEmpty(localPath,original,posDiv) {
-	var emptyPath,p;
+function saveEmpty(localPath, original, posDiv) {
+	var emptyPath, p;
 	if ((p = localPath.lastIndexOf("/")) != -1)
 		emptyPath = localPath.substr(0,p) + "/";
 	else if ((p = localPath.lastIndexOf("\\")) != -1)
@@ -8854,10 +8743,10 @@ function saveEmpty(localPath,original,posDiv) {
 	else
 		emptyPath = localPath + ".";
 	emptyPath += "empty.html";
-	var empty = original.substr(0,posDiv[0] + startSaveArea.length) + original.substr(posDiv[1]);
-	var emptySave = saveFile(emptyPath,empty);
+	var empty = original.substr(0, posDiv[0] + startSaveArea.length) + original.substr(posDiv[1]);
+	var emptySave = saveFile(emptyPath, empty);
 	if (emptySave)
-		displayMessage(config.messages.emptySaved,"file://" + emptyPath);
+		displayMessage(config.messages.emptySaved, "file://" + emptyPath);
 	else
 		alert(config.messages.emptyFailed);
 }
@@ -8913,8 +8802,8 @@ function getBackupPath(localPath,title,extension) {
 //--
 
 function saveRss(localPath) {
-	var rssPath = localPath.substr(0,localPath.lastIndexOf(".")) + ".xml";
-	if (saveFile(rssPath,convertUnicodeToFileFormat(generateRss())))
+	var rssPath = localPath.substr(0, localPath.lastIndexOf(".")) + ".xml";
+	if (saveFile(rssPath, generateRss()))
 		displayMessage(config.messages.rssSaved,"file://" + rssPath);
 	else
 		alert(config.messages.rssFailed);
@@ -8965,12 +8854,6 @@ function generateRss() {
 //--
 //-- Filesystem code
 //--
-
-// Copy a file in filesystem [Preemption]
-window.copyFile = window.copyFile || function(dest,source) {
-	return config.browser.isIE ? ieCopyFile(dest,source) : false;
-}
-
 
 // Save a file in filesystem [Preemption]
 window.saveFile = window.saveFile || function(fileUrl,content) {
@@ -9051,17 +8934,6 @@ function ieLoadFile(filePath) {
 	return content;
 }
 
-function ieCopyFile(dest,source) {
-	ieCreatePath(dest);
-	try {
-		var fso = new ActiveXObject("Scripting.FileSystemObject");
-		fso.GetFile(source).Copy(dest);
-	} catch(ex) {
-		return false;
-	}
-	return true;
-}
-
 // Returns null if it can't do it, false if there's an error, true if it saved OK
 function mozillaSaveFile(filePath,content) {
 	if (window.Components) {
@@ -9125,6 +8997,7 @@ function javaUrlToFilename(url) {
  *
  */
 var LOG_TIDDLYSAVER = true;
+
 function logTiddlySaverException(msg, ex) {
 	var applet = document.applets['TiddlySaver'];
 	console.log(msg + ": " + ex);
@@ -9202,21 +9075,23 @@ function javaLoadFile(filePath) {
 	return content.join("\n");
 }
 
-function HTML5DownloadSaveFile(filePath,content) {
-	if (document.createElement("a").download !== undefined) {
-		config.saveByDownload=true;
-		var slashpos=filePath.lastIndexOf("/");
-		if (slashpos==-1) slashpos=filePath.lastIndexOf("\\"); 
-		var filename=filePath.substr(slashpos+1);
-		var uri = getDataURI(content);
-		var link = document.createElement("a");
-		link.setAttribute("target","_blank");
-		link.setAttribute("href",uri);
-		link.setAttribute("download",filename);
-		document.body.appendChild(link); link.click(); document.body.removeChild(link);
-		return true;
-	}
-	return null;
+function HTML5DownloadSaveFile(filePath, content) {	
+	if (document.createElement("a").download == undefined) return null;
+	config.saveByDownload = true;
+	var slashpos = filePath.lastIndexOf("/");
+	if (slashpos == -1) slashpos = filePath.lastIndexOf("\\"); 
+	var filename = filePath.substr(slashpos + 1);
+	var blob = new Blob([content], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
+	var uri = window.URL.createObjectURL(blob);
+	var link = document.createElement("a");
+	// link.setAttribute("target","_blank");
+	link.setAttribute("href", uri);
+	link.setAttribute("download", filename);
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	// window.URL.revokeObjectURL(uri); // edge won't save with this
+	return true;
 }
 
 // Returns null if it can't do it, false if there's an error, true if it saved OK
@@ -9306,35 +9181,13 @@ function mozConvertUTF8ToUnicode(u) {
 	return fin.length > 0 ? s+fin : s;
 }
 
-function convertUnicodeToFileFormat(s) {
-	return config.browser.isOpera || !window.netscape ? (config.browser.isIE ? convertUnicodeToHtmlEntities(s) : s) : mozConvertUnicodeToUTF8(s);
-}
-
 function convertUnicodeToHtmlEntities(s) {
 	var re = /[^\u0000-\u007F]/g;
-	return s.replace(re,function($0) {return "&#" + $0.charCodeAt(0).toString() + ";";});
-}
-
-function convertUnicodeToUTF8(s) {
-// return convertUnicodeToFileFormat to allow plugin migration
-	return convertUnicodeToFileFormat(s);
+	return s.replace(re, function($0) {return "&#" + $0.charCodeAt(0).toString() + ";";});
 }
 
 function manualConvertUnicodeToUTF8(s) {
 	return unescape(encodeURIComponent(s));
-}
-
-function mozConvertUnicodeToUTF8(s) {
-	try {
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-		converter.charset = "UTF-8";
-	} catch(ex) {
-		return manualConvertUnicodeToUTF8(s);
-	} // fallback
-	var u = converter.ConvertFromUnicode(s);
-	var fin = converter.Finish();
-	return fin.length > 0 ? u + fin : u;
 }
 
 function convertUriToUTF8(uri,charSet) {
@@ -9503,28 +9356,28 @@ FileAdaptor.prototype.generateTiddlerInfo = function(tiddler) {
 };
 
 // Retrieve a tiddler from a given workspace on a given server
-FileAdaptor.prototype.getTiddler = function(title,context,userParams,callback) {
-	context = this.setContext(context,userParams,callback);
+FileAdaptor.prototype.getTiddler = function(title, context, userParams, callback) {
+	context = this.setContext(context, userParams, callback);
 	context.title = title;
 	context.complete = FileAdaptor.getTiddlerComplete;
 	if (context.adaptor.store) {
-		return context.complete(context,context.userParams);
+		return context.complete(context, context.userParams);
 	}
 	var options = {
-		type:"GET",
-		url:context.host,
-		processData:false,
-		success:function(data,textStatus,jqXHR) {
-			FileAdaptor.loadTiddlyWikiSuccess(context,jqXHR);
+		type: "GET",
+		url: context.host,
+		processData: false,
+		success: function(data, textStatus, jqXHR) {
+			FileAdaptor.loadTiddlyWikiSuccess(context, jqXHR);
 		},
-		error: function(jqXHR,textStatus,errorThrown) {
+		error: function(jqXHR, textStatus, errorThrown) {
 			FileAdaptor.loadTiddlyWikiError(context, jqXHR);
 		}
 	};
 	return ajaxReq(options);
 };
 
-FileAdaptor.getTiddlerComplete = function(context,userParams) {
+FileAdaptor.getTiddlerComplete = function(context, userParams) {
 	var t = context.adaptor.store.fetchTiddler(context.title);
 	if (t) {
 		t.fields['server.type'] = FileAdaptor.serverType;
@@ -9539,7 +9392,7 @@ FileAdaptor.getTiddlerComplete = function(context,userParams) {
 		context.isSynchronous = true;
 		context.callback(context,userParams);
 	} else {
-		window.setTimeout(function() {context.callback(context,userParams);},10);
+		window.setTimeout(function() {context.callback(context, userParams);},10);
 	}
 	return true;
 };
@@ -9662,14 +9515,14 @@ function compareVersions(v1,v2) {
 function merge(dst, src, preserveExisting) {
 	var i;
 	for (i in src) {
-		if (!preserveExisting || dst[i] === undefined)
+		if (! preserveExisting || dst[i] === undefined)
 			dst[i] = src[i];
 	}
 	return dst;
 }
 
-// Resolve the target object of an event
-function resolveTarget(e) {
+// Resolve the element that triggered an event
+function resolveSender(e) {
 	var obj;
 	if (e.target)
 		obj = e.target;
@@ -9737,7 +9590,7 @@ function createTiddlyElement(parent, tagName, id, className, text, attribs) {
 	* @param  {string}    text      - Optional. The text will become the inner html of the <a>...</a>.
 	* @param  {string}    tooltip   - Optional.
 	* @param  {function}  action    - Optional. This delegate will be called when the link is invoked.
-	* @param  {string}    className - Optional. A CSS class name. If omitted, "button" will be used as default.
+	* @param  {string}    className - Optional. CSS class name(s). If omitted, "button" will be used as default.
 	* @param  {string}    id        - Optional.
 	* @param  {string}    accessKey - Optional.
 	* @param  {hashtable} attribs   - Optional. These attributes will be added to the <a> tag.
@@ -9781,99 +9634,75 @@ function renderExternalLink(place, url, label) {
 	return link;
 }
 
-function getTiddlyLinkInfo(title, currClasses) {
-	var classes = currClasses ? currClasses.split(" ") : [];
+function buildClassNames(title, additionalClassNames) {
+	var classes = additionalClassNames ? additionalClassNames.split(" ") : [];
 	classes.pushUnique("tiddlyLink");
 	var tiddler = store.fetchTiddler(title);
-	var subTitle;
 	if (tiddler) {
-		subTitle = tiddler.getSubtitle();
 		classes.pushUnique("tiddlyLinkExisting");
 		classes.remove("tiddlyLinkNonExisting");
 		classes.remove("shadow");
 	} else {
-	    var f;
 		classes.remove("tiddlyLinkExisting");
 		classes.pushUnique("tiddlyLinkNonExisting");
 		if (store.isShadowTiddler(title)) {
-			f = config.messages.shadowedTiddlerToolTip;
 			classes.pushUnique("shadow");
 		} else {
-			f = config.messages.undefinedTiddlerToolTip;
 			classes.remove("shadow");
 		}
-		subTitle = f ? f.format([title]) : "";
 	}	
-	return {classes: classes.join(" "), subTitle: subTitle};
+	return classes.join(" ");
 }
 
 // Event handler for clicking on a tiddly link
 function onClickTiddlerLink(ev) {
 	var e = ev || window.event;
-	var target = resolveTarget(e);
-	var link = target;
-	var title = null;
-	var fields = null;	
-	do {
-		title = link.getAttribute("tiddlyLink");
-		fields = link.getAttribute("tiddlyFields");
-		link = link.parentNode;
-	} while (title == null && link != null);
-	if (!store.isShadowTiddler(title)) {
-		var f = fields ? fields.decodeHashMap() : {};
-		fields = String.encodeHashMap(merge(f,config.defaultCustomFields,true));
-	}
-	if (title) {		
-		if (store.getTiddler(title))
-			fields = null;
-		story.displayTiddler(target, title, null, true, null, fields);
-	}
+	var sender = resolveSender(e);
+	var title = sender.getAttribute("tiddlyLink");
+	story.displayTiddler(sender, title, null, true);
 	clearMessage();
 	return false;
 }
 
 /**
-	* Renders a link.
+	* Renders a link element (<a>)
 	*
-	* @param  {element} place - ???
-	* @param  {string}  titleAndSection - ???
-	* @param  {boolean} useTitleAsLabel - If true, the title will become the inner html of the <a>...</a> tag. Otherwise it'll be left empty, so one has to insert stuff afterwards.
+	* @param  {element} place                - Container element in which the link should be created
+	* @param  {string}  titleAndSection      - Target. E.g. "##SectionLabel"
+	* @param  {boolean} useTitleAsLabel      - If true, the title will become the inner html of the <a>...</a> tag. Otherwise it'll be left empty, so one has to insert stuff afterwards.
+	* @param  {string}  additionalClassNames - Additional CSS class names (to be added after default class names).
+	*                                          Defaults for internal links: "tiddlyLink", "tiddlyLinkExisting", "tiddlyLinkNonExisting"
+	*                                          Defaults for external links: "externalLink"
+	* @param  {boolean} isStatic             - Set true for external links.
 	*
 	* @return {element} - An <a> element.
 */
-function renderTiddlyLink(place, titleAndSection, useTitleAsLabel, className, isStatic, linkedFromTiddler) {	
+function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalClassNames, isStatic) {
 	var t = story.findContainingTiddler(place); 
 	var tid = t ? t.getAttribute('tiddler') : '';
 	var parts = titleAndSection.split(config.textPrimitives.sectionSeparator);
 	var title = parts[0]; 
 	var section = parts[1]; 
 	if (section) section = section.trim();
-	if (!title.length || title.toLowerCase() == 'here') title = tid;  // default=current tiddler
+	if (! title.length || title.toLowerCase() == 'here') title = tid;  // default=current tiddler
 	title = title.trim();
 	var label = useTitleAsLabel ? title : null;
-	var i = getTiddlyLinkInfo(title, className);
-	var btn = isStatic ? renderExternalLink(place, store.getTiddlerText("SiteUrl", null) + "#" + title) : renderTiddlyButton(place, label, i.subTitle, onClickTiddlerLink, i.classes);
-	if (isStatic)
-		btn.className += ' ' + className;
+	var classNames = buildClassNames(title, additionalClassNames);
+	var btn;
+	if (isStatic) {
+		btn = renderExternalLink(place, store.getTiddlerText("SiteUrl", null) + "#" + title) 
+		btn.className += ' ' + additionalClassNames;
+	} else {
+		btn = renderTiddlyButton(place, label, null, onClickTiddlerLink, classNames);
+	}
 	btn.setAttribute("refresh", "link");
-	btn.setAttribute("tiddlyLink", title);	
-	if (linkedFromTiddler) {
-		var fields = linkedFromTiddler.getInheritedFields();
-		if (fields)
-			btn.setAttribute("tiddlyFields", fields);
-	}	
+	btn.setAttribute("tiddlyLink", title);
 	if (section) {
 		btn.setAttribute('section', section);
 		if (! store.getTiddlerText(title + config.textPrimitives.sectionSeparator + section))
 			addClass(btn, 'tiddlyLinkNonExistingSection');
 	}
 	return btn;
-}
-
-function refreshTiddlyLink(e, title) {
-	var i = getTiddlyLinkInfo(title, e.className);
-	e.className = i.classes;
-	e.title = i.subTitle;
 }
 
 function createTiddlyDropDown(place, onchange, options, defaultValue) {
@@ -9920,7 +9749,7 @@ function onClickTag(ev) { // (do not mix up with onTagClick)
 		if (titles.length > 0) {
 			createTiddlyElement(createTiddlyElement(popup, "li", null, "listBreak"), "div");
 			for (r = 0; r < titles.length; r++) {
-				renderTiddlyLink(createTiddlyElement(popup,"li"), titles[r], true);
+				renderLinkElement(createTiddlyElement(popup, "li"), titles[r], true);
 			}
 		} else {
 			createTiddlyElement(popup, "li", null, "disabled", lingo.popupNone.format([tag])); // HACK: Kann theoretisch niemals vorkommen, dass tags aufgelistet werden, für die es keine Artikel gibt.
@@ -10249,7 +10078,7 @@ ListView.columnTypes.Tiddler = {
 	createItem: function(place, listObject, field, columnTemplate, col, row) {
 		var v = listObject[field];
 		if (v != undefined && v.title)
-			renderTiddlyLink(place, v.title, true);
+			renderLinkElement(place, v.title, true);
 	}
 };
 
@@ -10356,7 +10185,7 @@ ListView.columnTypes.TiddlerLink = {
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
 		if (v != undefined) {
-			var link = renderTiddlyLink(place, listObject[columnTemplate.tiddlerLink], false, null);
+			var link = renderLinkElement(place, listObject[columnTemplate.tiddlerLink]);
 			createTiddlyText(link, listObject[field]);
 		}
 	}
@@ -10686,7 +10515,7 @@ String.prototype.decodeHashMap = function() {
 	return r;
 };
 
-// Static method to encode a hashmap into a name:"value"... string
+// Static method to encode a hashmap into a [name:"value" name:"value" ...] string tuple (space separated)
 String.encodeHashMap = function(hashmap) {
 	var t,r = [];
 	for (t in hashmap)
@@ -11163,10 +10992,9 @@ function SaverBase() {}
 
 SaverBase.prototype.externalize = function(store) {
 	var results = [];
-	var t,tiddlers = store.getTiddlers("title");
-	for (t = 0; t < tiddlers.length; t++) {
-		if (!tiddlers[t].doNotSave())
-			results.push(this.externalizeTiddler(store, tiddlers[t]));
+	var tiddlers = store.getTiddlers("title");
+	for (var t = 0; t < tiddlers.length; t++) {
+		results.push(this.externalizeTiddler(store, tiddlers[t]));
 	}
 	return results.join("\n");
 };
