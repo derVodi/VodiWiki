@@ -827,8 +827,6 @@ Several lines of blockquoted text.
 ***/
 //{{{
 
-config.options.chkInsertTabs = true;
-
 // import default setting &quot;Keep these tiddlers linked to this server...&quot; (Checkbox 'chkSync') had to be patched, since it isn't reachable via script
 
 if (window.displayMessageBase == undefined)
@@ -905,7 +903,6 @@ config.options = {
 	chkToggleLinks: false,
 	chkHttpReadOnly: true,
 	chkConfirmDelete: true,
-	chkInsertTabs: false,
 	chkUsePreForStorage: true, // Whether to use <pre> format for storage
 	txtBackupFolder: "",
 	txtMaxEditRows: "30",
@@ -1029,10 +1026,10 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 
 config.shadowTiddlers = {	
 	ArticleTreePanel: '{{articleTreePanel{<<articleTree>>{{articleTreeButtons{<<newArticleButton "🕀 New Article" true>><<newArticleButton "🕁 New Sub Article" false>>}}}}}}',
-	MarkupPreHead: "", // xxx
-	MarkupPostHead: "", // xxx
-	MarkupPreBody: "", // xxx
-	MarkupPostBody: "", // xxx
+	MarkupPreHead: "", // todo could be removed
+	MarkupPostHead: "", // todo could be removed
+	MarkupPreBody: "", // todo could be removed
+	MarkupPostBody: "", // todo could be removed
 	NavigationPanel: '<<tabs navigationTabSetWrapper "╘" "Structured tree" ArticleTreePanel "A-Z" "Sorted list" SortedListPanel "🕓" "Timeline" TimelinePanel>>',
 	PluginManager: '<<plugins>>',
 	SortedListPanel: '<<list all>>',
@@ -1082,7 +1079,6 @@ merge(config.optionsDesc, {
 	chkToggleLinks: "Clicking on links to open tiddlers causes them to close",
 	chkHttpReadOnly: "Hide editing features when viewed over HTTP",
 	chkConfirmDelete: "Require confirmation before deleting tiddlers",
-	chkInsertTabs: "Use the tab key to insert tab characters instead of moving between fields",
 	txtBackupFolder: "Name of folder to use for backups",
 	txtMaxEditRows: "Maximum number of rows in edit boxes",
 	txtTheme: "Name of the theme to use",
@@ -3519,8 +3515,7 @@ TiddlyWiki.prototype.getShadowTiddlerText = function(title) {
 
 // Retrieve tiddler contents
 TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
-	if (!title)
-		return defaultText;
+	if (! title) return defaultText;
 	var pos = title.indexOf(config.textPrimitives.sectionSeparator);
 	var section = null;
 	if (pos != -1) {
@@ -3555,27 +3550,26 @@ TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
 		}
 		return defaultText;
 	}
-	if (defaultText != undefined)
-		return defaultText;
+	if (defaultText != undefined) return defaultText;
 	return null;
 };
 
 TiddlyWiki.prototype.getRecursiveTiddlerText = function(title, defaultText, depth) {
-	var bracketRegExp = new RegExp("(?:\\[\\[([^\\]]+)\\]\\])","mg");
-	var text = this.getTiddlerText(title,null);
-	if (text == null)
-		return defaultText;
+	var bracketRegExp = new RegExp("(?:\\[\\[([^\\]]+)\\]\\])", "mg");
+	var text = this.getTiddlerText(title, null);
+	if (text == null) return defaultText;
 	var textOut = [];
-	var match,lastPos = 0;
+	var match, lastPos = 0;
 	do {
 		match = bracketRegExp.exec(text);
 		if (match) {
-			textOut.push(text.substr(lastPos,match.index-lastPos));
+			textOut.push(text.substr(lastPos, match.index - lastPos));
 			if (match[1]) {
-				if (depth <= 0)
+				if (depth <= 0)	{
 					textOut.push(match[1]);
-				else
-					textOut.push(this.getRecursiveTiddlerText(match[1],"",depth-1));
+				} else {
+					textOut.push(this.getRecursiveTiddlerText(match[1], "", depth - 1));
+				}
 			}
 			lastPos = match.index + match[0].length;
 		} else {
@@ -4469,10 +4463,10 @@ Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFie
 	
 	if (desiredView) {
 		returningView = desiredView;
-		this.refreshTiddler(title, templateNameOrNumber, false, customFields);
+		this.refreshView(title, templateNameOrNumber, false, customFields);
 	} else {
 		var place = this.getArticleWrapper();
-		returningView = this.renderArticleView(place, title, templateNameOrNumber, customFields);
+		returningView = this.renderNewView(place, title, templateNameOrNumber, customFields);
 	}
 	story.scrollToSection(title, sectionName);
 	
@@ -4485,23 +4479,20 @@ Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFie
 	return returningView;
 };
 
-//# Create a tiddler frame at the appropriate place in a story column. If the tiddler doesn't exist,
-//# triggers an attempt to load it as a missing tiddler
+//# Create a tiddler frame at the appropriate place in a story column. If the tiddler doesn't exist, triggers an attempt to load it as a missing tiddler
 //# place - reference to parent element
 //# before - null, or reference to element before which to insert new tiddler
 //# title - title of new tiddler
 //# templateNameOrNumber - the name of the tiddler containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
 //# customFields - an optional list of name:"value" pairs to be assigned as tiddler fields
-Story.prototype.renderArticleView = function(place, title, templateNameOrNumber, customFields) {
+Story.prototype.renderNewView = function(place, title, templateNameOrNumber, customFields) {
 	var articleView = createTiddlyElement(null, "div", this.createIdFromTitle(title), "articleView");
 	articleView.setAttribute("refresh", "tiddler");
-	if (customFields)
-		articleView.setAttribute("tiddlyFields", customFields);
+	// if (customFields) articleView.setAttribute("tiddlyFields", customFields); xxx
 	place.appendChild(articleView);
-	var defaultText = null;
-	if (! store.tiddlerExists(title) && ! store.isShadowTiddler(title))
-		defaultText = this.loadMissingTiddler(title, customFields);
-	this.refreshTiddler(title, templateNameOrNumber, false, customFields, defaultText);
+	var fallbackText = null;
+	if (! store.tiddlerExists(title) && ! store.isShadowTiddler(title)) fallbackText = this.loadMissingTiddler(title, customFields);
+	this.refreshView(title, templateNameOrNumber, false, customFields, fallbackText);
 	return articleView;
 };
 
@@ -4523,7 +4514,7 @@ Story.prototype.loadMissingTiddler = function(title, fields, callback) {
 				store.setDirty(dirty);
 			autoSaveChanges();
 		} else {
-			story.refreshTiddler(context.title, null, true);
+			story.refreshView(context.title, null, true);
 		}
 		context.adaptor.close();
 		if (callback) {
@@ -4533,13 +4524,12 @@ Story.prototype.loadMissingTiddler = function(title, fields, callback) {
 	var tiddler = new Tiddler(title);
 	tiddler.fields = typeof fields == "string" ? fields.decodeHashMap() : fields || {};
 	var context = {serverType: tiddler.getServerType()};
-	if (!context.serverType)
-		return "";
+	if (! context.serverType) return ""; // todo: check if context.serverType is ever set - doesnt'seem so.
 	context.host = tiddler.fields['server.host'];
 	context.workspace = tiddler.fields['server.workspace'];
 	var adaptor = new config.adaptors[context.serverType]();
 	adaptor.getTiddler(title, context, null, getTiddlerCallback);
-	return config.messages.loadingMissingTiddler.format([title,context.serverType,context.host,context.workspace]);
+	return config.messages.loadingMissingTiddler.format([title, context.serverType, context.host, context.workspace]);
 };
 
 Story.prototype.chooseTemplateForTiddler = function(templateNameOrNumber) {
@@ -4561,11 +4551,10 @@ Story.prototype.getTemplateForTiddler = function(templateName) {
 //# force - if true, forces the refresh even if the template hasn't changed
 //# customFields - an optional list of name/value pairs to be assigned as tiddler fields (for edit templates)
 //# defaultText - an optional string to replace the default text for non-existent tiddlers
-Story.prototype.refreshTiddler = function(title, templateNameOrNumber, force, customFields, defaultText) {
+Story.prototype.refreshView = function(title, templateNameOrNumber, force, customFields, defaultText) {
 	var articleView = this.getArticleViewByTitle(title);
 	if (articleView) {
-		if (articleView.getAttribute("dirty") == "true" && ! force)
-			return articleView;
+		if (articleView.getAttribute("dirty") == "true" && ! force)	return articleView;
 		
 		var templateName = this.chooseTemplateForTiddler(templateNameOrNumber);
 		
@@ -4611,17 +4600,17 @@ Story.prototype.refreshTiddler = function(title, templateNameOrNumber, force, cu
 	return articleView;
 };
 
-Story.prototype.addCustomFields = function(place, customFields) {
+// renders hidden fields for customFields (alias "extended fields"), because later on it will be synced back to the entity (see mergeInputElementsToEditBuffer)
+Story.prototype.addCustomFields = function(place, customFields) { // todo: get rid of all custom fields stuff and make parenttiddler a native property (alias "TiddlyWiki.isStandardField")
 	var fields = customFields.decodeHashMap();
-	var w = createTiddlyElement(place,"div",null,"customFields");
+	var w = createTiddlyElement(place, "div", null, "customFields");
 	w.style.display = "none";
-	var t;
-	for (t in fields) {
+	for (var t in fields) {
 		var e = document.createElement("input");
-		e.setAttribute("type","text");
-		e.setAttribute("value",fields[t]);
+		e.setAttribute("type", "text");
+		e.setAttribute("value", fields[t]);
 		w.appendChild(e);
-		e.setAttribute("edit",t);
+		e.setAttribute("edit", t);
 	}
 };
 
@@ -4630,7 +4619,7 @@ Story.prototype.refreshAllTiddlers = function(force) {
 	while (e) {
 		var templateNameOrNumber = e.getAttribute("template");
 		if (templateNameOrNumber && e.getAttribute("dirty") != "true") {
-			this.refreshTiddler(e.getArticleTitle(), force ? null : templateNameOrNumber, true);
+			this.refreshView(e.getArticleTitle(), force ? null : templateNameOrNumber, true);
 		}
 		e = e.nextSibling;
 	}
@@ -4701,7 +4690,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 	var e = ev || window.event;
 	clearMessage();
 	var consume = false;
-	var title = this.getArticleTitle(); // "this" was bound to the articleView in which the key was pressed (see Story.prototype.refreshTiddler)
+	var title = this.getArticleTitle(); // "this" was bound to the articleView in which the key was pressed (see Story.prototype.refreshView)
 	var sender = resolveSender(e);
 	switch (e.keyCode) {
 		case 9: { // [Tab]
@@ -4712,7 +4701,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 				textAreaElement.select();
 				consume = true;
 			}
-			if (config.options.chkInsertTabs && sender.tagName.toLowerCase() == "textarea") {
+			if (! e.shiftKey && sender.tagName.toLowerCase() == "textarea") {
 				replaceSelection(sender, String.fromCharCode(9));
 				consume = true;
 			}
@@ -4856,30 +4845,29 @@ Story.prototype.isEmpty = function() {
 	return place && place.firstChild == null;
 };
 
-Story.prototype.gatherSaveFields = function(element, fields) {
+Story.prototype.mergeInputElementsToEditBuffer = function(element, editBuffer) {
 	if (element && element.getAttribute) {
 		var f = element.getAttribute("edit");
-		if (f) fields[f] = element.value.replace(/\r/mg, "");
+		if (f) editBuffer[f] = element.value.replace(/\r/mg, "");
 		if (element.hasChildNodes()) {
 			var c = element.childNodes;
-			for (var i = 0; i < c.length; i++) this.gatherSaveFields(c[i], fields);
+			for (var i = 0; i < c.length; i++) this.mergeInputElementsToEditBuffer(c[i], editBuffer);
 		}
 	}
 };
 
 Story.prototype.hasChanges = function(title) {
-	var e = this.getArticleViewByTitle(title);
-	if (e) {
-		var fields = {};
-		this.gatherSaveFields(e,fields);
+	var articleView = this.getArticleViewByTitle(title);
+	if (articleView) {
+		var editBuffer = {};
+		this.mergeInputElementsToEditBuffer(articleView, editBuffer);
 		if (store.fetchTiddler(title)) {
-		    var n;
-			for (n in fields) {
-				if (store.getValue(title,n) != fields[n]) //# tiddler changed
+			for (var fieldName in editBuffer) {
+				if (store.getValue(title, fieldName) != editBuffer[fieldName]) //# tiddler changed
 					return true;
 			}
 		} else {
-			if (store.isShadowTiddler(title) && store.getShadowTiddlerText(title) == fields.text) { //# not checking for title or tags
+			if (store.isShadowTiddler(title) && store.getShadowTiddlerText(title) == editBuffer.text) { //# not checking for title or tags
 				return false;
 			} else { //# changed shadow or new tiddler
 				return true;
@@ -4901,9 +4889,9 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 	
 	if (! articleView) return null;
 	
-	var fields = {};
-	this.gatherSaveFields(articleView, fields);
-	var newTitle = fields.title || title;
+	var editBuffer = {};
+	this.mergeInputElementsToEditBuffer(articleView, editBuffer);
+	var newTitle = editBuffer.title || title;
 	if (! store.tiddlerExists(newTitle)) {
 		newTitle = newTitle.trim();
 		var creator = config.options.txtUserName;
@@ -4920,17 +4908,16 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 	articleView.setAttribute("template", DEFAULT_VIEW_TEMPLATE); // hack hier wird ein integer eingesetzt - sollte aber besser string sein!
 	articleView.setAttribute("dirty", "false");
 	var newDate = new Date();
+	var extendedFields = {};
 	if (store.tiddlerExists(title)) {
-		var t = store.fetchTiddler(title);
-		var extendedFields = t.fields;
-		creator = t.creator;
+		var article = store.fetchTiddler(title);
+		extendedFields = article.fields; // article.fields is actually only extended fields. Other fields are real properties.
+		creator = article.creator;
 	}
-	var n;
-	for (n in fields) {
-		if (! TiddlyWiki.isStandardField(n))
-			extendedFields[n] = fields[n];
+	for (var fieldName in editBuffer) {
+		if (! TiddlyWiki.isStandardField(fieldName)) extendedFields[fieldName] = editBuffer[fieldName];
 	}
-	var tiddler = store.saveTiddler(title, newTitle, fields.text, config.options.txtUserName, newDate, fields.tags, extendedFields, null, null, creator);
+	var tiddler = store.saveTiddler(title, newTitle, editBuffer.text, config.options.txtUserName, newDate, editBuffer.tags, extendedFields, null, null, creator);
 	autoSaveChanges(null, [tiddler]);
 	return newTitle;
 };
@@ -4944,8 +4931,7 @@ Story.prototype.switchTheme = function(theme) { // todo: remove theming
 		if (readOnly)
 			r = store.getTiddlerSlice(theme,slice+"ReadOnly") || store.getTiddlerSlice(theme,"Web"+slice);
 		r = r || store.getTiddlerSlice(theme,slice);
-		if (r && r.indexOf(config.textPrimitives.sectionSeparator)==0)
-			r = theme + r;
+		if (r && r.indexOf(config.textPrimitives.sectionSeparator) == 0) r = theme + r;
 		return store.isAvailable(r) ? r : slice;
 	};
 
@@ -5308,16 +5294,16 @@ config.macros.importTiddlers.onGetWorkspaceList = function(context,wizard) {
 	wizard.addStep(me.step2Title,me.step2Html);
 	var t,s = wizard.getElement("selWorkspace");
 	s.onchange = me.onWorkspaceChange;
-	for (t=0; t<context.workspaces.length; t++) {
-		var e = createTiddlyElement(s,"option",null,null,context.workspaces[t].title);
+	for (t = 0; t < context.workspaces.length; t++) {
+		var e = createTiddlyElement(s, "option", null, null, context.workspaces[t].title);
 		e.value = context.workspaces[t].title;
 	}
 	var workspaceList = wizard.getValue("feedWorkspaceList");
 	if (workspaceList) {
 		var n, list = workspaceList.parseParams("workspace",null,false,true);
-		for (n=1; n<list.length; n++) {
-			if (context.workspaces.findByField("title",list[n].value) == null) {
-				e = createTiddlyElement(s,"option",null,null,list[n].value);
+		for (n = 1; n < list.length; n++) {
+			if (context.workspaces.findByField("title", list[n].value) == null) {
+				e = createTiddlyElement(s, "option", null, null, list[n].value);
 				e.value = list[n].value;
 			}
 		}
@@ -5768,7 +5754,7 @@ config.refreshers = {
 		var title = e.getArticleTitle();
 		var templateNameOrNumber = e.getAttribute("template");
 		if (changeList && (changeList.indexOf && changeList.indexOf(title) != -1) && ! story.isDirty(title))
-			story.refreshTiddler(title, templateNameOrNumber, true);
+			story.refreshView(title, templateNameOrNumber, true);
 		else
 			refreshElements(e, changeList);
 		return true;
@@ -6183,9 +6169,7 @@ config.macros.newArticleButton.handler = function(place, macroName, params) { //
 config.macros.newArticleButton.onClick = function(createRoot) {
 	var parentTitle = store.currentTiddler.title;	
 	if (createRoot || ! parentTitle || parentTitle == "Untitled")	parentTitle = "";
-	var newArticle = store.createArticle("Untitled");
-	newArticle.fields['parenttiddler'] = parentTitle;
-	story.displayTiddler("Untitled", DEFAULT_EDIT_TEMPLATE);
+	story.displayTiddler("Untitled", DEFAULT_EDIT_TEMPLATE, parentTitle ? "parenttiddler:[[" + parentTitle + "]]" : null);
 	story.focusTiddler("Untitled", "title");
 };
 
@@ -6312,11 +6296,13 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 
 	var article = store.getTiddler(title);
 	if (article) article.rescuedScrollTop = articleView.scrollTop;
-	var fields = articleView.getAttribute("tiddlyFields");
+	
+	//var fields = articleView.getAttribute("tiddlyFields"); xxx
+	var fields = null;
 	
 	story.displayTiddler(title, DEFAULT_EDIT_TEMPLATE, fields);
 	
-	var textAreaElement = story.getTiddlerField(title,"text");
+	var textAreaElement = story.getTiddlerField(title, "text");
 	
 	// Selected text: Reconstruct the selection by locating the n-th occurance of the formerly selected text
 	if (recurseViewerOccurance) {		
@@ -6339,7 +6325,7 @@ config.commands.cancelTiddler.handlerBase = config.commands.cancelTiddler.handle
 
 config.commands.cancelTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
 	var pos = story.getTiddlerField(title,"text").selectionStart;
-	var baseResult = config.commands.cancelTiddler.handlerBase(event,src,title);
+	var baseResult = config.commands.cancelTiddler.handlerBase(event, src, title);
 	story.getArticleViewByTitle(title).rescuedCaretPosition = pos;
 	return baseResult;
 };
@@ -10127,13 +10113,16 @@ String.prototype.htmlDecode = function() {
 };
 
 /**
-	* Parse a space-separated string of name:value parameters
+	* Parse a space-separated string tuple of lone tags or name:value pairs. Valid Examples (all creating an equal result)
+	*   idiot nickName:john age:42 fullName:[[John Smith]] [[Zip Number]]:12345 iq:
+	*   idiot nickName:john age:42 fullName:"John Smith" "Zip Number":12345 iq:
+	*   idiot nickName:john age:42 fullName:'John Smith' 'Zip Number':12345 iq:
 	*
-	* @param  {string}  defaultName     - ???
-	* @param  {string}  defaultValue    - ???
-	* @param  {boolean} allowEval       - If true, ...?
-	* @param  {boolean} noNames         - If true, ...?
-	* @param  {boolean} cascadeDefaults - If true, ...?
+	* @param  {string}  defaultName     - Optional. Will be used as boilerplate name for tags (in the example: "idiot" => "defaultName:idiot")
+	* @param  {string}  defaultValue    - Optional: Will be used as fallback value for missing values (in the example: "iq:" => "iq:defaultValue")
+	* @param  {boolean} allowEval       - If true, names or values quoted with {{double-curly braces}} are evaluated as a JavaScript expression
+	* @param  {boolean} noNames         - Name prefixes are not allowed if the 'noNames' parameter is true - huh???
+	* @param  {boolean} cascadeDefaults - If true, then the defaults are modified by updated by each specified name or value - huh???
 	*
 	* @return {array[0]}  - object with a member for each parameter name, value of that member being an array of values
 	* @return {array[>0]} - one object for each parameter, with 'name' and 'value' members
@@ -10147,9 +10136,9 @@ String.prototype.parseParams = function(defaultName, defaultValue, allowEval, no
 			n = match[p + 1];
 		else if (match[p + 2]) // Double-square-bracket quoted
 			n = match[p + 2];
-		else if (match[p+3]) // Double-brace quoted
+		else if (match[p + 3]) // Double-brace quoted
 			try {
-				n = match[p+3];
+				n = match[p + 3];
 				if (allowEval && config.evaluateMacroParameters != "none") {
 					if (config.evaluateMacroParameters == "restricted") {
 						if (window.restrictedEval) {
@@ -10163,7 +10152,7 @@ String.prototype.parseParams = function(defaultName, defaultValue, allowEval, no
 				throw "Unable to evaluate {{" + match[p+3] + "}}: " + exceptionText(ex);
 			}
 		else if (match[p + 4]) // Unquoted
-			n = match[p+4];
+			n = match[p + 4];
 		else if (match[p + 5]) // empty quote
 			n = "";
 		return n;
@@ -10202,8 +10191,7 @@ String.prototype.parseParams = function(defaultName, defaultValue, allowEval, no
 		}
 	} while (match);
 	// Summarise parameters into first element
-	var t;
-	for (t=1; t<r.length; t++) {
+	for (var t = 1; t < r.length; t++) {
 		if (r[0][r[t].name])
 			r[0][r[t].name].push(r[t].value);
 		else
@@ -10272,7 +10260,7 @@ String.buildInternalLinksTuple = function(list) {
 	}
 };
 
-// Convert a string as a sequence of name:"value" pairs into a hashmap
+// Convert a space-separated string tuple of "name:value name:value ..." pairs into a hashmap (= Dictionary(Of String, String))
 String.prototype.decodeHashMap = function() {
 	var fields = this.parseParams("anon", "", false);
 	var r = {};
