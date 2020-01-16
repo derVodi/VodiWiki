@@ -55,7 +55,7 @@ table td {vertical-align: top;}
 #displayArea {padding-top: 3px}
 #pageWrapper {position:relative; height:100%;}
 #tiddlerDisplay {position:relative;}
-.tiddler {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0; padding: 6pt 6pt 0;}
+.articleView {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0; padding: 6pt 6pt 0;}
 
 #saveTest {display:none;}
 
@@ -524,7 +524,7 @@ Here is a non printing space you can copy &amp; paste:
 <pre>|Code|Demo|h
 |{{{[[Web link to Startpage|https://www.startpage.com]]}}}|[[Web link to Startpage|https://www.startpage.com]]|
 |{{{[[Internal link to another wiki page|Syntax Examples]]}}}|[[Internal link to another wiki page|Syntax Examples]]|
-|{{{[[Internal link to another wiki page's headline|Syntax Examples##Formatted representation]]}}}|[[Internal link to another wiki page's headline|Syntax Examples##Formatted representation]]|
+|{{{[[Internal link to another wiki page's headline|Syntax Examples##Links &amp; Stylings]]}}}|[[Internal link to another wiki page's headline|Syntax Examples##Links &amp; Stylings]]|
 |{{{[[Internal link to a non existing wiki page|IDoNotExist]]}}}|[[Internal link to a non existing wiki page|IDoNotExist]]|
 |{{{[[Labeled Local link to Head 1|##Head 1]]}}}|[[Labeled Local link to Head 1|##Head 1]]|
 |{{{Local link to [[##Head 2]]}}}|Local link to [[##Head 2]]|
@@ -624,15 +624,6 @@ The default value (shown above) produces a link to each section within the tiddl
 config.macros.sectionTOC.linkFormat='[[%0|##%0]] &lt;&lt;editSection [[##%0]] [[(edit)]]&gt;&gt;';
 }}}
 &lt;&lt;&lt;
-!!!Examples
-&lt;&lt;&lt;
-links to sections defined by ''TW heading syntax'' (e.g, {{{!!!sectionname}}}):{{indent{
-[[SectionLinksPlugin##onClickTiddlerLink]]
-[[##onClickTiddlerLink]] //(current tiddler implied)//}}}
-links to anchors defined by ''HTML syntax'' (e.g., {{{&lt;html&gt;&lt;a href=&quot;anchorname&quot;&gt;&lt;/html&gt;}}}):{{indent{
-[[SectionLinksPlugin##sampleanchorlink]]
-[[##sampleanchorlink]] //(current tiddler implied)//}}}
-&lt;&lt;&lt;
 !!!Revisions
 &lt;&lt;&lt;
 2011.12.21 1.4.2 refactor sectionTOCformat to permit customization
@@ -645,7 +636,6 @@ links to anchors defined by ''HTML syntax'' (e.g., {{{&lt;html&gt;&lt;a href=&qu
 2009.08.01 1.3.0 in scrollToSection(), apply 3-tier section matching (exact, startsWith, contains)
 2009.07.06 1.2.2 fixed displayTiddler() hijack
 2009.07.03 1.2.1 in {{{&lt;&lt;sectionTOC&gt;&gt;}}}, suppress output if target is not found
-2009.06.02 1.2.0 added support for 'here' keyword in {{{[[here##section]]}}} links and {{{&lt;&lt;tiddler here##section&gt;&gt;}}} macro
 2009.04.09 1.1.1 in sectionTOC macro, make target visible when TOC is rendered.
 2009.01.18 1.1.0 added {{{&lt;&lt;sectionTOC&gt;&gt;}}} macro to generate numbered-bullet links to sections of current tiddler
 2009.01.06 1.0.0 converted to stand-alone plugin
@@ -656,36 +646,41 @@ links to anchors defined by ''HTML syntax'' (e.g., {{{&lt;html&gt;&lt;a href=&qu
 //{{{
 version.extensions.SectionLinksPlugin= {major: 1, minor: 4, revision: 2, date: new Date(2011,12,21)};
 
-Story.prototype.scrollToSection = function(title, section) {
-	if (!title||!section) return; var t=this.getTiddler(title); if (!t) return null;
-	var elems=t.getElementsByTagName('*');
-	var heads=[]; var anchors=[]; var cells=[];
-	for (var i=0; i&lt;elems.length; i++)
-		if (['H1','H2','H3','H4','H5'].contains(elems[i].nodeName)) heads.push(elems[i]);
-	for (var i=0; i&lt;elems.length; i++)
-		if (elems[i].nodeName=='A' &amp;&amp; (elems[i].getAttribute('name')||'').length) anchors.push(elems[i]);
-	for (var i=0; i&lt;elems.length; i++)
-		if (elems[i].nodeName=='TD') cells.push(elems[i]);
-	var found=null;
-	for (var i=0; i&lt;heads.length; i++)
-		if (getPlainText(heads[i]).trim()==section) { found=heads[i]; break; }
-	//if (!found) for (var i=0; i&lt;heads.length; i++)
-	//	if (getPlainText(heads[i]).trim().startsWith(section)) { found=heads[i]; break; }
-	//if (!found) for (var i=0; i&lt;heads.length; i++)
-	//	if (getPlainText(heads[i]).trim().indexOf(section)!=-1) { found=heads[i]; break; }
-	if (!found) for (var i=0; i&lt;anchors.length; i++)
-		if (anchors[i].getAttribute('name')==section) { found=anchors[i]; break; }
-	//if (!found) for (var i=0; i&lt;anchors.length; i++)
-	//	if (anchors[i].getAttribute('name').startsWith(section)) { found=anchors[i]; break; }
-	//if (!found) for (var i=0; i&lt;anchors.length; i++)
-	//	if (anchors[i].getAttribute('name').indexOf(section)!=-1) { found=anchors[i]; break; }
-	if (!found) for (var i=0; i&lt;cells.length; i++)
-		if (getPlainText(cells[i]).trim()==section) { found=cells[i]; break; }
-	if (found) {
-		// if section heading is collapsed, click to expand it - see [[FoldHeadingsPlugin]]
-		if (hasClass(found,'foldable') &amp;&amp; found.nextSibling.style.display=='none') found.onclick();		
-		story.currentTiddler.scrollTop = findPosY(found) - story.currentTiddler.clientHeight / 2;
-		return found;
+Story.prototype.scrollToSection = function(title, sectionName) {
+	
+	if (! title|| ! sectionName) return;
+	
+	var t = this.getArticleViewByTitle(title);
+	if (! t) return null;
+	
+	var elems = t.getElementsByTagName('*');
+	var heads = [];
+	var anchors = [];
+	var cells = [];
+	
+	for (var i = 0; i &lt; elems.length; i++)
+		if (['H1','H2','H3','H4','H5'].contains(elems[i].nodeName)) heads.push(elems[i]); // todo: optimize this - don't create unnecessary collections
+	
+	for (var i = 0; i &lt; elems.length; i++)
+		if (elems[i].nodeName == 'A' &amp;&amp; (elems[i].getAttribute('name')||'').length) anchors.push(elems[i]);
+	
+	for (var i = 0; i &lt; elems.length; i++)
+		if (elems[i].nodeName == 'TD') cells.push(elems[i]);
+	
+	var foundElement = null;
+	
+	for (var i = 0; i &lt; heads.length; i++)
+		if (getPlainText(heads[i]).trim() == sectionName) { foundElement = heads[i]; break; }
+	
+	if (!foundElement) for (var i = 0; i &lt; anchors.length; i++)
+		if (anchors[i].getAttribute('name') == sectionName) { foundElement = anchors[i]; break; }
+	
+	if (!foundElement) for (var i = 0; i &lt; cells.length; i++)
+		if (getPlainText(cells[i]).trim() == sectionName) { foundElement = cells[i]; break; }
+	
+	if (foundElement) {
+		story.currentTiddler.scrollTop = findPosY(foundElement) - story.currentTiddler.clientHeight / 2;
+		return foundElement;
 	}
 }
 //}}}
@@ -693,80 +688,26 @@ Story.prototype.scrollToSection = function(title, section) {
 !!!!core hijacks
 ***/
 /***
-!!!!!onClickTiddlerLink
-***/
-//{{{
-
-if (! window.onClickTiddlerLink_section)	window.onClickTiddlerLink_section = window.onClickTiddlerLink;
-
-window.onClickTiddlerLink = function(ev) { // xxx
-	var e = ev || window.event;
-	var sender = resolveSender(e);
-	var title = null;
-	var section = null;
-	
-	while (sender != null &amp;&amp; title == null) {
-		title = sender.getAttribute('tiddlyLink');
-		section = sender.getAttribute('section');
-		sender = sender.parentNode;
-	} 
-	var t = story.findContainingTiddler(sender); 
-	var tid = t ? t.getAttribute('tiddler') : '';
-	if (title != tid || ! section) onClickTiddlerLink_section.apply(this, arguments); // avoid excess scrolling for intra-tiddler links
-	// BEGIN patch by Vodi: Select section element
-	if (section) {
-		var el = story.scrollToSection(title, section);
-		var range = document.createRange();
-		range.selectNodeContents(el);
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-		sel.addRange(range);
-	}
-	//END
-	return false;
-}
-//}}}
-/***
-!!!!! displayTiddler
-***/
-//{{{
-if (!Story.prototype.displayTiddler_section)
-	Story.prototype.displayTiddler_section = Story.prototype.displayTiddler;
-
-Story.prototype.displayTiddler = function(srcElement, tiddler) { // todo: instead of hijacking kung-fu make one function of it
-	var title = (tiddler instanceof Tiddler) ? tiddler.title : tiddler;
-	var parts = title.split(config.textPrimitives.sectionSeparator);
-	var title = parts[0]; 
-	var section = parts[1];
-	if (section) section = section.trim();
-	//xxx
-	if (! title.length || title.toLowerCase() == 'here') {
-		var t = story.findContainingTiddler(place);
-		title = t ? t.getAttribute('tiddler'):'';
-	}
-	arguments[1] = title;  // default=current tiddler
-	this.displayTiddler_section.apply(this, arguments);
-	story.scrollToSection(title, section);
-}
-//}}}
-/***
 &lt;html&gt;&lt;a name=&quot;sampleanchorlink&quot; /&gt;&lt;/html&gt;This is a sample ''anchor link'': {{{&lt;html&gt;&lt;a name=&quot;sampleanchorlink&quot; /&gt;&lt;/html&gt;}}}
 !!!!!tiddler.handler
 ***/
 //{{{
-if (!config.macros.tiddler.handler_section)	config.macros.tiddler.handler_section=config.macros.tiddler.handler;
+if (! config.macros.tiddler.handler_section)	config.macros.tiddler.handler_section=config.macros.tiddler.handler;
 
-config.macros.tiddler.handler = function(place,macroName,params, wikifier, paramString,tiddler) { // Implements IMacroResolver.handler()
+config.macros.tiddler.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
 	if (!params[0]) return;
 	var sep=config.textPrimitives.sectionSeparator;
-	var parts=params[0].split(sep); var tid=parts[0]; var sec=parts[1]; if (sec) sec=sec.trim();
-	if ((tid.toLowerCase()=='here'||!tid.length) &amp;&amp; sec) { // fixup for 'here##section' and '##section'
-		var here = story.findContainingTiddler(place)
+	var parts=params[0].split(sep);
+	var tid=parts[0];
+	var sec=parts[1];
+	if (sec) sec=sec.trim();
+	if ((! tid.length) &amp;&amp; sec) { // fixup for '##section'
+		var here = story.getArticleViewByChild(place)
 		var tid = here ? here.getAttribute('tiddler') : tiddler ? tiddler.title:'';
 		arguments[2][0] = tid + sep + sec;
 		arguments[4] = paramString.replace(new RegExp('(here)?' + sep + sec), tid + sep + sec);
 	}
-	config.macros.tiddler.handler_section.apply(this,arguments);
+	config.macros.tiddler.handler_section.apply(this,arguments); // xxx
 }
 //}}}
 /***
@@ -779,7 +720,7 @@ config.macros.sectionTOC = {
 	handler: function(place,macroName,params, wikifier, paramString,tiddler) {
 		var out=[];
 		var targetClass=params[0]||this.targetClass;
-		var t = story.findContainingTiddler(place); if (!t) return;
+		var t = story.getArticleViewByChild(place); if (!t) return;
 		var elems=t.getElementsByTagName('*');
 		var level=5; // topmost heading level
 		for (var i=0; i&lt;elems.length; i++) {
@@ -886,14 +827,15 @@ config.macros.navigate.handler = function(place, macroName, params) { // Impleme
 if (Story.prototype._DisplayTiddlerFunction == undefined)
 	Story.prototype._DisplayTiddlerFunction = Story.prototype.displayTiddler;
 
+// Navigation
 Story.prototype.displayTiddler = function(srcElement, titleOrTiddler, template, animate, slowly) { // todo: instead of hijacking kung-fu make one function of it
 	var upcomingTitle = (titleOrTiddler instanceof Tiddler) ? titleOrTiddler.title : titleOrTiddler;
-	var upcomingTiddler = story.getTiddler(upcomingTitle); // null unless tiddler is already displayed
+	var articleView = story.getArticleViewByTitle(upcomingTitle); // null unless tiddler is already displayed
 	var doNotClose = false;
-	story.forEachTiddler(function(title, div) {
+	story.forEachArticleElement(function(title, div) {
 		if (title == upcomingTitle) return; // skip current tiddler
 		if (div.getAttribute(&quot;dirty&quot;) == &quot;true&quot;) {
-			if (upcomingTiddler) {
+			if (articleView) {
 				doNotClose = true;
 				return;
 			}
@@ -905,12 +847,12 @@ Story.prototype.displayTiddler = function(srcElement, titleOrTiddler, template, 
 				story.saveTiddler(title);
 			}
 		}
-		story.closeTiddler(title);
+		story.closeView(title);
 	});
 	if (doNotClose) return;
 	this._DisplayTiddlerFunction.apply(this, arguments);
 	store.currentTiddler = store.getTiddler(upcomingTitle);
-	story.currentTiddler = story.getTiddler(upcomingTitle);
+	story.currentTiddler = story.getArticleViewByTitle(upcomingTitle);
 	if (store.currentTiddler) story.currentTiddler.scrollTop = store.currentTiddler.rescuedScrollTop;
 	story.history.add(upcomingTitle);
 	refreshTreePath();
@@ -956,15 +898,6 @@ function calcOffsetTo(inner, outer) {
 	}
 	return curtop;
 }
-
-if (Story.prototype._CloseTiddlerFunction == undefined)	Story.prototype._CloseTiddlerFunction = Story.prototype.closeTiddler;
-
-Story.prototype.closeTiddler = function(title, animate, unused) {
-	var tiddlerSource = store.getTiddler(title);
-	if (tiddlerSource) tiddlerSource.rescuedScrollTop = this.getTiddler(title).scrollTop;
-	this._CloseTiddlerFunction.apply(this, arguments);
-};
-
 //}}}</pre>
 </div>
 <div title="SiteSubtitle" modifier="YourName" created="201305200104" modified="201910120923" changecount="3" parenttiddler="">
@@ -1533,7 +1466,6 @@ config.macros = {
 
 // Commands supported by the toolbar macro
 config.commands = {
-	closeTiddler: {},
 	editTiddler: {},
 	saveTiddler: {hideReadOnly: true},
 	cancelTiddler: {},
@@ -1896,12 +1828,6 @@ merge(config.macros.upgrade,{
 	step3Html: "You have cancelled the upgrade process"
 });
 
-
-merge(config.commands.closeTiddler,{
-	text: "Close",
-	tooltip: "Close this article"
-});
-
 merge(config.commands.editTiddler,{
 	text: "Edit",
 	tooltip: "Edit This Article\n[Ctrl - Enter]",
@@ -2078,7 +2004,7 @@ function saveTest() {
 function loadShadowTiddlers() {
 	var shadows = new TiddlyWiki();
 	shadows.loadFromDiv("shadowArea","shadows",true);
-	shadows.forEachTiddler(function(title,tiddler) {config.shadowTiddlers[title] = tiddler.text;});
+	shadows.forEachArticle(function(title,tiddler) {config.shadowTiddlers[title] = tiddler.text;});
 }
 
 function loadPlugins(tag) {
@@ -2992,8 +2918,8 @@ function invokeMacro(place, macroName, params, wikifier, tiddler) {
 	try {
 		var iMacroResolver = config.macros[macroName]; // Dynamically find the macro module implementation by name (VB = GetType("config.macros." + macroName))
 		if (iMacroResolver && iMacroResolver.handler) { // We hope that the module implements IMacroResolver
-			var tiddlerElem = story.findContainingTiddler(place);
-			window.tiddler = tiddlerElem ? store.getTiddler(tiddlerElem.getAttribute("tiddler")) : null;
+			var articleView = story.getArticleViewByChild(place);
+			window.tiddler = articleView ? store.getTiddler(articleView.getAttribute("tiddler")) : null;
 			window.place = place;
 			var allowEval = true;
 			if (config.evaluateMacroParameters == "system") {
@@ -3160,8 +3086,7 @@ config.macros.allTags.handler = function(place, macroName, params) { // Implemen
 var macro = config.macros.timeline;
 merge(macro, {
 	handler: function(place,macroName,params, wikifier, paramString, tiddler) {
-		var container = jQuery("<div />").attr("params", paramString).
-			attr("macroName", macroName).appendTo(place)[0];
+		var container = jQuery("<div />").attr("params", paramString).attr("macroName", macroName).appendTo(place)[0];
 		macro.refresh(container);
 	},
 	refresh: function(container) {
@@ -3266,8 +3191,8 @@ config.macros.tiddler.transclude = function(wrapper, tiddlerName, args) {
 	}
 };
 
-config.macros.tiddler.renderText = function(place,text,tiddlerName) {
-	wikify(text,place,null,store.getTiddler(tiddlerName));
+config.macros.tiddler.renderText = function(place, text, title) {
+	wikify(text, place, null, store.getTiddler(title));
 };
 
 config.macros.tiddler.tiddlerStack = [];
@@ -3289,7 +3214,7 @@ config.macros.tags.handler = function(place,macroName,params,wikifier,paramStrin
 	var lingo = config.views.wikified.tag;
 	var label = null;
 	var t;
-	for (t=0; t<tiddler.tags.length; t++) {
+	for (t = 0; t < tiddler.tags.length; t++) {
 		var tag = store.getTiddler(tiddler.tags[t]);
 		if (!tag || !tag.tags.contains("excludeLists")) {
 			if (!label)
@@ -3546,10 +3471,10 @@ config.macros.tabs.switchTab = function(tabset, tab) {
 	if (tabElement) {
 		if (tabset.nextSibling && tabset.nextSibling.className == "tabContents")
 			jQuery(tabset.nextSibling).remove();
-		var tabContent = createTiddlyElement(null,"div",null,"tabContents");
-		tabset.parentNode.insertBefore(tabContent,tabset.nextSibling);
+		var tabContent = createTiddlyElement(null, "div", null, "tabContents");
+		tabset.parentNode.insertBefore(tabContent, tabset.nextSibling);
 		var contentTitle = tabElement.getAttribute("content");
-		wikify(store.getTiddlerText(contentTitle),tabContent,null,store.getTiddler(contentTitle));		
+		wikify(store.getTiddlerText(contentTitle), tabContent, null, store.getTiddler(contentTitle));		
 	}
 };
 
@@ -3615,7 +3540,7 @@ config.macros.toolbar.onClickPopup = function(ev) {
 	var popup = Popup.create(this);
 	var command = config.commands[this.getAttribute("commandName")];
 	var title = this.getAttribute("tiddler");
-	popup.setAttribute("tiddler",title);
+	popup.setAttribute("tiddler", title);
 	command.handlePopup(popup,title);
 	Popup.show();
 	return false;
@@ -3714,16 +3639,6 @@ config.macros.toolbar.customCommand = function(place,command,wikifier,tiddler) {
 //-- Menu and toolbar commands
 //--
 
-config.commands.closeTiddler.handler = function(event, src, title) {
-	if (story.isDirty(title) && !readOnly) {
-		if (!confirm(config.commands.cancelTiddler.warning.format([title])))
-			return false;
-	}
-	story.setDirty(title,false);
-	story.closeTiddler(title,true);
-	return false;
-};
-
 config.commands.saveTiddler.handler = function(event, src, title) {
 	var newTitle = story.saveTiddler(title); // todo - wieso kann sich title ändern?
 	if (newTitle) story.displayTiddler(null, newTitle);
@@ -3746,7 +3661,7 @@ config.commands.deleteTiddler.handler = function(event, src, title) {
 		deleteIt = confirm(this.warning.format([title]));
 	if (deleteIt) {
 		store.removeTiddler(title);
-		story.closeTiddler(title, true);
+		story.closeView(title);
 		autoSaveChanges();
 	}
 	return false;
@@ -3774,7 +3689,7 @@ config.commands.references.handlePopup = function(popup, title) {
 };
 
 config.commands.jump.handlePopup = function(popup, title) {
-	story.forEachTiddler(function(title,element) {
+	story.forEachArticleElement(function(title, element) {
 		renderLinkElement(createTiddlyElement(popup, "li"), title, true, null, false, null, true);
 	});
 };
@@ -3969,7 +3884,7 @@ function TiddlyWiki(params) {
 		delete this.slices[tiddler.title];
 		tiddlers[tiddler.title] = tiddler;
 	};
-	this.forEachTiddler = function(callback) {
+	this.forEachArticle = function(callback) {
 		var t;
 		for (t in tiddlers) {
 			var tiddler = tiddlers[t];
@@ -4005,7 +3920,7 @@ TiddlyWiki.prototype.isAvailable = function(title) {
 	return this.tiddlerExists(title) || this.isShadowTiddler(title);
 };
 
-TiddlyWiki.prototype.createTiddler = function(title) {
+TiddlyWiki.prototype.createArticle = function(title) {
 	var tiddler = this.fetchTiddler(title);
 	if (!tiddler) {
 		tiddler = new Tiddler(title);
@@ -4038,11 +3953,11 @@ TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
 	var section = null;
 	if (pos != -1) {
 		section = title.substr(pos + config.textPrimitives.sectionSeparator.length);
-		title = title.substr(0,pos);
+		title = title.substr(0, pos);
 	}
 	pos = title.indexOf(config.textPrimitives.sliceSeparator);
 	if (pos != -1) {
-		var slice = this.getTiddlerSlice(title.substr(0,pos),title.substr(pos + config.textPrimitives.sliceSeparator.length));
+		var slice = this.getTiddlerSlice(title.substr(0, pos), title.substr(pos + config.textPrimitives.sliceSeparator.length));
 		if (slice)
 			return slice;
 	}
@@ -4323,7 +4238,7 @@ TiddlyWiki.prototype.importTiddlyWiki = function(text) {
 
 TiddlyWiki.prototype.updateTiddlers = function() {
 	this.tiddlersUpdated = true;
-	this.forEachTiddler(function(title,tiddler) {
+	this.forEachArticle(function(title,tiddler) {
 		tiddler.changed();
 	});
 };
@@ -4347,7 +4262,7 @@ TiddlyWiki.prototype.search = function(searchRegExp,sortField,excludeTag,match) 
 // Returns an array of arrays where [tag][0] is the name of the tag and [tag][1] is the number of occurances
 TiddlyWiki.prototype.getTags = function(excludeTag) {
 	var results = [];
-	this.forEachTiddler(function(title,tiddler) {
+	this.forEachArticle(function(title,tiddler) {
 	    var g,c;
 		for (g=0; g<tiddler.tags.length; g++) {
 			var tag = tiddler.tags[g];
@@ -4391,7 +4306,7 @@ TiddlyWiki.prototype.getReferringTiddlers = function(title,unusedParameter,sortF
 // lookupMatch == true to match tiddlers, false to exclude tiddlers
 TiddlyWiki.prototype.reverseLookup = function(lookupField,lookupValue,lookupMatch,sortField) {
 	var results = [];
-	this.forEachTiddler(function(title,tiddler) {
+	this.forEachArticle(function(title,tiddler) {
 		var f = !lookupMatch;
 		var values;
 		if (["links", "tags"].contains(lookupField)) {
@@ -4427,7 +4342,7 @@ TiddlyWiki.prototype.reverseLookup = function(lookupField,lookupValue,lookupMatc
 	*/
 TiddlyWiki.prototype.getTiddlers = function(fieldName, excludeTag) {
 	var results = [];
-	this.forEachTiddler(function(title, tiddler) {
+	this.forEachArticle(function(title, tiddler) {
 		if (excludeTag == undefined || ! tiddler.isTagged(excludeTag))
 			results.push(tiddler);
 	});
@@ -4441,7 +4356,7 @@ TiddlyWiki.prototype.getMissingLinks = function() {
 	if (!this.tiddlersUpdated)
 		this.updateTiddlers();
 	var results = [];
-	this.forEachTiddler(function (title, tiddler) {
+	this.forEachArticle(function (title, tiddler) {
 		if (tiddler.isTagged("excludeMissing") || tiddler.isTagged("systemConfig"))
 			return;
 		var n;
@@ -4457,7 +4372,7 @@ TiddlyWiki.prototype.getMissingLinks = function() {
 // Return an array of names of tiddlers that are defined but not referred to
 TiddlyWiki.prototype.getOrphans = function() {
 	var results = [];
-	this.forEachTiddler(function (title,tiddler) {
+	this.forEachArticle(function (title,tiddler) {
 		if (this.getReferringTiddlers(title).length == 0 && !tiddler.isTagged("excludeLists"))
 			results.push(title);
 	});
@@ -4479,7 +4394,7 @@ TiddlyWiki.prototype.getShadowed = function() {
 // Return an array of tiddlers that have been touched since they were downloaded or created
 TiddlyWiki.prototype.getTouched = function() {
 	var results = [];
-	this.forEachTiddler(function(title,tiddler) {
+	this.forEachArticle(function(title,tiddler) {
 		if (tiddler.isTouched())
 			results.push(tiddler);
 		});
@@ -4740,12 +4655,12 @@ TiddlyWiki.prototype.forEachField = function(tiddler,callback,onlyExtendedFields
 /**
 	* @typedef {Object} Story
 	*
-	* UI layer. Controller which manages (the) visible tiddler(s) DOM element(s).
+	* UI layer. Controller which manages the visible article representations.
 	*
 */
 
-function Story(containerId) {
-	this.container = containerId;
+function Story(articleWrapperId) {
+	this.articleWrapperId = articleWrapperId;
 	this.highlightRegExp = null;
 	
 	/**
@@ -4758,10 +4673,7 @@ function Story(containerId) {
 	this.createIdFromTitle = function(title) {
 		return "article" + title.replace(/_/g, "__").replace(/ /g, "_");		
 	};
-	
-	this.containerId = function() {
-		return this.container;
-	};
+
 }
 
 Story.prototype.editLink = function() {	
@@ -4832,6 +4744,13 @@ Story.prototype.getLinkUnderCursor = function() {
 	
 	return linkInfo;
 }
+
+/**
+	* @return {Element} - The element representing the article. Null, if no article is currently opened.
+*/
+Story.prototype.getCurrentArticleView = function() {
+	return this.getArticleWrapper().firstChild;
+};
 	
 /**
 	* Returns the dom element representing an opened article (one could say the 'tab page').
@@ -4839,17 +4758,24 @@ Story.prototype.getLinkUnderCursor = function() {
 	* @param  {string}  title - The title of an article.
 	*
 	* @return {Element} - The element (div) containing the article elements. Null, if the article is currently not opened.
-*/	
-Story.prototype.getTiddler = function(title) {
+*/
+Story.prototype.getArticleViewByTitle = function(title) {
 	return document.getElementById(this.createIdFromTitle(title));
 };
 
-Story.prototype.getContainer = function() {
-	return document.getElementById(this.containerId());
+Story.prototype.getArticleViewByChild = function(nestedElement) {
+	while (nestedElement && ! jQuery(nestedElement).hasClass("articleView")) {
+		nestedElement = jQuery(nestedElement).hasClass("popup") && Popup.stack[0] ? Popup.stack[0].root : nestedElement.parentNode;
+	}
+	return nestedElement;
 };
 
-Story.prototype.forEachTiddler = function(fn) {
-	var place = this.getContainer();
+Story.prototype.getArticleWrapper = function() {
+	return document.getElementById(this.articleWrapperId);
+};
+
+Story.prototype.forEachArticleElement = function(fn) {
+	var place = this.getArticleWrapper();
 	if (!place)
 		return;
 	var e = place.firstChild;
@@ -4871,16 +4797,22 @@ Story.prototype.displayTiddlers = function(unused, titles, template, unused, unu
 	for (var t = titles.length - 1; t >= 0; t--) this.displayTiddler(null, titles[t], template, null, null, customFields);
 };
 
+// Original
 Story.prototype.displayTiddler = function(unused, tiddler, template, unused, unused, customFields) { // todo: instead of hijacking kung-fu make one function of it
 	var title = (tiddler instanceof Tiddler) ? tiddler.title : tiddler;
-	var tiddlerElem = this.getTiddler(title);
-	if (tiddlerElem) {
+	var parts = title.split(config.textPrimitives.sectionSeparator);
+	title = parts[0]; 
+	var sectionName = parts[1];
+	if (sectionName) sectionName = sectionName.trim();
+	var articleView = this.getArticleViewByTitle(title);
+	if (articleView) {
 		this.refreshTiddler(title, template, false, customFields);
 	} else {
-		var place = this.getContainer();		
-		tiddlerElem = this.createTiddler(place, null, title, template, customFields);
-	}	
-	return tiddlerElem;
+		var place = this.getArticleWrapper();
+		articleView = this.renderArticleView(place, title, template, customFields);
+	}
+	story.scrollToSection(title, sectionName);
+	return articleView;
 };
 
 //# Create a tiddler frame at the appropriate place in a story column. If the tiddler doesn't exist,
@@ -4890,17 +4822,17 @@ Story.prototype.displayTiddler = function(unused, tiddler, template, unused, unu
 //# title - title of new tiddler
 //# template - the name of the tiddler containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
 //# customFields - an optional list of name:"value" pairs to be assigned as tiddler fields
-Story.prototype.createTiddler = function(place, before, title, template, customFields) {
-	var tiddlerElem = createTiddlyElement(null, "div", this.createIdFromTitle(title), "tiddler");
-	tiddlerElem.setAttribute("refresh","tiddler");
+Story.prototype.renderArticleView = function(place, title, template, customFields) {
+	var articleView = createTiddlyElement(null, "div", this.createIdFromTitle(title), "articleView");
+	articleView.setAttribute("refresh", "tiddler");
 	if (customFields)
-		tiddlerElem.setAttribute("tiddlyFields", customFields);
-	place.insertBefore(tiddlerElem, before);
+		articleView.setAttribute("tiddlyFields", customFields);
+	place.appendChild(articleView);
 	var defaultText = null;
 	if (! store.tiddlerExists(title) && ! store.isShadowTiddler(title))
 		defaultText = this.loadMissingTiddler(title, customFields);
 	this.refreshTiddler(title, template, false, customFields, defaultText);
-	return tiddlerElem;
+	return articleView;
 };
 
 //# Attempts to load a missing tiddler from the server specified in the custom fields
@@ -4911,13 +4843,13 @@ Story.prototype.loadMissingTiddler = function(title, fields, callback) {
 	var getTiddlerCallback = function(context)	{
 		if (context.status) {
 			var t = context.tiddler;
-			if (!t.created)
+			if (! t.created)
 				t.created = new Date();
-			if (!t.modified)
+			if (! t.modified)
 				t.modified = t.created;
 			var dirty = store.isDirty();
-			context.tiddler = store.saveTiddler(t.title,t.title,t.text,t.modifier,t.modified,t.tags,t.fields,true,t.created,t.creator);
-			if (!window.allowSave())
+			context.tiddler = store.saveTiddler(t.title, t.title, t.text, t.modifier, t.modified, t.tags, t.fields, true, t.created, t.creator);
+			if (! window.allowSave())
 				store.setDirty(dirty);
 			autoSaveChanges();
 		} else {
@@ -4929,7 +4861,7 @@ Story.prototype.loadMissingTiddler = function(title, fields, callback) {
 		}
 	};
 	var tiddler = new Tiddler(title);
-	tiddler.fields = typeof fields == "string" ? fields.decodeHashMap() : fields||{};
+	tiddler.fields = typeof fields == "string" ? fields.decodeHashMap() : fields || {};
 	var context = {serverType: tiddler.getServerType()};
 	if (!context.serverType)
 		return "";
@@ -4941,7 +4873,7 @@ Story.prototype.loadMissingTiddler = function(title, fields, callback) {
 };
 
 Story.prototype.chooseTemplateForTiddler = function(title, template) {
-	if (!template)
+	if (! template)
 		template = DEFAULT_VIEW_TEMPLATE;
 	if (template == DEFAULT_VIEW_TEMPLATE || template == DEFAULT_EDIT_TEMPLATE)
 		template = config.tiddlerTemplates[template];
@@ -4949,7 +4881,7 @@ Story.prototype.chooseTemplateForTiddler = function(title, template) {
 };
 
 Story.prototype.getTemplateForTiddler = function(title, template, tiddler) {
-	return store.getRecursiveTiddlerText(template,null,10);
+	return store.getRecursiveTiddlerText(template, null, 10);
 };
 
 // Renders an article viewer / editor - for existing articles as well as for non-existing articles
@@ -4960,14 +4892,14 @@ Story.prototype.getTemplateForTiddler = function(title, template, tiddler) {
 //# customFields - an optional list of name/value pairs to be assigned as tiddler fields (for edit templates)
 //# defaultText - an optional string to replace the default text for non-existent tiddlers
 Story.prototype.refreshTiddler = function(title, template, force, customFields, defaultText) {
-	var tiddlerElem = this.getTiddler(title);
-	if (tiddlerElem) {
-		if (tiddlerElem.getAttribute("dirty") == "true" && !force)
-			return tiddlerElem;
+	var articleView = this.getArticleViewByTitle(title);
+	if (articleView) {
+		if (articleView.getAttribute("dirty") == "true" && !force)
+			return articleView;
 		
 		template = this.chooseTemplateForTiddler(title, template);
 		
-		var currTemplate = tiddlerElem.getAttribute("template");
+		var currTemplate = articleView.getAttribute("template");
 		if ((template != currTemplate) || force) {
 			var tiddler = store.getTiddler(title);
 			
@@ -4983,30 +4915,30 @@ Story.prototype.refreshTiddler = function(title, template, force, customFields, 
 					tiddler.set(title, text, config.views.wikified.defaultModifier, version.date, [], version.date, fields);
 				}
 			}
-			tiddlerElem.setAttribute("tags",tiddler.tags.join(" "));
-			tiddlerElem.setAttribute("tiddler",title);
-			tiddlerElem.setAttribute("template",template);
-			tiddlerElem.onmouseover = this.onTiddlerMouseOver;
-			tiddlerElem.onmouseout = this.onTiddlerMouseOut;
-			tiddlerElem.ondblclick = this.onTiddlerDblClick;
-			tiddlerElem[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
-			tiddlerElem.innerHTML = this.getTemplateForTiddler(title,template,tiddler);
-			applyHtmlMacros(tiddlerElem, tiddler);
+			articleView.setAttribute("tags",tiddler.tags.join(" "));
+			articleView.setAttribute("tiddler", title);
+			articleView.setAttribute("template", template);
+			articleView.onmouseover = this.onTiddlerMouseOver;
+			articleView.onmouseout = this.onTiddlerMouseOut;
+			articleView.ondblclick = this.onTiddlerDblClick;
+			articleView[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
+			articleView.innerHTML = this.getTemplateForTiddler(title, template, tiddler);
+			applyHtmlMacros(articleView, tiddler);
 			if (store.getTaggedTiddlers(title).length > 0)
-				jQuery(tiddlerElem).addClass("isTag");
+				jQuery(articleView).addClass("isTag");
 			else
-				jQuery(tiddlerElem).removeClass("isTag");
+				jQuery(articleView).removeClass("isTag");
 			if (store.tiddlerExists(title)) {
-				jQuery(tiddlerElem).removeClass("shadow");
-				jQuery(tiddlerElem).removeClass("missing");
+				jQuery(articleView).removeClass("shadow");
+				jQuery(articleView).removeClass("missing");
 			} else {
-				jQuery(tiddlerElem).addClass(store.isShadowTiddler(title) ? "shadow" : "missing");
+				jQuery(articleView).addClass(store.isShadowTiddler(title) ? "shadow" : "missing");
 			}
 			if (customFields)
-				this.addCustomFields(tiddlerElem,customFields);
+				this.addCustomFields(articleView, customFields);
 		}
 	}
-	return tiddlerElem;
+	return articleView;
 };
 
 Story.prototype.addCustomFields = function(place, customFields) {
@@ -5024,11 +4956,11 @@ Story.prototype.addCustomFields = function(place, customFields) {
 };
 
 Story.prototype.refreshAllTiddlers = function(force) {
-	var e = this.getContainer().firstChild;
+	var e = this.getArticleWrapper().firstChild;
 	while (e) {
 		var template = e.getAttribute("template");
 		if (template && e.getAttribute("dirty") != "true") {
-			this.refreshTiddler(e.getAttribute("tiddler"),force ? null : template,true);
+			this.refreshTiddler(e.getAttribute("tiddler"), force ? null : template, true);
 		}
 		e = e.nextSibling;
 	}
@@ -5061,7 +4993,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 	var e = ev || window.event;
 	clearMessage();
 	var consume = false;
-	var title = this.getAttribute("tiddler");
+	var title = this.getAttribute("tiddler"); // "this" was bound to the articleView in which the key was pressed (see Story.prototype.refreshTiddler)
 	var sender = resolveSender(e);
 	switch (e.keyCode) {
 		case 9: { // [Tab]
@@ -5080,7 +5012,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 		}
 		case 75: { // [Ctrl]-[K]
 			if (e.ctrlKey) {
-				story.forEachTiddler(
+				story.forEachArticleElement(
 					function(title, tiddler) {
 						if (hasClass(tiddler, 'selected') && story.isDirty(title)) story.editLink();
 					}
@@ -5122,7 +5054,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 	* @return {element} - The input or textarea element that is bound to dataFieldName. Fallback: The first element that is bound to any data field. Null, if there's no bound element at all.
 */
 Story.prototype.getTiddlerField = function(title, dataFieldName) {
-	var articleElement = this.getTiddler(title);
+	var articleElement = this.getArticleViewByTitle(title);
 	
 	if (! articleElement) return null;	
 	
@@ -5150,10 +5082,10 @@ Story.prototype.focusTiddler = function(title, dataFieldName) {
 };
 
 Story.prototype.blurTiddler = function(title) {
-	var tiddlerElem = this.getTiddler(title);
-	if (tiddlerElem && tiddlerElem.focus && tiddlerElem.blur) {
-		tiddlerElem.focus();
-		tiddlerElem.blur();
+	var articleView = this.getArticleViewByTitle(title);
+	if (articleView && articleView.focus && articleView.blur) {
+		articleView.focus();
+		articleView.blur();
 	}
 };
 
@@ -5174,35 +5106,37 @@ Story.prototype.setTiddlerTag = function(title, tag, mode) {
 	this.setTiddlerField(title, tag, mode, "tags");
 };
 
-Story.prototype.closeTiddler = function(title,animate,unused) {
-	var tiddlerElem = this.getTiddler(title);
-	if (tiddlerElem) {
-		clearMessage();
-		this.scrubTiddler(tiddlerElem);
-		jQuery(tiddlerElem).remove();
-	}	
+Story.prototype.closeView = function(title) {
+	
+	var articleView = this.getArticleViewByTitle(title);
+	if (! articleView) {
+		return;
+	}
+	
+	var article = store.getTiddler(title);
+	if (article) article.rescuedScrollTop = articleView.scrollTop;
+	
+	clearMessage();
+	articleView.id = null;
+	jQuery(articleView).remove();
 };
 
-Story.prototype.scrubTiddler = function(tiddlerElem) {
-	tiddlerElem.id = null;
-};
-
-Story.prototype.setDirty = function(title,dirty) {
-	var tiddlerElem = this.getTiddler(title);
-	if (tiddlerElem)
-		tiddlerElem.setAttribute("dirty", dirty ? "true" : "false");
+Story.prototype.setDirty = function(title, dirty) {
+	var articleView = this.getArticleViewByTitle(title);
+	if (articleView)
+		articleView.setAttribute("dirty", dirty ? "true" : "false");
 };
 
 Story.prototype.isDirty = function(title) {
-	var tiddlerElem = this.getTiddler(title);
-	if (tiddlerElem)
-		return tiddlerElem.getAttribute("dirty") == "true";
+	var articleView = this.getArticleViewByTitle(title);
+	if (articleView)
+		return articleView.getAttribute("dirty") == "true";
 	return null;
 };
 
 Story.prototype.areAnyDirty = function() {
 	var r = false;
-	this.forEachTiddler(function(title,element) {
+	this.forEachArticleElement(function(title, element) {
 		if (this.isDirty(title))
 			r = true;
 	});
@@ -5210,15 +5144,8 @@ Story.prototype.areAnyDirty = function() {
 };
 
 Story.prototype.isEmpty = function() {
-	var place = this.getContainer();
+	var place = this.getArticleWrapper();
 	return place && place.firstChild == null;
-};
-
-Story.prototype.findContainingTiddler = function(e) {
-	while (e && !jQuery(e).hasClass("tiddler")) {
-		e = jQuery(e).hasClass("popup") && Popup.stack[0] ? Popup.stack[0].root : e.parentNode;
-	}
-	return e;
 };
 
 Story.prototype.gatherSaveFields = function(element, fields) {
@@ -5233,7 +5160,7 @@ Story.prototype.gatherSaveFields = function(element, fields) {
 };
 
 Story.prototype.hasChanges = function(title) {
-	var e = this.getTiddler(title);
+	var e = this.getArticleViewByTitle(title);
 	if (e) {
 		var fields = {};
 		this.gatherSaveFields(e,fields);
@@ -5254,7 +5181,6 @@ Story.prototype.hasChanges = function(title) {
 	return false;
 };
 
-
 /**
 		* function story.saveTiddler() - 
 		*
@@ -5263,12 +5189,12 @@ Story.prototype.hasChanges = function(title) {
 		* @return {string} - The title usable as internal id (e.g. 'articleMy_great_foo__article')
 	*/
 Story.prototype.saveTiddler = function(title, minorUpdate) {
-	var tiddlerElem = this.getTiddler(title);
+	var articleView = this.getArticleViewByTitle(title);
 	
-	if (! tiddlerElem) return null;
+	if (! articleView) return null;
 	
 	var fields = {};
-	this.gatherSaveFields(tiddlerElem, fields);
+	this.gatherSaveFields(articleView, fields);
 	var newTitle = fields.title || title;
 	if (! store.tiddlerExists(newTitle)) {
 		newTitle = newTitle.trim();
@@ -5279,12 +5205,12 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 			return null;
 			title = newTitle;
 	}
-	if (newTitle != title)
-		this.closeTiddler(newTitle,false);
-	tiddlerElem.id = this.createIdFromTitle(newTitle);
-	tiddlerElem.setAttribute("tiddler", newTitle);
-	tiddlerElem.setAttribute("template", DEFAULT_VIEW_TEMPLATE);
-	tiddlerElem.setAttribute("dirty", "false");
+	if (newTitle != title) // todo: warum kann sich der titel ändern?
+		this.closeView(newTitle);
+	articleView.id = this.createIdFromTitle(newTitle);
+	articleView.setAttribute("tiddler", newTitle);
+	articleView.setAttribute("template", DEFAULT_VIEW_TEMPLATE);
+	articleView.setAttribute("dirty", "false");
 	var newDate = new Date();
 	if (store.tiddlerExists(title)) {
 		var t = store.fetchTiddler(title);
@@ -5972,7 +5898,7 @@ function upgradeFrom(path) {
 	if (window.netscape !== undefined)
 		tw = convertUTF8ToUnicode(tw);
 	importStore.importTiddlyWiki(tw);
-	importStore.forEachTiddler(function(title,tiddler) {
+	importStore.forEachArticle(function(title,tiddler) {
 		if (!store.getTiddler(title)) {
 			store.addTiddler(tiddler);
 		}
@@ -6075,7 +6001,7 @@ config.macros.plugins.doDelete = function(e) {
 			var t;
 			for (t=0; t<rowNames.length; t++) {
 				store.removeTiddler(rowNames[t]);
-				story.closeTiddler(rowNames[t],true);
+				story.closeView(rowNames[t]);
 			}
 		}
 		autoSaveChanges();
@@ -6130,17 +6056,17 @@ config.refreshers = {
 		return true;
 	},
 
-	tiddler: function(e,changeList)	{
+	tiddler: function(e, changeList)	{
 		var title = e.getAttribute("tiddler");
 		var template = e.getAttribute("template");
-		if (changeList && (changeList.indexOf && changeList.indexOf(title) != -1) && !story.isDirty(title))
+		if (changeList && (changeList.indexOf && changeList.indexOf(title) != -1) && ! story.isDirty(title))
 			story.refreshTiddler(title,template,true);
 		else
 			refreshElements(e,changeList);
 		return true;
 	},
 
-	content: function(e,changeList)	{
+	content: function(e, changeList)	{
 		var title = e.getAttribute("tiddler");
 		var force = e.getAttribute("force");
 		var args = e.getAttribute("args");
@@ -6152,7 +6078,7 @@ config.refreshers = {
 			return false;
 	},
 
-	macro: function(e,changeList)	{
+	macro: function(e, changeList)	{
 		var macro = e.getAttribute("macroName");
 		var params = e.getAttribute("params");
 		if (macro)
@@ -6211,11 +6137,11 @@ function applyHtmlMacros(root, tiddler) {
 
 function refreshPageTemplate(title) {
 	var stash = jQuery("<div/>").appendTo("body").hide()[0];
-	var display = story.getContainer();
+	var display = story.getArticleWrapper();
 	var nodes,t;
 	if (display) {
 		nodes = display.childNodes;
-		for (t=nodes.length-1; t>=0; t--)
+		for (t = nodes.length - 1; t >= 0; t--)
 			stash.appendChild(nodes[t]);
 	}
 	var wrapper = document.getElementById("contentWrapper");
@@ -6227,12 +6153,12 @@ function refreshPageTemplate(title) {
 	wrapper.innerHTML = store.getRecursiveTiddlerText(title,null,10);
 	applyHtmlMacros(wrapper);
 	refreshElements(wrapper);
-	display = story.getContainer();
+	display = story.getArticleWrapper();
 	jQuery(display).empty();
 	if (!display)
-		display = createTiddlyElement(wrapper,"div",story.containerId());
+		display = createTiddlyElement(wrapper, "div", story.articleWrapperId);
 	nodes = stash.childNodes;
-	for (t=nodes.length-1; t>=0; t--)
+	for (t = nodes.length - 1; t >= 0; t--)
 		display.appendChild(nodes[t]);
 	jQuery(stash).remove();
 }
@@ -6438,7 +6364,7 @@ config.macros.option.propagateOption = function(opt, valueField, value, elementT
 	config.options[opt] = value;
 	saveOption(opt);
 	var t,nodes = document.getElementsByTagName(elementType);
-	for (t=0; t<nodes.length; t++) {
+	for (t = 0; t < nodes.length; t++) {
 		var optNode = nodes[t].getAttribute('option');
 		if (opt == optNode && nodes[t]!=elem)
 			nodes[t][valueField] = value;
@@ -6544,7 +6470,7 @@ config.macros.newArticleButton.onClick = function(createRoot) {
 	if (createRoot || ! currentTiddlerTitle || currentTiddlerTitle == "Untitled"){
 		currentTiddlerTitle = ".";
 	}
-	var newTiddler = store.createTiddler("Untitled");
+	var newTiddler = store.createArticle("Untitled");
 	newTiddler.fields['parenttiddler'] = currentTiddlerTitle;
 	story.displayTiddler(null, "Untitled", DEFAULT_EDIT_TEMPLATE);
 	story.focusTiddler("Untitled", "title");
@@ -6573,16 +6499,16 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 
 	clearMessage();
 	
-	var articleElement = story.getTiddler(title);
+	var articleView = story.getArticleViewByTitle(title); // xxx könnte auch null sein! umbauen auf getCurrentArticleView
 	
 	recurseViewerOccurance = 0;
 	var found = -1;
 	var selectedText = window.getSelection().toString();
 	if (selectedText.length) {
 		var viewer = null;
-		for (var i = 0; i < articleElement.childNodes.length; i++) {
-			if (articleElement.childNodes[i].className == "articleContentContainer") { // HACK: Code dependency to CSS class name!
-				viewer = articleElement.childNodes[i];
+		for (var i = 0; i < articleView.childNodes.length; i++) {
+			if (articleView.childNodes[i].className == "articleContentContainer") { // HACK: Code dependency to CSS class name!
+				viewer = articleView.childNodes[i];
 				break;
 			}
 		}		
@@ -6590,8 +6516,8 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 	}
 
 	var tiddlerSource = store.getTiddler(title);
-	if (tiddlerSource) tiddlerSource.rescuedScrollTop = articleElement.scrollTop;
-	var fields = articleElement.getAttribute("tiddlyFields"); // tiddlyFields
+	if (tiddlerSource) tiddlerSource.rescuedScrollTop = articleView.scrollTop;
+	var fields = articleView.getAttribute("tiddlyFields"); // tiddlyFields
 	story.displayTiddler(null, title, DEFAULT_EDIT_TEMPLATE, false, null, fields);
 	var textAreaElement = story.getTiddlerField(title,"text");
 	if (recurseViewerOccurance) {		
@@ -6601,10 +6527,10 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 			found = textAreaElement.value.indexOf(selectedText, found + 1);
 		} while (recurseViewerOccurance && found>=0)
 	}
-	if (found>=0) {
+	if (found >= 0) {
 		setCaretPosition(textAreaElement, found);
 	} else {
-		setCaretPosition(textAreaElement, (articleElement.rescuedCaretPosition ? articleElement.rescuedCaretPosition : 0));
+		setCaretPosition(textAreaElement, (articleView.rescuedCaretPosition ? articleView.rescuedCaretPosition : 0));
 	}	
 	return false;
 }
@@ -6614,7 +6540,7 @@ config.commands.cancelTiddler.handlerBase = config.commands.cancelTiddler.handle
 config.commands.cancelTiddler.handler = function(event,src,title) { // Implements IMacroResolver.handler()
 	var pos = story.getTiddlerField(title,"text").selectionStart;
 	var baseResult = config.commands.cancelTiddler.handlerBase(event,src,title);
-	story.getTiddler(title).rescuedCaretPosition = pos;
+	story.getArticleViewByTitle(title).rescuedCaretPosition = pos;
 	return baseResult;
 };
 
@@ -6623,7 +6549,7 @@ config.commands.saveTiddler.handlerBase = config.commands.saveTiddler.handler; /
 config.commands.saveTiddler.handler = function(event, src, title) { // Implements IMacroResolver.handler()
 	var pos = story.getTiddlerField(title,"text").selectionStart;
 	var baseResult = config.commands.saveTiddler.handlerBase(event,src,title);
-	story.getTiddler(title).rescuedCaretPosition = pos;
+	story.getArticleViewByTitle(title).rescuedCaretPosition = pos;
 	return baseResult;
 };
 
@@ -6634,18 +6560,18 @@ function refreshTreePath() {
 	}
 	var tiddler = store.currentTiddler;
 	if (! tiddler) return;
-	var parent;
-	var parents = [];
+	var parentTitle;
+	var parentTitles = [];
 	do {
-		parent = tiddler.fields['parenttiddler'];
-		if (parent) {
-			parents.push(parent);
-			tiddler = store.getTiddler(parent);
+		parentTitle = tiddler.fields['parenttiddler'];
+		if (parentTitle) {
+			parentTitles.push(parentTitle);
+			tiddler = store.getTiddler(parentTitle);
 		}		
-	} while (parent && tiddler);
+	} while (parentTitle && tiddler);
 	
-	for (var i = parents.length - 2; i >= 0; i--) {		
-	 renderLinkElement(place, parents[i], parents[i]);
+	for (var i = parentTitles.length - 2; i >= 0; i--) {		
+	 renderLinkElement(place, parentTitles[i], parentTitles[i]);
 	 createTiddlyText(place, " ▸ ");
 	}	
 	createTiddlyText(place, store.currentTiddler.title);
@@ -6954,10 +6880,12 @@ abego.parseTiddlerFilterTerm = function(queryText,offset,options) {
 			var code = abego.getBracedText(queryText,0,lastIndexRef);
 			if (!code)
 				throw "Invalid {...} syntax";
-			var f = Function("tiddler","return ("+code+");");
-			return {func: f,
-					lastIndex:lastIndexRef.lastIndex,
-					markRE: null};
+			var f = Function("tiddler", "return (" + code + ");");
+			return {
+				func: f,
+				lastIndex: lastIndexRef.lastIndex,
+				markRE: null
+			};
 		}
 		if (m[2])
 			fullWordMatch = true;
@@ -8542,10 +8470,10 @@ window.onkeydown = function(e) {
 		searchField.select();
 		return false;
 	}	
-	if (e.ctrlKey && e.keyCode==13) {
-    story.forEachTiddler(
+	if (e.ctrlKey && e.keyCode == 13) { // [Ctrl]-[Enter]
+    story.forEachArticleElement( // xxx umbauen auf getCurrentArticleView
       function(title, tiddler) {
-        if (hasClass(tiddler, 'selected') && !story.isDirty(title)) config.commands.editTiddler.handler(e, null, title);
+        if (hasClass(tiddler, 'selected') && ! story.isDirty(title)) config.commands.editTiddler.handler(e, null, title);
       }
     );
     return false;
@@ -9327,16 +9255,16 @@ FileAdaptor.prototype.getTiddlerList = function(context, userParams, callback, f
 	return ajaxReq(options);
 };
 
-FileAdaptor.getTiddlerListComplete = function(context,userParams) {
+FileAdaptor.getTiddlerListComplete = function(context, userParams) {
 	if (context.status) {
 		if (context.filter) {
 			context.tiddlers = context.adaptor.store.filterTiddlers(context.filter);
 		} else {
 			context.tiddlers = [];
-			context.adaptor.store.forEachTiddler(function(title,tiddler) {context.tiddlers.push(tiddler);});
+			context.adaptor.store.forEachArticle(function(title,tiddler) {context.tiddlers.push(tiddler);});
 		}
 		var i;
-		for (i=0; i<context.tiddlers.length; i++) {
+		for (i = 0; i < context.tiddlers.length; i++) {
 			context.tiddlers[i].fields['server.type'] = FileAdaptor.serverType;
 			context.tiddlers[i].fields['server.host'] = AdaptorBase.minHostName(context.host);
 			context.tiddlers[i].fields['server.page.revision'] = context.tiddlers[i].modified.convertToYYYYMMDDHHMM();
@@ -9344,7 +9272,7 @@ FileAdaptor.getTiddlerListComplete = function(context,userParams) {
 		context.status = true;
 	}
 	if (context.callback) {
-		window.setTimeout(function() {context.callback(context,userParams);},10);
+		window.setTimeout(function() {context.callback(context, userParams);}, 10);
 	}
 	return true;
 };
@@ -9654,13 +9582,33 @@ function buildClassNames(title, additionalClassNames) {
 	return classes.join(" ");
 }
 
-// Event handler for clicking on a tiddly link
-function onClickTiddlerLink(ev) {
+function onLinkElementClicked(ev) {
 	var e = ev || window.event;
 	var sender = resolveSender(e);
 	var title = sender.getAttribute("tiddlyLink");
-	story.displayTiddler(sender, title, null, true);
+	var sectionName = sender.getAttribute('section');
+	var articleView = story.getArticleViewByChild(sender); 
+	var senderTitle = articleView ? articleView.getAttribute('tiddler') : '';
+	
+	if (title != senderTitle || ! sectionName) { // link target is not on the current page
+		story.displayTiddler(sender, title, null, true);
+	}
+	
 	clearMessage();
+	
+	// Select section element
+	
+	if (sectionName) {
+		var sectionElement = story.scrollToSection(title, sectionName);
+		if (sectionElement){
+			var range = document.createRange();
+			range.selectNodeContents(sectionElement);
+			var sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}
+	}
+			
 	return false;
 }
 
@@ -9668,7 +9616,7 @@ function onClickTiddlerLink(ev) {
 	* Renders a link element (<a>)
 	*
 	* @param  {element} place                - Container element in which the link should be created
-	* @param  {string}  titleAndSection      - Target. E.g. "##SectionLabel"
+	* @param  {string}  titleAndSection      - Target. E.g. "##SectionName"
 	* @param  {boolean} useTitleAsLabel      - If true, the title will become the inner html of the <a>...</a> tag. Otherwise it'll be left empty, so one has to insert stuff afterwards.
 	* @param  {string}  additionalClassNames - Additional CSS class names (to be added after default class names).
 	*                                          Defaults for internal links: "tiddlyLink", "tiddlyLinkExisting", "tiddlyLinkNonExisting"
@@ -9678,13 +9626,16 @@ function onClickTiddlerLink(ev) {
 	* @return {element} - An <a> element.
 */
 function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalClassNames, isStatic) {
-	var t = story.findContainingTiddler(place); 
-	var tid = t ? t.getAttribute('tiddler') : '';
 	var parts = titleAndSection.split(config.textPrimitives.sectionSeparator);
 	var title = parts[0]; 
 	var section = parts[1]; 
 	if (section) section = section.trim();
-	if (! title.length || title.toLowerCase() == 'here') title = tid;  // default=current tiddler
+	
+	if (! title.length) { // Fallback: if title is empty => use title of the article in which the link is rendered
+		var articleView = story.getArticleViewByChild(place);
+		title = articleView ? articleView.getAttribute('tiddler') : '';
+	}
+	
 	title = title.trim();
 	var label = useTitleAsLabel ? title : null;
 	var classNames = buildClassNames(title, additionalClassNames);
@@ -9693,7 +9644,7 @@ function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalCl
 		btn = renderExternalLink(place, store.getTiddlerText("SiteUrl", null) + "#" + title) 
 		btn.className += ' ' + additionalClassNames;
 	} else {
-		btn = renderTiddlyButton(place, label, null, onClickTiddlerLink, classNames);
+		btn = renderTiddlyButton(place, label, null, onLinkElementClicked, classNames);
 	}
 	btn.setAttribute("refresh", "link");
 	btn.setAttribute("tiddlyLink", title);
@@ -9709,8 +9660,8 @@ function createTiddlyDropDown(place, onchange, options, defaultValue) {
 	var sel = createTiddlyElement(place, "select");
 	sel.onchange = onchange;
 	var t;
-	for (t=0; t<options.length; t++) {
-		var e = createTiddlyElement(sel,"option",null,null,options[t].caption);
+	for (t = 0; t < options.length; t++) {
+		var e = createTiddlyElement(sel, "option", null, null, options[t].caption);
 		e.value = options[t].name;
 		if (options[t].name == defaultValue)
 			e.selected = true;
@@ -10170,13 +10121,13 @@ ListView.columnTypes.TagCheckbox = {
 	createHeader: ListView.columnTypes.String.createHeader,
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var e = createTiddlyCheckbox(place,null,listObject[field],this.onChange);
-		e.setAttribute("tiddler",listObject.title);
-		e.setAttribute("tag",columnTemplate.tag);
+		e.setAttribute("tiddler", listObject.title);
+		e.setAttribute("tag", columnTemplate.tag);
 	},
 	onChange : function(e) {
 		var tag = this.getAttribute("tag");
-		var tiddler = this.getAttribute("tiddler");
-		store.setTiddlerTag(tiddler,this.checked,tag);
+		var title = this.getAttribute("tiddler");
+		store.setTiddlerTag(title, this.checked,tag);
 	}
 };
 
@@ -10966,11 +10917,11 @@ function removeStyleSheet(id) {
 function LoaderBase() {}
 
 LoaderBase.prototype.loadTiddler = function(store,node,tiddlers) {
-	var title = this.getTitle(store,node);
+	var title = this.getTitle(store, node);
 	if (safeMode && store.isShadowTiddler(title))
 		return;
 	if (title) {
-		var tiddler = store.createTiddler(title);
+		var tiddler = store.createArticle(title);
 		this.internalizeTiddler(store,tiddler,title,node);
 		tiddlers.push(tiddler);
 	}
@@ -11007,11 +10958,11 @@ function TW21Loader() {}
 
 TW21Loader.prototype = new LoaderBase();
 
-TW21Loader.prototype.getTitle = function(store,node) {
+TW21Loader.prototype.getTitle = function(store, node) {
 	var title = null;
 	if (node.getAttribute) {
 		title = node.getAttribute("title");
-		if (!title)
+		if (! title)
 			title = node.getAttribute("tiddler");
 	}
 	if (!title && node.id) {
@@ -11082,12 +11033,12 @@ TW21Saver.prototype.externalizeTiddler = function(store,tiddler) {
 		if (!usePre || tags)
 			attributes += ' tags="' + tags.htmlEncode() + '"';
 		return ('<div %0="%1"%2%3>%4</'+'div>').format([
-				usePre ? "title" : "tiddler",
-				tiddler.title.htmlEncode(),
-				attributes,
-				extendedAttributes,
-				usePre ? "\n<pre>" + tiddler.text.htmlEncode() + "</pre>\n" : tiddler.text.escapeLineBreaks().htmlEncode()
-			]);
+			usePre ? "title" : "tiddler",
+			tiddler.title.htmlEncode(),
+			attributes,
+			extendedAttributes,
+			usePre ? "\n<pre>" + tiddler.text.htmlEncode() + "</pre>\n" : tiddler.text.escapeLineBreaks().htmlEncode()
+		]);
 	} catch (ex) {
 		throw exceptionText(ex,config.messages.tiddlerSaveError.format([tiddler.title]));
 	}
