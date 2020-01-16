@@ -7,37 +7,15 @@ var version = {title: "VodiWiki", major: 2020, minor: 1, revision: 1, date: new 
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta name="copyright" content="
-TiddlyWiki created by Jeremy Ruston, (jeremy [at] osmosoft [dot] com)
-
-Copyright (c) Jeremy Ruston 2004-2007
+<meta name="copyright" content="Copyright (c) Mark Vodicka 2016-2020 (www.vodi.de)
+Copyright (c) TiddlyWiki created by Jeremy Ruston 2004-2007 (jeremy [at] osmosoft [dot] com)
 Copyright (c) UnaMesa Association 2007-2012
+Copyright (c) abego Software GmbH, 2005-2012 (www.abego-software.de)
 
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. Neither the name of Mark Vodicka, Jeremy Ruston, the UnaMesa Association, abego Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or other
-materials provided with the distribution.
-
-Neither the name of the UnaMesa Association nor the names of its contributors may be
-used to endorse or promote products derived from this software without specific
-prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
-SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.
-" />
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITEDTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+/>
 <!--PRE-HEAD-START-->
 <!--{{{-->
 <link rel='alternate' type='application/rss+xml' title='RSS' href='index.xml' />
@@ -60,9 +38,13 @@ html, body, #contentWrapper, #displayArea, #tiddlerDisplay {height: 100%; overfl
 #menuCollapser {position:absolute; top: 5px; right: 0; z-index:200;}
 #mainMenu {position:static; height:100%;}
 
-#navAndSearch{margin-bottom: 0.3em;}
-#navToolbar {margin:0 200px 0.3em 0;}
-#treePath {border: 1px inset grey;padding: 0 0.3em;}
+#navAndSearch {margin-bottom: 0.3em;}
+#treePath {border: 1px inset grey; padding: 0 0.3em; line-height: 1.3em; }
+#navToolbar, #search, #navButtons, #treePath {display: table-cell; vertical-align: top;}
+#navToolbar, #treePath {width: 100%;}
+#search, #treePath {white-space: nowrap;}
+.searchField {margin-left: 1em;}
+.searchField, #search .button {display: inline-block; box-sizing: border-box; height: 1.7em;}
 
 .articleContentContainer {padding-top: 0.5em; padding-bottom: 2em;}
 table {border-collapse: collapse;}
@@ -70,7 +52,7 @@ table td {vertical-align: top;}
 .articleContentContainer table, table.twtable {margin: 1pt 0;}
 .articleContentContainer th, .articleContentContainer td, .articleContentContainer tr, .articleContentContainer caption, .twtable th, .twtable td, .twtable tr,.twtable caption {padding:3px;}
 .toolbar {text-align:right; font-size:.9em;}
-#displayArea {margin: 0; padding-top: 3px}
+#displayArea {padding-top: 3px}
 #pageWrapper {position:relative; height:100%;}
 #tiddlerDisplay {position:relative;}
 .tiddler {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0; padding: 6pt 6pt 0;}
@@ -93,6 +75,7 @@ table td {vertical-align: top;}
 
 body, #mainMenu, .articleContentContainer, .editor, h3, h4 {font-size: 11.5pt;}
 h5, #search {font-size: 10pt;}
+.licenseText {display: inline-block; font-size: 8pt; line-height: 1em; width: 51em; text-align: justify;}
 body, .articleContentContainer, .editor, h3, h4, h5, h6 {font-family: calibri, tahoma, helvetica; line-height: 1.2em;}
 
 h1, h2, h3, h4, h5, h6 {margin: 0; border: 0;}
@@ -139,7 +122,6 @@ blockquote::before {position:absolute;top:0.3em;left:0.2em;content:'\275D'; font
 input:not([type]) {width:  11em; border:0;} /* These are nested in table cells */
 /*input[type=file], input[type=checkbox] {width:  auto;}*/
 .tiddlerPopupButton {padding: 0.2em;}
-.articleContentContainer .button {border:1px solid [[ColorPalette::SecondaryMid]];}
 .branch .button {position: absolute; left: -1.3em; padding: 0;}
 .tab {margin: 0 1pt 0 0; padding: 2px 0.6em; border-radius: 0.4em 0.4em 0 0;}
 .tabContents {padding: 0.3em;}
@@ -156,10 +138,6 @@ input:not([type]) {width:  11em; border:0;} /* These are nested in table cells *
 .branch a {display: block;}
 .branch, .leaf {display: block; margin-left: 1.3em;}
 .treeButtons {display: block; margin-top: 0.5em;}
-
-#navToolbar, #search, #navButtons, #treePath {display: table-cell;}
-#navToolbar, #treePath {width: 100%;}
-#search, #treePath {white-space: nowrap;}
 
 #backstageCloak {display:none; z-index:500; position:absolute; width:100%; height:100%; background: black; opacity:0.6; filter:alpha(opacity=60);}
 
@@ -203,7 +181,6 @@ a, a:hover {color:blue;}
 table.twtable, .twtable td, .twtable thead td, .twtable th, .wizard {border-color: darkgray;}
 h5, .popup li.disabled, #backstageTabBar {color: gray;}
 .popup, .wizard, .listBreak {border-color: lightgray;}
-
 pre {border: 1px solid lightblue;}
 .tabContents {color: deepskyblue;}
 
@@ -224,6 +201,7 @@ h2, h3, h4, h5 {color: #366092;}
 
 a:hover {background-color:transparent;}
 .highlight, .marked {background: yellow;}
+
 #tiddlerDisplay, .inputDialogPanel, .wizard {background-color:white;}
 body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {background-color: whitesmoke;}
 .dualColorTable tbody td:first-child, .listView tbody td:first-child {background-color: #DEEBF6;} /* Blue 80% */
@@ -236,7 +214,7 @@ body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {b
 
 /* Shadows */
 
-.popup, .wizard {box-shadow: 3px 3px 5px lightgray;}
+.popup, .wizard, #yourSearchResult {box-shadow: 3px 3px 5px lightgray;}
 
 </style>
 <!--POST-HEAD-START-->
@@ -258,23 +236,6 @@ body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {b
 <div id="contentWrapper"></div>
 <div id="contentStash"></div>
 <div id="shadowArea">
-<div title="ColorPalette">
-<pre>Background: #fff
-Foreground: #000
-PrimaryPale: #8cf
-PrimaryLight: #18f
-PrimaryMid: #04b
-PrimaryDark: #014
-SecondaryPale: #ffc
-SecondaryLight: #fe8
-SecondaryMid: #db4
-SecondaryDark: #841
-TertiaryPale: #eee
-TertiaryLight: #ccc
-TertiaryMid: #999
-TertiaryDark: #666
-</pre>
-</div>
 <div title="EditTemplate">
 <pre>&lt;!--{{{--&gt;
 &lt;div class="toolbar" macro="toolbar +saveTiddler -cancelTiddler"&gt;&lt;/div&gt;
@@ -370,19 +331,22 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 <div title="- Home -" modifier="YourName" created="201904232038" modified="201904232156" parenttiddler="." changecount="6">
 <pre>!Welcome to VodiWiki
 
-* VodiWiki is a self contained wiki in a single html file with built-in editor
-* It's based on TiddliWiki 2.8.1 (by Jeremy Ruston) plus some plugins (see below)
-* The UI has been strongly modified to look and feel more like a common notes taking app
+* This is a monolithic (= single HTML file) wiki with built-in viewer and editor.
+* It's purpose is to make any kind of documentation accessible, portable, publishable, platform independent.
+
+!! Usage scenarios
+
+* ... write a documentation for your product and deliver it for offline reading
+* ... put the HTML file on a public server for online reading
 
 !Get Started
 
 * Just go here: [[Anatomy Of The Main Window]] (and following pages)
 
-!Credits
+!License
 
-* Eric Shulman for SectionLinksPlugin.
-* Pascal Collin &amp; Simon Huggins for TagsTreePlugin.
-* Udo Borkowski for YourSearchPlugin.
+&lt;&lt;licenseText&gt;&gt;
+
 </pre>
 </div>
 <div title="Anatomy Of The Main Window" modifier="YourName" created="201701242104" modified="201904232014" changecount="30" parenttiddler="Getting Started">
@@ -751,8 +715,8 @@ window.onkeydown = function(e) {
 	if (e.ctrlKey &amp;&amp; e.keyCode == 69) {
 		var searchField = document.getElementsByClassName('searchField')[0];
 		if (! searchField.onkeypress) {
-			searchField.onkeypress = function(e) {
-				if (e.keyCode==13) {
+			searchField.onkeypress = function(e) { // todo patch this directly into search code
+				if (e.keyCode == 13) {
 					// document.getElementsByClassName('yourSearchTitle')[0].firstChild.focus();
 					var foundTiddlers = abego.YourSearch.getFoundTiddlers();
 					story.displayTiddler(null, foundTiddlers[0]);
@@ -1669,7 +1633,6 @@ config.shadowTiddlers.TagsTreeStyleSheet = &quot;/*{{{*/\n&quot;;
 config.shadowTiddlers.TagsTreeStyleSheet +=&quot;.leaf, .subtree {display:block; margin-left : 0.5em}\n&quot;;
 config.shadowTiddlers.TagsTreeStyleSheet +=&quot;.subtree {margin-bottom:0.5em}\n&quot;;
 config.shadowTiddlers.TagsTreeStyleSheet +=&quot;#mainMenu {text-align:left}\n&quot;;
-config.shadowTiddlers.TagsTreeStyleSheet +=&quot;.branch .button {border:1px solid #DDD; color:#AAA;font-size:9px;padding:0 2px;margin-right:0.3em;vertical-align:middle;text-align:center;}\n&quot;;
 config.shadowTiddlers.TagsTreeStyleSheet +=&quot;/*}}}*/&quot;;
 
 store.addNotification(&quot;TagsTreeStyleSheet&quot;, refreshStyles); 
@@ -1927,7 +1890,7 @@ config.views = {
 };
 
 // Backstage tasks
-config.backstageTasks = ["save", "importTask", "tweak", "upgrade", "plugins"];
+config.backstageTasks = ["save", "importTask", "tweak", "plugins", "upgrade"];
 
 // Extensions
 config.extensions = {};
@@ -1936,7 +1899,7 @@ config.extensions = {};
 config.macros = {
 	today: {},
 	version: {},
-	search: {sizeTextbox: 15},
+	search: {},
 	tiddler: {},
 	tag: {},
 	tags: {},
@@ -1953,7 +1916,6 @@ config.macros = {
 	saveChanges: {},	
 	option: {},
 	options: {},
-	newTiddler: {}, //xxx
 	tabs: {},
 	gradient: {},
 	message: {},
@@ -2058,7 +2020,7 @@ merge(config.tasks, {
 	save: {text: "Save", tooltip: "Save your changes to this wiki"},
 	importTask: {text: "Import", tooltip: "Import content and plugins from other wiki files and servers", content: '<<importTiddlers>>'},
 	tweak: {text: "Tweak", tooltip: "Tweak some options", content: '<<options>>'},
-	upgrade: {text: "Upgrade", tooltip: "Upgrade integrated viewer and editor", content: '<<upgrade>>'},
+	upgrade: {text: "About / Upgrade", tooltip: "Upgrade integrated viewer and editor", content: '<<upgrade>>'},
 	plugins: {text: "Plugins", tooltip: "Manage installed plugins", content: '<<plugins>>'}
 });
 
@@ -2122,23 +2084,16 @@ merge(config.messages,{
 	fieldCannotBeChanged: "Field '%0' cannot be changed",
 	loadingMissingTiddler: "Attempting to retrieve the tiddler '%0' from the '%1' server at:\n\n'%2' in the workspace '%3'",
 	upgradeDone: "The upgrade to version %0 is now complete\n\nClick 'OK' to reload the newly upgraded TiddlyWiki",
-	invalidCookie: "Invalid cookie '%0'"});
+	invalidCookie: "Invalid cookie '%0'"
+});
 
-config.messages.backstage = {
-	open: {text: "Backstage", tooltip: "Open the backstage area to perform authoring and editing tasks"},
-	close: {text: "Close", tooltip: "Close the backstage area"},
-	hint: "Backstage: "
-};
-
-config.messages.dates.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November","December"];
+config.messages.dates.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 config.messages.dates.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 config.messages.dates.shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 config.messages.dates.shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 // suffixes for dates, eg "1st","2nd","3rd"..."30th","31st"
-config.messages.dates.daySuffixes = ["st","nd","rd","th","th","th","th","th","th","th",
-		"th","th","th","th","th","th","th","th","th","th",
-		"st","nd","rd","th","th","th","th","th","th","th",
-		"st"];
+config.messages.dates.daySuffixes = ["st","nd","rd","th","th","th","th","th","th","th","th","th","th","th","th","th","th","th","th","th","st","nd","rd","th","th","th","th","th","th","th","st"];
 config.messages.dates.am = "am";
 config.messages.dates.pm = "pm";
 
@@ -2180,38 +2135,22 @@ merge(config.messages,{
 	]
 });
 
-merge(config.macros.search,{
-	label: "Search",
-	hint: "Search this Wiki",
-	placeholder: "",
-	accessKey: "F",
-	successMsg: "%0 tiddlers found matching %1",
-	failureMsg: "No tiddlers found matching %0"}
-);
+merge(config.macros.timeline, {
+	dateFormat: "DD MMM YYYY"
+});
 
-merge(config.macros.timeline,{
-	dateFormat: "DD MMM YYYY"}
-);
-
-merge(config.macros.allTags,{
+merge(config.macros.allTags, {
 	tooltip: "Show tiddlers tagged with '%0'",
-	noTags: "There are no tagged tiddlers"}
-);
+	noTags: "There are no tagged tiddlers"
+});
 
-merge(config.macros.saveChanges,{
+merge(config.macros.saveChanges, {
 	label: "save changes",
 	hint: "Save all tiddlers to create a new TiddlyWiki",
 	accessKey: "S"
 });
 
-merge(config.macros.newTiddler,{
-	label: "new tiddler",
-	hint: "Create a new tiddler",
-	title: "New Tiddler",
-	accessKey: "N"
-});
-
-merge(config.macros.options,{
+merge(config.macros.options, {
 	wizardTitle: "Tweak advanced options",
 	step1Title: "These options are saved in the wiki file itself.",
 	step1Html: "<input id='chkUnknown' name='chkUnknown' type='checkbox' checked='false'/><label for='chkUnknown'>Show undocumented options</label><br/><input type='hidden' name='markList'/>",
@@ -2226,7 +2165,7 @@ merge(config.macros.options,{
 	}
 });
 
-merge(config.macros.plugins,{
+merge(config.macros.plugins, {
 	wizardTitle: "Manage plugins",
 	step1Title: "Currently loaded plugins",
 	step1Html: "<input type='hidden' name='markList'></input>", // DO NOT TRANSLATE
@@ -2331,9 +2270,16 @@ merge(config.macros.importTiddlers,{
 });
 
 merge(config.macros.upgrade,{
-	wizardTitle: "Upgrade The Wiki Editor",
-	step1Title: "Editor version is %0",
-	step1Html: "You are about to upgrade the integrated viewer and editor of this wiki (from <a href='%0' class='externalLink' target='_blank'>%1</a>).<br/>Your content will be preserved across the upgrade.",
+	wizardTitle: "VodiWiki",
+	step1Title: "About",
+	step1Html:
+		"VodiWiki is a single page application developed and maintained by Mark Vodicka (<a href='www.vodi.de' target='_blank'>www.vodi.de</a>).<br/>" +
+		"It contains parts of Jeremy Ruston's TiddlyWiki, abego Software's YourSearchPlugin.<br/><br/>" +
+		"<h1>License</h1><span macro=\"licenseText\"></span><br/><br/>" +
+		"<h1>Check for Upgrade (This Version: <span macro=\"version\"></span>)</h1>" +
+		"Hitting the upgrade button will check for an update of the integrated viewer and editor.<br/>"+
+		"Your content will be preserved.<br/>"+
+	  "(Update source: <a href='%0' class='externalLink' target='_blank'>%0</a>).",
 	errorCantUpgrade: "Unable to upgrade this TiddlyWiki. You can only perform upgrades on TiddlyWiki files stored locally",
 	errorNotSaved: "You must save changes before you can perform an upgrade",
 	step2Title: "Confirm the upgrade details",
@@ -2356,7 +2302,7 @@ merge(config.macros.upgrade,{
 	cancelPrompt: "Cancel the upgrade process",
 	step3Title: "Upgrade cancelled",
 	step3Html: "You have cancelled the upgrade process"
-	});
+});
 
 
 merge(config.commands.closeTiddler,{
@@ -3191,7 +3137,7 @@ config.formatters = [
 	name: "lineBreak",
 	match: "\\n|<br ?/?>",
 	handler: function(w) {
-		createTiddlyElement(w.output,"br");
+		createTiddlyElement(w.output, "br");
 	}
 },
 
@@ -3501,11 +3447,18 @@ config.macros.collapseArea.toggle = function(sender, id) {
 	}
 };
 
+config.macros.licenseText = {};
+
+config.macros.licenseText.handler = function(place) { // Implements IMacroResolver.handler()
+	var s = createTiddlyElement(place, "span", null, "licenseText");
+	s.innerHTML =  document.querySelector('meta[name="copyright"]').content.lineBreaksToBr();
+};
+
 config.macros.version.handler = function(place) { // Implements IMacroResolver.handler()
 	jQuery("<span/>").text(formatVersion()).appendTo(place);
 };
 
-config.macros.today.handler = function(place,macroName,params) { // Implements IMacroResolver.handler()
+config.macros.today.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
 	var now = new Date();
 	var text = params[0] ? now.formatString(params[0].trim()) : now.toLocaleString();
 	jQuery("<span/>").text(text).appendTo(place);
@@ -3948,123 +3901,6 @@ config.macros.refreshDisplay.handler = function(place) { // Implements IMacroRes
 config.macros.refreshDisplay.onClick = function(e) {
 	refreshAll();
 	return false;
-};
-
-//--
-//-- NewTiddler macros
-//--
-
-config.macros.newTiddler.createNewTiddlerButton = function(place, title, params, label, hint, accessKey, newFocus) { // xxx
-	var tags = [];
-	var t;
-	for (t = 1; t < params.length; t++) {
-		if ((params[t].name == "anon" && t != 1) || (params[t].name == "tag")) tags.push(params[t].value);
-	}
-	label = getParam(params, "label", label);
-	hint = getParam(params, "prompt", hint);
-	accessKey = getParam(params, "accessKey", accessKey);
-	newFocus = getParam(params, "focus", newFocus);
-	var customFields = getParam(params, "fields", "");
-	if (!customFields && !store.isShadowTiddler(title)) customFields = String.encodeHashMap(config.defaultCustomFields);
-	var btn = renderTiddlyButton(place, label, hint, this.onClickNewTiddler, null, null, accessKey);
-	btn.setAttribute("newTitle", title);	
-	if (tags.length > 0)
-		btn.setAttribute("params",tags.join("|"));
-	btn.setAttribute("newFocus", newFocus);
-	btn.setAttribute("newTemplate",getParam(params,"template",DEFAULT_EDIT_TEMPLATE));
-	if (customFields !== "")
-		btn.setAttribute("customFields",customFields);
-	var text = getParam(params,"text");
-	if (text !== undefined)
-		btn.setAttribute("newText",text);
-	return btn;
-};
-
-config.macros.newTiddler.onClickNewTiddler = function() {
-	var title = this.getAttribute("newTitle");
-	var params = this.getAttribute("params");
-	var tags = params ? params.split("|") : [];
-	var focus = this.getAttribute("newFocus");
-	var template = this.getAttribute("newTemplate");
-	var customFields = this.getAttribute("customFields");
-	if (!customFields && !store.isShadowTiddler(title))
-		customFields = String.encodeHashMap(config.defaultCustomFields);
-	story.displayTiddler(null, title, template, false,null,null);
-	var tiddlerElem = story.getTiddler(title);
-	if (customFields)
-		story.addCustomFields(tiddlerElem,customFields);
-	var text = this.getAttribute("newText");
-	if (typeof text == "string" && story.getTiddlerField(title,"text"))
-		story.getTiddlerField(title,"text").value = text.format([title]);
-	var t;
-	for (t=0;t<tags.length;t++)
-		story.setTiddlerTag(title,tags[t],+1);
-	story.focusTiddler(title, focus);
-	return false;
-};
-
-config.macros.newTiddler.handler = function(place, macroName, params, wikifier, paramString) { // Implements IMacroResolver.handler()
-	if (!readOnly) {
-		params = paramString.parseParams("anon",null,true,false,false);
-		var title = params[1] && params[1].name == "anon" ? params[1].value : this.title;
-		title = getParam(params,"title",title);
-		this.createNewTiddlerButton(place, title, params, this.label, this.hint, this.accessKey, "title");
-	}
-};
-
-//--
-//-- Search macro
-//--
-
-// Global because there's only ever one outstanding incremental search timer
-config.macros.search.timeout = null;
-
-config.macros.search.doSearch = function(txt) {
-	if (txt.value.length > 0) {
-		story.search(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch);
-		txt.setAttribute("lastSearchText",txt.value);
-	}
-};
-
-config.macros.search.onClick = function(e) {
-	config.macros.search.doSearch(this.nextSibling);
-	return false;
-};
-
-config.macros.search.onKeyPress = function(ev) {
-	var me = config.macros.search;
-	var e = ev || window.event;
-	switch(e.keyCode) {
-		case 9: // Tab
-			return;
-		case 13: // Ctrl-Enter
-		case 10: // Ctrl-Enter on IE PC
-			me.doSearch(this);
-			break;
-		case 27: // Escape
-			this.value = "";
-			clearMessage();
-			break;
-	}
-	if (config.options.chkIncrementalSearch) {
-		if (this.value.length > 2) {
-			if (this.value != this.getAttribute("lastSearchText")) {
-				if (me.timeout) {
-					clearTimeout(me.timeout);
-				}
-				var txt = this;
-				me.timeout = setTimeout(function() {me.doSearch(txt);},500);
-			}
-		} else {
-			if (me.timeout) {
-				clearTimeout(me.timeout);
-			}
-		}
-	}
-};
-
-config.macros.search.onFocus = function(e){
-	this.select();
 };
 
 //--
@@ -5515,9 +5351,9 @@ Story.prototype.refreshTiddler = function(title, template, force, customFields, 
 			tiddlerElem.onmouseover = this.onTiddlerMouseOver;
 			tiddlerElem.onmouseout = this.onTiddlerMouseOut;
 			tiddlerElem.ondblclick = this.onTiddlerDblClick;
-			tiddlerElem[window.event?"onkeydown":"onkeypress"] = this.onTiddlerKeyPress;
+			tiddlerElem[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
 			tiddlerElem.innerHTML = this.getTemplateForTiddler(title,template,tiddler);
-			applyHtmlMacros(tiddlerElem,tiddler);
+			applyHtmlMacros(tiddlerElem, tiddler);
 			if (store.getTaggedTiddlers(title).length > 0)
 				jQuery(tiddlerElem).addClass("isTag");
 			else
@@ -5717,18 +5553,6 @@ Story.prototype.isEmpty = function() {
 	return place && place.firstChild == null;
 };
 
-Story.prototype.search = function(text, useCaseSensitive, useRegExp) {
-	highlightHack = new RegExp(useRegExp ? text : text.escapeRegExp(),useCaseSensitive ? "mg" : "img");
-	var matches = store.search(highlightHack, "title", "excludeSearch");
-	this.displayTiddlers(null, matches);
-	highlightHack = null;
-	var q = useRegExp ? "/" : "'";
-	if (matches.length > 0)
-		displayMessage(config.macros.search.successMsg.format([matches.length.toString(), q + text + q]));
-	else
-		displayMessage(config.macros.search.failureMsg.format([q + text + q]));
-};
-
 Story.prototype.findContainingTiddler = function(e) {
 	while (e && !jQuery(e).hasClass("tiddler")) {
 		e = jQuery(e).hasClass("popup") && Popup.stack[0] ? Popup.stack[0].root : e.parentNode;
@@ -5849,9 +5673,6 @@ Story.prototype.switchTheme = function(theme) { // todo: remove theming
 			removeStyleSheet(config.refresherData.styleSheet);
 			config.refresherData.styleSheet = replaceNotification(i,config.refresherData.styleSheet,theme,name);
 			break;
-		case "ColorPalette":
-			config.refresherData.colorPalette = replaceNotification(i,config.refresherData.colorPalette,theme,name);
-			break;
 		default:
 			break;
 		}
@@ -5892,21 +5713,19 @@ var backstage = {
 		this.cloak = document.getElementById("backstageCloak");
 		this.tabBar = document.getElementById("backstageTabBar");
 		this.panel = document.getElementById("backstagePanel");
-		var cmb = config.messages.backstage;
 		
 		this.button.style.display = "block";
-		var t = cmb.open.text + " ↩";
-		this.showButton = renderTiddlyButton(this.button, t, cmb.open.tooltip, function(e) {backstage.show(); return false;}, null, "backstageShow");
-		t = "↪ " + cmb.close.text;
-		this.hideButton = renderTiddlyButton(this.button, t, cmb.close.tooltip,	function(e) {backstage.hide(); return false;}, null, "backstageHide");
+		this.showButton = renderTiddlyButton(this.button, "↩", null, function(e) {backstage.show(); return false;}, null, "backstageShow");
+		this.hideButton = renderTiddlyButton(this.button, "↪", null,	function(e) {backstage.hide(); return false;}, null, "backstageHide");
 		
 		this.cloak.onmousedown = function(e) {backstage.switchTab(null);};
 		
 		this.panelBody = createTiddlyElement(this.panel, "div", null, "backstagePanelBody");
 		
-		createTiddlyText(this.tabBar, cmb.hint);
-		for (t = 0; t < config.backstageTasks.length; t++) {
-			var taskName = config.backstageTasks[t];
+		createTiddlyText(this.tabBar, "Backstage: ");
+		
+		for (var i = 0; i < config.backstageTasks.length; i++) {
+			var taskName = config.backstageTasks[i];
 			var task = config.tasks[taskName];
 			var handler = task.action ? this.onClickCommand : this.onClickTab;
 			var text = task.text + (task.action ? "" : "▾");
@@ -6040,7 +5859,7 @@ config.macros.importTiddlers.onClose = function(e) {
 
 config.macros.importTiddlers.restart = function(wizard) {
 	var me = config.macros.importTiddlers;
-	wizard.addStep(this.step1Title,this.step1Html);
+	wizard.addStep(this.step1Title, this.step1Html);
 	var t,s = wizard.getElement("selTypes");
 	for (t in config.adaptors) {
 		var e = createTiddlyElement(s,"option",null,null,config.adaptors[t].serverLabel || t);
@@ -6396,7 +6215,7 @@ config.macros.importTiddlers.onGetTiddler = function(context,wizard) {
 config.macros.upgrade.handler = function(place) { // Implements IMacroResolver.handler()
 	var w = new Wizard();
 	w.createWizard(place, this.wizardTitle);
-	w.addStep(this.step1Title.format(formatVersion()), this.step1Html.format([this.source, this.source]));
+	w.addStep(this.step1Title.format(formatVersion()), this.step1Html.format([this.source]));
 	w.setButtons([{caption: this.upgradeLabel, tooltip: this.upgradePrompt, onClick: this.onClickUpgrade}]);
 };
 
@@ -6636,7 +6455,6 @@ config.notifyTiddlers = [
 	{name: "SiteTitle", notify: refreshPageTitle},
 	{name: "SiteSubtitle", notify: refreshPageTitle},
 	{name: "WindowTitle", notify: refreshPageTitle},
-	{name: "ColorPalette", notify: refreshColorPalette},
 	{name: null, notify: refreshDisplay}
 ];
 
@@ -6684,9 +6502,7 @@ config.refresherData = {
 	styleSheet: "StyleSheet",
 	defaultStyleSheet: "StyleSheet",
 	pageTemplate: "PageTemplate",
-	defaultPageTemplate: "PageTemplate",
-	colorPalette: "ColorPalette",
-	defaultColorPalette: "ColorPalette"
+	defaultPageTemplate: "PageTemplate"
 };
 
 function refreshElements(root,changeList) {
@@ -6704,7 +6520,8 @@ function refreshElements(root,changeList) {
 	}
 }
 
-function applyHtmlMacros(root,tiddler) {
+// scans html code for elements with macro attributes and executes the macros. E.g. <span macro="version"></span>
+function applyHtmlMacros(root, tiddler) {
 	var e = root.firstChild;
 	while (e) {
 		var nextChild = e.nextSibling;
@@ -6718,7 +6535,7 @@ function applyHtmlMacros(root,tiddler) {
 					params = macro.substr(p+1);
 					macro = macro.substr(0,p);
 				}
-				invokeMacro(e,macro,params,null,tiddler);
+				invokeMacro(e, macro, params, null, tiddler);
 			}
 		}
 		if (e.hasChildNodes())
@@ -6776,11 +6593,6 @@ function getPageTitle() {
 
 function refreshStyles(title, doc) {
 	setStylesheet(title == null ? "" : store.getRecursiveTiddlerText(title, "", 10), title, doc || document);
-}
-
-function refreshColorPalette(title) {
-	if (!startingUp)
-		refreshAll();
 }
 
 function refreshAll() {
@@ -7284,35 +7096,6 @@ abego.TiddlerFilterTerm.prototype.test = function(tiddler) {
 	return this.tester.test(tiddler);
 };
 
-// Recognize a string like "Some Title. Some content text #Tag1 #Tag2 Tag3"
-// with the tags and the text being optional.
-// Also the period at the end of the title is optional when no content text is specified)
-//
-// Returns the result in an object with properties "title" and "params",
-// with "params" following the parseParams format, containing the "tag" and "text" arguments.
-//
-abego.parseNewTiddlerCommandLine = function(s) {
-	var m = /(.*?)\.(?:\s+|$)([^#]*)(#.*)?/.exec(s);
-	if (!m) 
-		m = /([^#]*)()(#.*)?/.exec(s);
-	if (m) {
-		var r;
-		if (m[3]) {
-			var s2 = m[3].replace(/#/g,"");
-			r = s2.parseParams("tag");
-		} else
-			r = [[]];
-			
-		// add the text parameter
-		var text = m[2]?m[2].trim():"";
-		r.push({name: "text", value: text});
-		r[0].text = [text];
-		
-		return {title: m[1].trim(), params: r}; 
-	} else
-		return {title: s.trim(),params: [[]]};
-};	
-
 // 		options.defaultFields [@seeOptionDefault abego.TiddlerFilterTerm.fields] fields to check when no fields are explicitly specified in queryText.
 // 		options.withExtendedFields [@seeOptionDefault abego.TiddlerFilterTerm.withExtendedFields] when true and no fields are explicitly specified in queryText also the extended fields are considered (in addition to the ones in defaultFields).
 // @seeOptions abego.TiddlerFilterTerm (-fields -fullWordMatch -withExtendedFields)
@@ -7375,7 +7158,7 @@ abego.parseTiddlerFilterTerm = function(queryText,offset,options) {
 				options.fields = fields;
 				options.withExtendedFields	= false;
 			}	
-			var term = new abego.TiddlerFilterTerm(text,options);
+			var term = new abego.TiddlerFilterTerm(text, options);
 			var markREText = textIsRegExp ? text : text.escapeRegExp();
 			if (markREText && fullWordMatch)
 				markREText = "\\b"+markREText+"\\b";
@@ -8133,14 +7916,13 @@ var standardRankFunction = function(tiddler, query) {
 var findMatches = function(store, searchText,caseSensitive,useRegExp,sortField,excludeTag) {
 	lastQuery = null;
 	
-	var candidates = store.reverseLookup("tags",excludeTag,false);
+	var candidates = store.reverseLookup("tags", excludeTag, false);
 	try {
 		var defaultFields = [];
 		if (config.options.chkSearchInTitle) defaultFields.push("title");
 		if (config.options.chkSearchInText) defaultFields.push("text");
 		if (config.options.chkSearchInTags) defaultFields.push("tags");
-		lastQuery = new abego.TiddlerQuery(
-				searchText,caseSensitive, useRegExp,defaultFields,config.options.chkSearchExtendedFields); 
+		lastQuery = new abego.TiddlerQuery(searchText, caseSensitive, useRegExp, defaultFields, config.options.chkSearchExtendedFields);
 	} catch (e) {
 		// when an invalid query is given no tiddlers are matched
 		return [];
@@ -8203,7 +7985,6 @@ var lastSearchText = null; // The last search text, as passed to findMatches
 var resultElement = null; // The (popup) DOM element containing the search result [may be null]
 var searchInputField = null; // The "search" input field
 var searchButton = null; // The "search" button
-var lastNewTiddlerButton = null;
 
 var initStylesheet = function() {
 	if (version.extensions.YourSearchPlugin.styleSheetInited) 
@@ -8276,18 +8057,11 @@ var adjustResultPositionAndSize = function() {
 	resultElement.style.display = "block";
 };
 
-var scrollVisible = function() {
-	// Scroll the window to make the result page (and the search Input field) visible.
-	if (resultElement) window.scrollTo(0,ensureVisible(resultElement));
-	if (searchInputField) window.scrollTo(0,ensureVisible(searchInputField));
-};
-
 // Makes sure the result page has a good size and position and visible
 // (may scroll the window)
 //
 var	ensureResultIsDisplayedNicely = function() {
-	adjustResultPositionAndSize();
-	scrollVisible();
+	adjustResultPositionAndSize();	
 };
 
 var indexInPage = undefined; // The index (in the current page) of the tiddler currently rendered.
@@ -8307,16 +8081,16 @@ var MyItemRenderer = function(parent) {
 		this.place = createTiddlyElement(parent,"div",yourSearchResultItemsID);
 };
 
-merge(MyItemRenderer.prototype,{
-	render: function(pager,object,index,indexOnPage) {
+merge(MyItemRenderer.prototype, {
+	render: function(pager, object, index, indexOnPage) {
 		// Define global variables, referenced by macros during applyHtmlMacros
 		indexInPage = indexOnPage;
 		currentTiddler = object;
 		
-		var item = createTiddlyElement(this.place,"div",null, "yourSearchItem");
+		var item = createTiddlyElement(this.place, "div", null, "yourSearchItem");
 		item.innerHTML = this.itemHtml;
-		applyHtmlMacros(item,null);
-		refreshElements(item,null);
+		applyHtmlMacros(item, null);
+		refreshElements(item, null);
 	},
 
 	endRendering: function(pager) {
@@ -8360,7 +8134,7 @@ pager.onPageChanged = function() {
 };
 
 var	reopenResultIfApplicable = function() {
-	if (searchInputField == null || !config.options.chkUseYourSearch) return;
+	if (searchInputField == null) return;
 	
 	if ((searchInputField.value == lastSearchText) && lastSearchText && !isResultOpen()) {
 		// For speedup we check re-use the previously created resultElement, if possible.
@@ -8372,7 +8146,6 @@ var	reopenResultIfApplicable = function() {
 		}
 	}
 };
-
 
 var invalidateResult = function() {
 	closeResult();
@@ -8428,28 +8201,20 @@ var myMacroSearchHandler = function(place, macroName, params, wikifier, paramStr
 
 	lastSearchText = "";
 	var searchTimeout = null;
-	var doSearch = function(txt) {
-		if (config.options.chkUseYourSearch)
-			myStorySearch(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch);
-		else
-			story.search(txt.value,config.options.chkCaseSensitiveSearch,config.options.chkRegExpSearch);
+	var doSearch = function(txt) {		
+		myStorySearch(txt.value, config.options.chkCaseSensitiveSearch, config.options.chkRegExpSearch);
 		lastSearchText = txt.value;
-		};
-	var clickHandler = function(e)
-		{
+	};
+	var clickHandler = function(e) {
 		doSearch(searchInputField);
 		return false;
-		};
+	};
 	var keyHandler = function(e) {
 		if (!e) e = window.event;
 		searchInputField = this;
-		switch(e.keyCode)
-			{
+		switch (e.keyCode) {
 			case 13:
-				if (e.ctrlKey && lastNewTiddlerButton && isResultOpen())
-					lastNewTiddlerButton.onclick.apply(lastNewTiddlerButton,[e]);
-				else
-					doSearch(this);
+				doSearch(this);
 				break;
 			case 27:
 				// When the result is open, close it, 
@@ -8461,30 +8226,22 @@ var myMacroSearchHandler = function(place, macroName, params, wikifier, paramStr
 					clearMessage();
 				}
 				break;
-			}
-		if (String.fromCharCode(e.keyCode) == this.accessKey || e.altKey) {
-			reopenResultIfApplicable();
 		}
-
-		if(this.value.length<3 && searchTimeout) clearTimeout(searchTimeout);
-		if(this.value.length > 2) {
+		
+		if (this.value.length < 3 && searchTimeout) clearTimeout(searchTimeout);
+		
+		if (this.value.length > 2) {
 		 	if (this.value != lastSearchText) {
-				if (!config.options.chkUseYourSearch || config.options.chkSearchAsYouType) {
-					if(searchTimeout)
-						clearTimeout(searchTimeout);
+				if (config.options.chkSearchAsYouType) {
+					if (searchTimeout) clearTimeout(searchTimeout);
 					var txt = this;
-					searchTimeout = setTimeout(function() {doSearch(txt);},500);
-					}
+					searchTimeout = setTimeout(function() {doSearch(txt);}, 500);
 				}
-			else
-				{
-				if(searchTimeout)
-					clearTimeout(searchTimeout);
-				}
-			};
-		if (this.value.length == 0) {
-			closeResult();
-		}
+			}	else {
+				if(searchTimeout) clearTimeout(searchTimeout);
+			}
+		};
+		if (this.value.length == 0) {closeResult();}
 	};
 
 	var focusHandler = function(e) {
@@ -8493,32 +8250,22 @@ var myMacroSearchHandler = function(place, macroName, params, wikifier, paramStr
 		reopenResultIfApplicable();
 	};
 	
-	var args = paramString.parseParams("list",null,true);
-	// either create the button to the left or the right of the text.
-	var buttonAtRight = getFlag(args, "buttonAtRight");
-	var sizeTextbox = getParam(args, "sizeTextbox", this.sizeTextbox);
-	
+	var args = paramString.parseParams("list",null,true);		
 	var txt = createTiddlyElement(null,"input",null,"txtOptionInput searchField",null);
-	if(params[0])
+	if (params[0])
 		txt.value = params[0];
 	txt.onkeyup = keyHandler;
-	txt.onfocus = focusHandler;
-	txt.setAttribute("size",sizeTextbox);
-	txt.setAttribute("accessKey",this.accessKey);
-	txt.setAttribute("autocomplete","off");
+	txt.onfocus = focusHandler;	
+	// txt.setAttribute("accessKey", "f");
+	txt.setAttribute("autocomplete", "off");
 	if (config.browser.isSafari)	{
-		txt.setAttribute("type","search");
-		txt.setAttribute("results","5");
-	}	else if (!config.browser.isIE) txt.setAttribute("type","text");
+		txt.setAttribute("type", "search");
+		txt.setAttribute("results", "5");
+	}	else if (! config.browser.isIE) txt.setAttribute("type", "text");
 
-	var btn = renderTiddlyButton(null,this.label,this.prompt,clickHandler);
-	if (place) {
-		if (!buttonAtRight)
-			place.appendChild(btn);
-		place.appendChild(txt);
-		if (buttonAtRight)
-			place.appendChild(btn);
-	}
+	var btn = renderTiddlyButton(null, "🔎", null, clickHandler);
+	place.appendChild(txt);
+	place.appendChild(btn);
 
 	searchInputField = txt;
 	searchButton = btn;
@@ -8587,6 +8334,7 @@ TiddlyWiki.prototype.saveTiddler = function(title,newTitle,newBody,modifier,modi
 	oldTiddlyWikiSaveTiddler.apply(this, arguments);
 	invalidateResult();
 };
+
 var oldTiddlyWikiRemoveTiddler = TiddlyWiki.prototype.removeTiddler;
 TiddlyWiki.prototype.removeTiddler = function(title) {
 	oldTiddlyWikiRemoveTiddler.apply(this, arguments);
@@ -8604,12 +8352,12 @@ config.macros.yourSearch = {
 	label: "yourSearch",
 	prompt: "Gives access to the current/last YourSearch result",
 	
-	handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+	handler: function(place, macroName, params, wikifier, paramString, tiddler) {
 		if (params.length == 0) return;
 	
 		var name = params[0];
 		var func = config.macros.yourSearch.funcs[name];
-		if (func) func(place,macroName,params,wikifier,paramString,tiddler);
+		if (func) func(place, macroName, params, wikifier, paramString, tiddler);
 	},
 	
 	tests: {
@@ -8638,37 +8386,7 @@ config.macros.yourSearch = {
 			}
 		},
 		
-		version: function(place) {
-			var t = "YourSearch %0.%1.%2".format(
-					[version.extensions.YourSearchPlugin.major, 
-					 version.extensions.YourSearchPlugin.minor, 
-					 version.extensions.YourSearchPlugin.revision]);
-			var e = createTiddlyElement(place, "a");
-			e.setAttribute("href", "http://tiddlywiki.abego-software.de/#YourSearchPlugin");
-			e.innerHTML = '<font color="black" face="Arial, Helvetica, sans-serif">'+t+'<font>';
-		},
-		
-		copyright: function(place) {
-			var e = createTiddlyElement(place, "a");
-			e.setAttribute("href", "http://www.abego-software.de");
-			e.innerHTML = '<font color="black" face="Arial, Helvetica, sans-serif">&copy; 2005-2008 <b><font color="red">abego</font></b> Software<font>';
-		},
-		
-		newTiddlerButton: function(place) {
-			if (lastQuery) {
-				var r = abego.parseNewTiddlerCommandLine(lastQuery.getQueryText());
-				var btn = config.macros.newTiddler.createNewTiddlerButton(place,r.title,r.params,"new tiddler","Create a new tiddler based on search text. (Shortcut: Ctrl-Enter; Separators: '.', '#')",null,"text");				
-				// Close the result before the new tiddler is created.
-				var oldOnClick = btn.onclick;
-				btn.onclick = function() {
-					closeResult();
-					oldOnClick.apply(this,arguments);
-				};
-				lastNewTiddlerButton = btn;
-			}
-		},
-		
-		linkButton: function(place,macroName,params,wikifier,paramString,tiddler) {
+		linkButton: function(place, macroName, params, wikifier, paramString, tiddler) {
 			if (params < 2) return;
 			
 			var	tiddlyLink = params[1];
@@ -8676,21 +8394,20 @@ config.macros.yourSearch = {
 			var tooltip = params < 4 ? text : params[3];
 			var accessKey = params < 5 ? null : params[4];
 			
-			var btn = renderTiddlyButton(place,text,tooltip,closeResultAndDisplayTiddler,null,null, accessKey);
-			btn.setAttribute("tiddlyLink",tiddlyLink);
+			var btn = renderTiddlyButton(place, text, tooltip, closeResultAndDisplayTiddler, null, null, accessKey);
+			btn.setAttribute("tiddlyLink", tiddlyLink);
 		},
 		
 		closeButton: function(place,macroName,params,wikifier,paramString,tiddler) {
 			renderTiddlyButton(place, "close", "Close the Search Results (Shortcut: ESC)", closeResult);
 		},
 		
-		openAllButton: function(place,macroName,params,wikifier,paramString,tiddler) {
+		openAllButton: function(place,macroName,params,wikifier,paramString,tiddler) { // xxx
 			var n = getLastResultsCount();
 			if (n == 0) return;
 		
 			var title = n == 1 ? "open tiddler" : "open all %0 tiddlers".format([n]);
-			var button = renderTiddlyButton(place, title, "Open all found tiddlers (Shortcut: Alt-O)", openAllFoundTiddlers);
-			button.setAttribute("accessKey","O");
+			var button = renderTiddlyButton(place, title, "Open all found tiddlers (Shortcut: Alt-O)", openAllFoundTiddlers);			
 		},
 		
 		naviBar: function(place,macroName,params,wikifier,paramString,tiddler) {
@@ -8804,7 +8521,7 @@ config.macros.foundTiddler = {
 // Configuration Stuff
 //----------------------------------------------------------------------------
 
-var opts = {chkUseYourSearch:true,
+var opts = {
 	chkPreviewText:true,
 	chkSearchAsYouType:true,
 	chkSearchInTitle:true,
@@ -8812,15 +8529,15 @@ var opts = {chkUseYourSearch:true,
 	chkSearchInTags:true,
 	chkSearchExtendedFields:true,
 	txtItemsPerPage:itemsPerPageDefault,
-	txtItemsPerPageWithPreview:itemsPerPageWithPreviewDefault};
+	txtItemsPerPageWithPreview:itemsPerPageWithPreviewDefault
+};
+
 for (var n in opts) 
 	if (config.options[n] == undefined) config.options[n] = opts[n];
 
 //----------------------------------------------------------------------------
 // Shadow Tiddlers
 //----------------------------------------------------------------------------
-
-config.shadowTiddlers.AdvancedOptions += "\n<<option chkUseYourSearch>> Use 'Your Search' //([[more options|YourSearch Options]]) ([[help|YourSearch Help]])// ";
 
 config.shadowTiddlers["YourSearch Help"] =
 "!Field Search\nWith the Field Search you can restrict your search to certain fields of a tiddler, e.g"+
@@ -8878,8 +8595,9 @@ config.shadowTiddlers["YourSearch Help"] =
 "hese shortcuts don't work for you check your browser if you have other extensions installed that alr"+
 "eady \"use\" these shortcuts.//";
 
+// todo remove shadow tiddler and integrate into global options
 config.shadowTiddlers["YourSearch Options"] =
-"|>|!YourSearch Options|\n|>|<<option chkUseYourSearch>> Use 'Your Search'|\n|!|<<option chkPreviewText"+
+"|>|!YourSearch Options|\n|!|<<option chkPreviewText"+
 ">> Show Text Preview|\n|!|<<option chkSearchAsYouType>> 'Search As You Type' Mode (No RETURN required"+
 " to start search)|\n|!|Default Search Filter:<<option chkSearchInTitle>>Title ('!')     <<option chk"+
 "SearchInText>>Text ('%')     <<option chkSearchInTags>>Tags ('#')    <<option chkSearchExtendedFiel"+
@@ -8897,7 +8615,7 @@ config.shadowTiddlers["YourSearchStyleSheet"] =
 "rchRange, .yourSearchCount, .yourSearchQuery   {\n\tfont-weight: bold;\n}\n\n.yourSearchResult .summary ."+
 "button {\n\tfont-size: 10px;\n\n\tpadding-left: 0.3em;\n\tpadding-right: 0.3em;\n}\n\n.yourSearchResult .summa"+
 "ry .chkBoxLabel {\n\tfont-size: 10px;\n\n\tpadding-right: 0.3em;\n}\n\n/*}}}*/\n/***\n!!Items Area\n***/\n/*{{{*"+
-"/\n.yourSearchResult .marked {\n\tbackground: none;\n\tfont-weight: bold;\n}\n\n.yourSearchItem {\n\tmargin-to"+
+"/\n\n.yourSearchItem {\n\tmargin-to"+
 "p: 2px;\n}\n\n.yourSearchNumber {\n\tcolor: #808080;\n}\n\n\n.yourSearchTags {\n\tcolor: #008000;\n}\n\n.yourSearc"+
 "hText {\n\tcolor: #808080;\n\tmargin-bottom: 6px;\n}\n\n/*}}}*/\n/***\n!!Footer\n***/\n/*{{{*/\n.yourSearchFoote"+
 "r {\n\tmargin-top: 8px;\n\tborder-top-width: thin;\n\tborder-top-style: solid;\n\tborder-top-color: #999999;"+
@@ -8911,25 +8629,23 @@ config.shadowTiddlers["YourSearchStyleSheet"] =
 config.shadowTiddlers["YourSearchResultTemplate"] =
 "<!--\n{{{\n-->\n<span macro=\"yourSearch if found\">\n<!-- The Summary Header ============================"+
 "================ -->\n<table class=\"summary\" border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">"+
-"<tbody>\n  <tr>\n\t<td align=\"left\">\n\t\tYourSearch Result <span class=\"yourSearchRange\" macro=\"yourSearc"+
+"<tbody>\n  <tr>\n\t<td align=\"left\">\n\t\tResult <span class=\"yourSearchRange\" macro=\"yourSearc"+
 "h itemRange\"></span>\n\t\t&nbsp;of&nbsp;<span class=\"yourSearchCount\" macro=\"yourSearch count\"></span>\n"+
 "\t\tfor&nbsp;<span class=\"yourSearchQuery\" macro=\"yourSearch query\"></span>\n\t</td>\n\t<td class=\"yourSea"+
 "rchButtons\" align=\"right\">\n\t\t<span macro=\"yourSearch chkPreviewText\"></span><span class=\"chkBoxLabel"+
-"\">preview text</span>\n\t\t<span macro=\"yourSearch newTiddlerButton\"></span>\n\t\t<span macro=\"yourSearch openAllButton\"></span>\n\t\t<span macro=\"yourSearch lin"+
+"\">preview text</span>\n\t\t<span macro=\"yourSearch openAllButton\"></span>\n\t\t<span macro=\"yourSearch lin"+
 "kButton 'YourSearch Options' options 'Configure YourSearch'\"></span>\n\t\t<span macro=\"yourSearch linkB"+
 "utton 'YourSearch Help' help 'Get help how to use YourSearch'\"></span>\n\t\t<span macro=\"yourSearch clo"+
 "seButton\"></span>\n\t</td>\n  </tr>\n</tbody></table>\n\n<!-- The List of Found Tiddlers ================="+
 "=========================== -->\n<div id=\"yourSearchResultItems\" itemsPerPage=\"25\" itemsPerPageWithPr"+
 "eview=\"10\"></div>\n\n<!-- The Footer (with the Navigation) ==========================================="+
-"= -->\n<table class=\"yourSearchFooter\" border=\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody"+
-">\n  <tr>\n\t<td align=\"left\">\n\t\tResult page: <span class=\"yourSearchNaviBar\" macro=\"yourSearch naviBar"+
-"\"></span>\n\t</td>\n\t<td align=\"right\"><span macro=\"yourSearch version\"></span>, <span macro=\"yourSearc"+
-"h copyright\"></span>\n\t</td>\n  </tr>\n</tbody></table>\n<!-- end of the 'tiddlers found' case ========="+
+"= -->\n<div class=\"yourSearchFooter\">Result page: <span class=\"yourSearchNaviBar\" macro=\"yourSearch naviBar\"></span>"+
+"\n</div><!-- end of the 'tiddlers found' case ========="+
 "================================== -->\n</span>\n\n\n<!-- The \"No tiddlers found\" case ================="+
 "========================== -->\n<span macro=\"yourSearch if not found\">\n<table class=\"summary\" border="+
-"\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody>\n  <tr>\n\t<td align=\"left\">\n\t\tYourSearch Resu"+
+"\"0\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tbody>\n  <tr>\n\t<td align=\"left\">\n\t\tResu"+
 "lt: No tiddlers found for <span class=\"yourSearchQuery\" macro=\"yourSearch query\"></span>.\n\t</td>\n\t<t"+
-"d class=\"yourSearchButtons\" align=\"right\">\n\t\t<span macro=\"yourSearch newTiddlerButton\"></span>\n\t\t<span macro=\"yourSearch linkButton 'YourSearch Options'"+
+"d class=\"yourSearchButtons\" align=\"right\">\n\t\t<span macro=\"yourSearch linkButton 'YourSearch Options'"+
 " options 'Configure YourSearch'\"></span>\n\t\t<span macro=\"yourSearch linkButton 'YourSearch Help' help"+
 " 'Get help how to use YourSearch'\"></span>\n\t\t<span macro=\"yourSearch closeButton\"></span>\n\t</td>\n  <"+
 "/tr>\n</tbody></table>\n</span>\n\n\n<!--\n}}}\n-->\n";
@@ -10021,7 +9737,7 @@ function resolveTarget(e) {
 }
 
 // Returns a string containing the description of an exception, optionally prepended by a message
-function exceptionText(e,message) {
+function exceptionText(e, message) {
 	var s = e.description || e.toString();
 	return message ? "%0:\n%1".format([message,s]) : s;
 }
@@ -10053,16 +9769,16 @@ function createTiddlyCheckbox(parent,caption,checked,onChange) {
 }
 
 function createTiddlyElement(parent, tagName, id, className, text, attribs) {
-	var n,e = document.createElement(tagName);
+	var e = document.createElement(tagName);
 	if (className != null)
 		e.className = className;
 	if (id != null)
-		e.setAttribute("id",id);
+		e.setAttribute("id", id);
 	if (text != null)
 		e.appendChild(document.createTextNode(text));
 	if (attribs) {
-		for (n in attribs) {
-			e.setAttribute(n,attribs[n]);
+		for (var n in attribs) {
+			e.setAttribute(n, attribs[n]);
 		}
 	}
 	if (parent != null)
@@ -10437,13 +10153,13 @@ Wizard.prototype.setButtons = function(buttonInfo, status) {
 	}
 };
 
-Wizard.prototype.addStep = function(stepTitle,html) {
+Wizard.prototype.addStep = function(stepTitle, html) {
 	jQuery(this.bodyElem).empty();
-	var w = createTiddlyElement(this.bodyElem,"div");
-	createTiddlyElement(w,"h1",null,null,stepTitle);
-	var step = createTiddlyElement(w,"div",null,"wizardStep");
+	var w = createTiddlyElement(this.bodyElem, "div");
+	createTiddlyElement(w, "h1", null, null, stepTitle);
+	var step = createTiddlyElement(w, "div", null, "wizardStep");
 	step.innerHTML = html;
-	applyHtmlMacros(step,tiddler);
+	applyHtmlMacros(step, tiddler);
 };
 
 Wizard.prototype.getElement = function(name) {
@@ -10859,6 +10575,10 @@ String.prototype.escapeLineBreaks = function() {
 // Convert "\n" to newlines, "\b" to " ", "\s" to "\" (and remove carriage returns)
 String.prototype.unescapeLineBreaks = function() {
 	return this.replace(/\\n/mg,"\n").replace(/\\b/mg," ").replace(/\\s/mg,"\\").replace(/\r/mg,"");
+};
+
+String.prototype.lineBreaksToBr = function() {
+	return this.replace(/(?:\r\n|\r|\n)/g, '<br/>');
 };
 
 // Convert & to "&amp;", < to "&lt;", > to "&gt;" and " to "&quot;"
