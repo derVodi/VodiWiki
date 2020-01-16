@@ -17,10 +17,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITEDTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 />
 <!--PRE-HEAD-START-->
-<!--{{{-->
-<link rel='alternate' type='application/rss+xml' title='RSS' href='index.xml' />
-<!--}}}-->
-
 <!--PRE-HEAD-END-->
 <title> VodiWiki - 19.11.12 </title>
 <style id="styleArea" type="text/css">
@@ -68,7 +64,7 @@ table td {vertical-align: top;}
 
 #storeArea {display:none;}
 #storeArea div {padding:0.5em; margin:1em 0em 0em 0em; border-color:#fff #666 #444 #ddd; border-style:solid; border-width:2px; overflow:auto;}
-#shadowArea {display:none;}
+#builtInArticles {display:none;}
 #javascriptWarning {width:100%; text-align:center; font-weight:bold; background-color:#dd1100; color:#fff; padding:1em 0em;}
 
 /* Text */
@@ -250,7 +246,7 @@ body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {b
 <div id="backstagePanel"></div>
 <div id="contentWrapper"></div>
 <div id="contentStash"></div>
-<div id="shadowArea">
+<div id="builtInArticles">
 <div title="EditTemplate">
 <pre>&lt;!--{{{--&gt;
 &lt;div class="toolbar" macro="toolbar +saveTiddler -cancelTiddler"&gt;&lt;/div&gt;
@@ -265,12 +261,6 @@ body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {b
 </div>
 <div title="ImportTiddlers">
 <pre>&lt;&lt;importTiddlers&gt;&gt;
-</pre>
-</div>
-<div title="MarkupPreHead">
-<pre>&lt;!--{{{--&gt;
-&lt;link rel='alternate' type='application/rss+xml' title='RSS' href='index.xml' /&gt;
-&lt;!--}}}--&gt;
 </pre>
 </div>
 <div title="PageTemplate">
@@ -859,8 +849,7 @@ window.displayMessage = function(text, linkText) {
 // * This code is designed to be readable but for compactness it only includes brief comments. You can see fuller comments
 //   in the project repository at https://github.com/TiddlyWiki/tiddlywiki
 //
-// * You should never need to modify this source code directly. TiddlyWiki is carefully designed to allow deep customisation
-//   without changing the core code. Please consult the development group at http://groups.google.com/group/TiddlyWikiDev
+// * You should never need to modify this source code directly. Please consult the development group at http://groups.google.com/group/TiddlyWikiDev
 //
 // JSLint directives
 /*global jQuery:false, version:false */
@@ -871,8 +860,7 @@ window.displayMessage = function(text, linkText) {
 
 // Miscellaneous options
 var config = {
-	numRssItems: 20, // Number of items in the RSS feed	
-	locale: "en" // W3C language tag
+	numRssItems: 20 // Number of items in the RSS feed	
 };
 
 // Hashmap of alternative parsers for the wikifier
@@ -1021,15 +1009,11 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 	config.textPrimitives.urlPattern + ")","mg");
 
 //--
-//-- Shadow tiddlers - these are programmatic, in contrast to those which were collected from the "shadowArea" div. See loadShadowTiddlers()
+//-- Built-in articles - these are programmatic, in contrast to those which were collected from the "builtInArticles" div. See loadBuiltInArticlesFromHtmlIntoJsDictionary()
 //--
 
 config.shadowTiddlers = {	
 	ArticleTreePanel: '{{articleTreePanel{<<articleTree>>{{articleTreeButtons{<<newArticleButton "🕀 New Article" true>><<newArticleButton "🕁 New Sub Article" false>>}}}}}}',
-	MarkupPreHead: "", // todo could be removed
-	MarkupPostHead: "", // todo could be removed
-	MarkupPreBody: "", // todo could be removed
-	MarkupPostBody: "", // todo could be removed
 	NavigationPanel: '<<tabs navigationTabSetWrapper "╘" "Structured tree" ArticleTreePanel "A-Z" "Sorted list" SortedListPanel "🕓" "Timeline" TimelinePanel>>',
 	PluginManager: '<<plugins>>',
 	SortedListPanel: '<<list all>>',
@@ -1089,12 +1073,12 @@ merge(config.messages,{
 	pluginError: "Error: %0",
 	pluginDisabled: "Not executed because disabled via 'systemConfigDisable' tag",
 	nothingSelected: "Nothing is selected. You must select one or more items first",
-	savedSnapshotError: "It appears that this TiddlyWiki has been incorrectly saved. Please see http://www.tiddlywiki.com/#Download for details",
+	savedSnapshotError: "It appears that this Wiki has been incorrectly saved. Please see http://www.tiddlywiki.com/#Download for details",
 	externalLinkTooltip: "External link to %0",
 	noTags: "There are no tagged tiddlers",
-	notFileUrlError: "You need to save this TiddlyWiki to a file before you can save changes",
-	cantSaveError: "It's not possible to save changes. Possible reasons include:\n- your browser doesn't support saving (Firefox, Internet Explorer, Safari and Opera all work if properly configured)\n- the pathname to your TiddlyWiki file contains illegal characters\n- the TiddlyWiki HTML file has been moved or renamed",
-	invalidFileError: "The original file '%0' does not appear to be a valid TiddlyWiki",
+	notFileUrlError: "You need to save this Wiki to a file before you can save changes",
+	cantSaveError: "It's not possible to save changes. Possible reasons include:\n- your browser doesn't support saving (Firefox, Internet Explorer, Safari and Opera all work if properly configured)\n- the pathname to your Wiki file contains illegal characters\n- the Wiki HTML file has been moved or renamed",
+	invalidFileError: "The original file '%0' does not appear to be a valid Wiki",
 	backupSaved: "Backup saved",
 	backupFailed: "Failed to save backup file",
 	rssSaved: "RSS feed saved",
@@ -1102,23 +1086,22 @@ merge(config.messages,{
 	emptySaved: "Empty template saved",
 	emptyFailed: "Failed to save empty template file",
 	mainSaved: "Wiki saved.",
-	mainDownload: "Downloading/saving main TiddlyWiki file",
-	mainDownloadManual: "RIGHT CLICK HERE to download/save main TiddlyWiki file",
-	mainFailed: "Failed to save main TiddlyWiki file. Your changes have not been saved",
+	mainDownload: "Downloading/saving main Wiki file",
+	mainDownloadManual: "RIGHT CLICK HERE to download/save main Wiki file",
+	mainFailed: "Failed to save main Wiki file. Your changes have not been saved",
 	macroError: "Error in macro <<%0>>",
 	macroErrorDetails: "Error while executing macro <<%0>>:\n%1",
 	missingMacro: "No such macro",
 	overwriteWarning: "A tiddler named '%0' already exists. Choose OK to overwrite it",
-	unsavedChangesWarning: "WARNING! There are unsaved changes in TiddlyWiki\n\nChoose OK to save\nChoose CANCEL to discard",
-	confirmExit: "--------------------------------\n\nThere are unsaved changes in TiddlyWiki. If you continue you will lose those changes\n\n--------------------------------",
-	unsupportedTWFormat: "Unsupported TiddlyWiki format '%0'",
+	unsavedChangesWarning: "WARNING! There are unsaved changes in Wiki\n\nChoose OK to save\nChoose CANCEL to discard",
+	confirmExit: "--------------------------------\n\nThere are unsaved changes in Wiki. If you continue you will lose those changes\n\n--------------------------------",
+	unsupportedTWFormat: "Unsupported Wiki format '%0'",
 	tiddlerSaveError: "Error when saving tiddler '%0'",
 	tiddlerLoadError: "Error when loading tiddler '%0'",
 	wrongSaveFormat: "Cannot save with storage format '%0'. Using standard format for save.",
 	invalidFieldName: "Invalid field name %0",
 	fieldCannotBeChanged: "Field '%0' cannot be changed",
-	loadingMissingTiddler: "Attempting to retrieve the tiddler '%0' from the '%1' server at:\n\n'%2' in the workspace '%3'",
-	upgradeDone: "The upgrade to version %0 is now complete\n\nClick 'OK' to reload the newly upgraded TiddlyWiki",
+	upgradeDone: "The upgrade to version %0 is now complete\n\nClick 'OK' to reload the newly upgraded VodiWiki",
 	invalidCookie: "Invalid cookie '%0'"
 });
 
@@ -1150,8 +1133,7 @@ merge(config.views.wikified,{
 });
 
 merge(config.views.editor,{
-	tagHint: "Type tags separated with spaces, [[use double square brackets]] if necessary, or add existing ",
-	defaultText: "Type the text for '%0'"
+	tagHint: "Type tags separated with spaces, [[use double square brackets]] if necessary, or add existing "
 });
 
 merge(config.views.editor.tagChooser,{
@@ -1181,7 +1163,7 @@ merge(config.macros.allTags, {
 
 merge(config.macros.saveChanges, {
 	label: "save changes",
-	hint: "Save all tiddlers to create a new TiddlyWiki",
+	hint: "Save all articles to create a new Wiki",
 	accessKey: "S"
 });
 
@@ -1255,13 +1237,13 @@ merge(config.macros.toolbar,{
 
 merge(config.macros.refreshDisplay,{
 	label: "refresh",
-	hint: "Redraw the entire TiddlyWiki display"
+	hint: "Redraw the entire Wiki display"
 });
 
 merge(config.macros.importTiddlers,{
-	readOnlyWarning: "You cannot import into a read-only TiddlyWiki file. Try opening it from a file:// URL",
+	readOnlyWarning: "You cannot import into a read-only Wiki file. Try opening it from a file:// URL",
 	wizardTitle: "Import tiddlers from another file or server",
-	step1Title: "Step 1: Locate the server or TiddlyWiki file",
+	step1Title: "Step 1: Locate the server or Wiki file",
 	step1Html: "Specify the type of the server: <select name='selTypes'><option value=''>Choose...</option></select><br>Enter the URL or pathname here: <input type='text' size=50 name='txtPath'><br>...or browse for a file: <input type='file' size=50 name='txtBrowse'><br><hr>...or select a pre-defined feed: <select name='selFeeds'><option value=''>Choose...</option></select>",
 	openLabel: "Open",
 	openPrompt: "Open the connection to this file or server",
@@ -1276,7 +1258,7 @@ merge(config.macros.importTiddlers,{
 	errorGettingTiddlerList: "Error getting list of tiddlers, click Cancel to try again",
 	errorGettingTiddlerListHttp404: "Error retrieving tiddlers from url, please ensure the url exists. Click Cancel to try again.",
 	errorGettingTiddlerListHttp: "Error retrieving tiddlers from url, please ensure this url exists and is <a href='http://enable-cors.org/'>CORS</a> enabled",
-	errorGettingTiddlerListFile: "Error retrieving tiddlers from local file, please make sure the file is in the same directory as your TiddlyWiki. Click Cancel to try again.",
+	errorGettingTiddlerListFile: "Error retrieving tiddlers from local file, please make sure the file is in the same directory as your Wiki. Click Cancel to try again.",
 	step3Title: "Step 3: Choose the tiddlers to import",
 	step3Html: "<input type='hidden' name='markList'></input><br><input type='checkbox' name='chkSync'>Keep these tiddlers linked to this server so that you can synchronise subsequent changes</input><br><input type='checkbox' name='chkSave'>Save the details of this server in a 'systemServer' tiddler called:</input> <input type='text' size=25 name='txtSaveTiddler'>",
 	importLabel: "import",
@@ -1315,12 +1297,12 @@ merge(config.macros.upgrade,{
 		"Hitting the upgrade button will check for an update of the integrated viewer and editor.<br/>"+
 		"Your content will be preserved.<br/>"+
 	  "(Update source: <a href='%0' class='externalLink' target='_blank'>%0</a>).",
-	errorCantUpgrade: "Unable to upgrade this TiddlyWiki. You can only perform upgrades on TiddlyWiki files stored locally",
+	errorCantUpgrade: "Unable to upgrade this Wiki. You can only perform upgrades on Wiki files stored locally",
 	errorNotSaved: "You must save changes before you can perform an upgrade",
 	step2Title: "Confirm the upgrade details",
-	step2Html_downgrade: "You are about to downgrade to TiddlyWiki version %0 from %1.<br><br>Downgrading to an earlier version of the core code is not recommended",
-	step2Html_restore: "This TiddlyWiki appears to be already using the latest version of the core code (%0).<br><br>You can continue to upgrade anyway to ensure that the core code hasn't been corrupted or damaged",
-	step2Html_upgrade: "You are about to upgrade to TiddlyWiki version %0 from %1",
+	step2Html_downgrade: "You are about to downgrade to Wiki version %0 from %1.<br><br>Downgrading to an earlier version of the core code is not recommended",
+	step2Html_restore: "This Wiki appears to be already using the latest version of the core code (%0).<br><br>You can continue to upgrade anyway to ensure that the core code hasn't been corrupted or damaged",
+	step2Html_upgrade: "You are about to upgrade to Wiki version %0 from %1",
 	upgradeLabel: "Upgrade",
 	upgradePrompt: "Prepare for the upgrade process",
 	statusPreparingBackup: "Preparing backup",
@@ -1407,7 +1389,7 @@ merge(config.shadowTiddlers,{
 //--
 
 var params = null; // Command line parameters
-var store = null; // TiddlyWiki storage
+var store = null; // Article entities in-memory storage
 var story = null; // Main story
 var formatter = null; // Default formatters for the wikifier
 var readOnly = false; // Whether we're in readonly mode
@@ -1434,7 +1416,8 @@ if (!window || !window.console) {
 
 // Starting up
 function main() {
-	window.originalHTML = recreateOriginal();
+	window.originalHTML = recreateOriginal(); 
+	// xxx hier wird ein riesen snapshot gemacht - stattdessen sollte recreateOriginal() so gepimpt werden, dass auch später dynamisch befüllte interne DIVs ALLE geleert werden!
 	
 	startingUp = true;
 	// var doc = jQuery(document);
@@ -1445,7 +1428,7 @@ function main() {
 	if (window.location.hash) params = decodeURIComponent(window.location.hash.substr(1));	
 	if (params)	params = params.parseParams("open", null, false);
 		
-	store = new TiddlyWiki({config:config});
+	store = new ArticleStore({config: config});
 		
 	story = new Story("tiddlerDisplay");
 	addEvent(document, "click", Popup.onDocumentClick);
@@ -1455,9 +1438,9 @@ function main() {
 		store.addNotification(config.notifyTiddlers[s].name, config.notifyTiddlers[s].notify);
 	}
 
-	loadShadowTiddlers();	
+	loadBuiltInArticlesFromHtmlIntoJsDictionary();	
 
-	store.loadFromDiv("storeArea", "store", true);
+	store.loadFromDiv("storeArea", true);
 	
 	loadOptions();
 	
@@ -1512,16 +1495,15 @@ function saveTest() {
 	s.appendChild(document.createTextNode("savetest"));
 }
 
-function loadShadowTiddlers() {
-	var shadows = new TiddlyWiki();
-	shadows.loadFromDiv("shadowArea", "shadows", true);
+function loadBuiltInArticlesFromHtmlIntoJsDictionary() {
+	var shadows = new ArticleStore();
+	shadows.loadFromDiv("builtInArticles", true);
 	shadows.forEachArticle(function(title, tiddler) {config.shadowTiddlers[title] = tiddler.text;});
 }
 
 function loadPlugins(tag) {
 	
-	if (safeMode)
-		return false;
+	if (safeMode)	return false;
 	
 	var tiddlers = store.getTaggedTiddlers(tag);
 	tiddlers.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : 1);});
@@ -2204,7 +2186,7 @@ config.formatters = [
 
 function getParser(tiddler, format) {
 	if (tiddler) {
-		if (!format)
+		if (! format)
 			format = tiddler.fields["wikiformat"];
 		var i;
 		if (format) {
@@ -3320,32 +3302,27 @@ Tiddler.prototype.isTouched = function() {
 };
 
 // Change the text and other attributes of a tiddler
-Tiddler.prototype.set = function(title,text,modifier,modified,tags,created,fields,creator) {
-	this.assign(title,text,modifier,modified,tags,created,fields,creator);
+Tiddler.prototype.set = function(title, text, modifier, modified, tags, created, fields, creator) {
+	this.assign(title, text, modifier, modified, tags, created, fields, creator);
 	this.changed();
 	return this;
 };
 
 // Change the text and other attributes of a tiddler without triggered a tiddler.changed() call
-Tiddler.prototype.assign = function(title,text,modifier,modified,tags,created,fields,creator) {
-	if (title != undefined)
-		this.title = title;
-	if (text != undefined)
-		this.text = text;
-	if (modifier != undefined)
-		this.modifier = modifier;
-	if (modified != undefined)
-		this.modified = modified;
-	if (creator != undefined)
-		this.creator = creator;
-	if (created != undefined)
-		this.created = created;
-	if (fields != undefined)
-		this.fields = fields;
-	if (tags != undefined)
+Tiddler.prototype.assign = function(title, text, modifier, modified, tags, created, fields, creator) {
+	if (title != undefined)	this.title = title;
+	if (text != undefined) this.text = text;
+	if (modifier != undefined) this.modifier = modifier;
+	if (modified != undefined) this.modified = modified;
+	if (creator != undefined) this.creator = creator;
+	if (created != undefined) this.created = created;
+	if (fields != undefined) this.fields = fields;
+	
+	if (tags != undefined) {
 		this.tags = (typeof tags == "string") ? tags.readBracketedList() : tags;
-	else if (this.tags == undefined)
+	} else if (this.tags == undefined) {
 		this.tags = [];
+	}
 	return this;
 };
 
@@ -3408,27 +3385,11 @@ Tiddler.prototype.isReadOnly = function() {
 	return readOnly;
 };
 
-Tiddler.prototype.getServerType = function() {
-	var serverType = null;
-	if (this.fields['server.type'])
-		serverType = this.fields['server.type'];
-	if (!serverType)
-		serverType = this.fields['wikiformat'];
-	if (serverType && ! config.adaptors[serverType])
-		serverType = null;
-	return serverType;
-};
-
-Tiddler.prototype.getAdaptor = function() {
-	var serverType = this.getServerType();
-	return serverType ? new config.adaptors[serverType]() : null;
-};
-
 //--
-//-- TiddlyWiki instance contains TiddlerS
+//-- ArticleStore
 //--
 
-function TiddlyWiki(params) {
+function ArticleStore(params) {
 	var tiddlers = {}; // Hashmap by name of tiddlers
 	if (params && params.config) {
 		this.config = config;
@@ -3462,24 +3423,24 @@ function TiddlyWiki(params) {
 	};
 }
 
-TiddlyWiki.prototype.setDirty = function(dirty) {
+ArticleStore.prototype.setDirty = function(dirty) {
 	this.dirty = dirty;
 };
 
-TiddlyWiki.prototype.isDirty = function() {
+ArticleStore.prototype.isDirty = function() {
 	return this.dirty;
 };
 
-TiddlyWiki.prototype.tiddlerExists = function(title) {
+ArticleStore.prototype.tiddlerExists = function(title) {
 	var t = this.fetchTiddler(title);
 	return t != undefined;
 };
 
-TiddlyWiki.prototype.isShadowTiddler = function(title) {
+ArticleStore.prototype.isShadowTiddler = function(title) {
 	return config.shadowTiddlers[title] === undefined ? false : true;
 };
 
-TiddlyWiki.prototype.isAvailable = function(title) {
+ArticleStore.prototype.isAvailable = function(title) {
 	if (!title)
 		return false;
 	var s = title ? title.indexOf(config.textPrimitives.sectionSeparator) : -1;
@@ -3488,17 +3449,17 @@ TiddlyWiki.prototype.isAvailable = function(title) {
 	return this.tiddlerExists(title) || this.isShadowTiddler(title);
 };
 
-TiddlyWiki.prototype.createArticle = function(title) {
-	var tiddler = this.fetchTiddler(title);
-	if (!tiddler) {
-		tiddler = new Tiddler(title);
-		this.addTiddler(tiddler);
-		this.setDirty(true);
-	}
-	return tiddler;
+ArticleStore.prototype.getOrAddNewArticle = function(title) {
+	var article = this.fetchTiddler(title);
+	if (article) return article;
+		
+	article = new Tiddler(title);
+	this.addTiddler(article);
+	this.setDirty(true);
+	return article;
 };
 
-TiddlyWiki.prototype.getTiddler = function(title) {
+ArticleStore.prototype.getTiddler = function(title) {
 	var t = this.fetchTiddler(title);
 	if (t != undefined)
 		return t;
@@ -3506,7 +3467,7 @@ TiddlyWiki.prototype.getTiddler = function(title) {
 		return null;
 };
 
-TiddlyWiki.prototype.getShadowTiddlerText = function(title) {
+ArticleStore.prototype.getShadowTiddlerText = function(title) {
 	if (typeof config.shadowTiddlers[title] == "string")
 		return config.shadowTiddlers[title];
 	else
@@ -3514,7 +3475,7 @@ TiddlyWiki.prototype.getShadowTiddlerText = function(title) {
 };
 
 // Retrieve tiddler contents
-TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
+ArticleStore.prototype.getTiddlerText = function(title, defaultText) {
 	if (! title) return defaultText;
 	var pos = title.indexOf(config.textPrimitives.sectionSeparator);
 	var section = null;
@@ -3554,7 +3515,7 @@ TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
 	return null;
 };
 
-TiddlyWiki.prototype.getRecursiveTiddlerText = function(title, defaultText, depth) {
+ArticleStore.prototype.getRecursiveTiddlerText = function(title, defaultText, depth) {
 	var bracketRegExp = new RegExp("(?:\\[\\[([^\\]]+)\\]\\])", "mg");
 	var text = this.getTiddlerText(title, null);
 	if (text == null) return defaultText;
@@ -3579,10 +3540,10 @@ TiddlyWiki.prototype.getRecursiveTiddlerText = function(title, defaultText, dept
 	return textOut.join("");
 };
 
-//TiddlyWiki.prototype.slicesRE = /(?:^([\'\/]{0,2})~?([\.\w]+)\:\1[\t\x20]*([^\n]+)[\t\x20]*$)|(?:^\|([\'\/]{0,2})~?([\.\w]+)\:?\4\|[\t\x20]*([^\n]+)[\t\x20]*\|$)/gm;
-TiddlyWiki.prototype.slicesRE = /(?:^([\'\/]{0,2})~?([\.\w]+)\:\1[\t\x20]*([^\n]*)[\t\x20]*$)|(?:^\|([\'\/]{0,2})~?([\.\w]+)\:?\4\|[\t\x20]*([^\|\n]*)[\t\x20]*\|$)/gm;
+//ArticleStore.prototype.slicesRE = /(?:^([\'\/]{0,2})~?([\.\w]+)\:\1[\t\x20]*([^\n]+)[\t\x20]*$)|(?:^\|([\'\/]{0,2})~?([\.\w]+)\:?\4\|[\t\x20]*([^\n]+)[\t\x20]*\|$)/gm;
+ArticleStore.prototype.slicesRE = /(?:^([\'\/]{0,2})~?([\.\w]+)\:\1[\t\x20]*([^\n]*)[\t\x20]*$)|(?:^\|([\'\/]{0,2})~?([\.\w]+)\:?\4\|[\t\x20]*([^\|\n]*)[\t\x20]*\|$)/gm;
 // @internal
-TiddlyWiki.prototype.calcAllSlices = function(title) {
+ArticleStore.prototype.calcAllSlices = function(title) {
 	var slices = {};
 	var text = this.getTiddlerText(title,"");
 	this.slicesRE.lastIndex = 0;
@@ -3598,7 +3559,7 @@ TiddlyWiki.prototype.calcAllSlices = function(title) {
 };
 
 // Returns the slice of text of the given name
-TiddlyWiki.prototype.getTiddlerSlice = function(title,sliceName) {
+ArticleStore.prototype.getTiddlerSlice = function(title,sliceName) {
 	var slices = this.slices[title];
 	if (!slices) {
 		slices = this.calcAllSlices(title);
@@ -3608,7 +3569,7 @@ TiddlyWiki.prototype.getTiddlerSlice = function(title,sliceName) {
 };
 
 // Build an hashmap of the specified named slices of a tiddler
-TiddlyWiki.prototype.getTiddlerSlices = function(title,sliceNames) {
+ArticleStore.prototype.getTiddlerSlices = function(title,sliceNames) {
 	var t,r = {};
 	for (t=0; t<sliceNames.length; t++) {
 		var slice = this.getTiddlerSlice(title,sliceNames[t]);
@@ -3618,16 +3579,16 @@ TiddlyWiki.prototype.getTiddlerSlices = function(title,sliceNames) {
 	return r;
 };
 
-TiddlyWiki.prototype.suspendNotifications = function() {
+ArticleStore.prototype.suspendNotifications = function() {
 	this.notificationLevel--;
 };
 
-TiddlyWiki.prototype.resumeNotifications = function() {
+ArticleStore.prototype.resumeNotifications = function() {
 	this.notificationLevel++;
 };
 
 // Invoke the notification handlers for a particular tiddler
-TiddlyWiki.prototype.notify = function(title, doBlanket) {
+ArticleStore.prototype.notify = function(title, doBlanket) {
 	if (! this.notificationLevel) {
 	    var t;
 		for (t = 0; t < this.namedNotifications.length; t++) {
@@ -3639,7 +3600,7 @@ TiddlyWiki.prototype.notify = function(title, doBlanket) {
 };
 
 // Invoke the notification handlers for all tiddlers
-TiddlyWiki.prototype.notifyAll = function() {
+ArticleStore.prototype.notifyAll = function() {
 	if (!this.notificationLevel) {
 	    var t;
 		for (t = 0; t < this.namedNotifications.length; t++) {
@@ -3651,7 +3612,7 @@ TiddlyWiki.prototype.notifyAll = function() {
 };
 
 // Add a notification handler to a tiddler
-TiddlyWiki.prototype.addNotification = function(title, fn) {
+ArticleStore.prototype.addNotification = function(title, fn) {
 	var i;
 	for (i = 0; i < this.namedNotifications.length; i++) {
 		if ((this.namedNotifications[i].name == title) && (this.namedNotifications[i].notify == fn))
@@ -3661,7 +3622,7 @@ TiddlyWiki.prototype.addNotification = function(title, fn) {
 	return this;
 };
 
-TiddlyWiki.prototype.removeTiddler = function(title) {
+ArticleStore.prototype.removeTiddler = function(title) {
 	var tiddler = this.fetchTiddler(title);
 	if (tiddler) {
 		this.deleteTiddler(title);
@@ -3671,7 +3632,7 @@ TiddlyWiki.prototype.removeTiddler = function(title) {
 };
 
 // Reset the sync status of a freshly synced tiddler
-TiddlyWiki.prototype.resetTiddler = function(title) {
+ArticleStore.prototype.resetTiddler = function(title) {
 	var tiddler = this.fetchTiddler(title);
 	if (tiddler) {
 		tiddler.clearChangeCount();
@@ -3680,7 +3641,7 @@ TiddlyWiki.prototype.resetTiddler = function(title) {
 	}
 };
 
-TiddlyWiki.prototype.setTiddlerTag = function(title, status, tag) {
+ArticleStore.prototype.setTiddlerTag = function(title, status, tag) {
 	var tiddler = this.fetchTiddler(title);
 	if (tiddler) {
 		var t = tiddler.tags.indexOf(tag);
@@ -3695,7 +3656,7 @@ TiddlyWiki.prototype.setTiddlerTag = function(title, status, tag) {
 	}
 };
 
-TiddlyWiki.prototype.addTiddlerFields = function(title,fields) {
+ArticleStore.prototype.addTiddlerFields = function(title,fields) {
 	var tiddler = this.fetchTiddler(title);
 	if (!tiddler)
 		return;
@@ -3706,8 +3667,8 @@ TiddlyWiki.prototype.addTiddlerFields = function(title,fields) {
 	this.setDirty(true);
 };
 
-// Store tiddler in TiddlyWiki instance
-TiddlyWiki.prototype.saveTiddler = function(title, newTitle, newBody, modifier, modified, tags, fields, clearChangeCount, created, creator) {
+// Put an article into the store
+ArticleStore.prototype.saveTiddler = function(title, newTitle, newBody, modifier, modified, tags, fields, clearChangeCount, created, creator) {
 	var tiddler;
 	if (title instanceof Tiddler) {
 		tiddler = title;
@@ -3737,50 +3698,46 @@ TiddlyWiki.prototype.saveTiddler = function(title, newTitle, newBody, modifier, 
 	return tiddler;
 };
 
-TiddlyWiki.prototype.incChangeCount = function(title) {
+ArticleStore.prototype.incChangeCount = function(title) {
 	var tiddler = this.fetchTiddler(title);
 	if (tiddler)
 		tiddler.incChangeCount();
 };
 
-TiddlyWiki.prototype.getLoader = function() {
+ArticleStore.prototype.getLoader = function() {
 	if (! this.loader) this.loader = new TW21Loader();
 	return this.loader;
 };
 
-TiddlyWiki.prototype.getSaver = function() {
+ArticleStore.prototype.getSaver = function() {
 	if (! this.saver) this.saver = new TW21Saver();
 	return this.saver;
 };
 
 // Return all tiddlers formatted as an HTML string
-TiddlyWiki.prototype.allTiddlersAsHtml = function() {
+ArticleStore.prototype.allTiddlersAsHtml = function() {
 	return this.getSaver().externalize(store);
 };
 
-// Load contents of a TiddlyWiki from an HTML DIV
-TiddlyWiki.prototype.loadFromDiv = function(src, idPrefix, noUpdate) {
-	this.idPrefix = idPrefix;
-	var storeElem = (typeof src == "string") ? document.getElementById(src) : src;
-	if (!storeElem)
-		return;
-	var tiddlers = this.getLoader().loadTiddlers(this, storeElem.childNodes);
+// Load articles of a Wiki from an HTML DIV element containing articles (e.g. "storeArea" or "builtInArticles")
+ArticleStore.prototype.loadFromDiv = function(elementOrId, noUpdate) {
+	
+	var containerElement = (typeof elementOrId == "string") ? document.getElementById(elementOrId) : elementOrId;
+	if (! containerElement) return;
+	
+	var articles = this.getLoader().loadArticles(containerElement.childNodes, this);
+	
 	this.setDirty(false);
-	if (!noUpdate) {
-		var i;
-		for (i = 0; i < tiddlers.length; i++)
-			tiddlers[i].changed();
-	}
-	jQuery(document).trigger("loadTiddlers");
+	
+	if (! noUpdate)	for (var i = 0; i < articles.length; i++){articles[i].changed();}
 };
 
-// Load contents of a TiddlyWiki from a string
+// Load contents of a Wiki from a string
 // Returns null if there's an error
-TiddlyWiki.prototype.importTiddlyWiki = function(text) {
-	var posDiv = locateStoreArea(text);
-	if (!posDiv)
-		return null;
-	var content = "<" + "html><" + "body>" + text.substring(posDiv[0],posDiv[1] + endSaveArea.length) + "<" + "/body><" + "/html>";
+ArticleStore.prototype.importTiddlyWiki = function(text) {
+	var storeAreaRange = locateStoreArea(text);
+	if (! storeAreaRange)	return null;
+	var content = "<" + "html><" + "body>" + text.substring(storeAreaRange[0], storeAreaRange[1] + endSaveArea.length) + "<" + "/body><" + "/html>";
 	// Create the iframe
 	var iframe = document.createElement("iframe");
 	iframe.style.display = "none";
@@ -3794,15 +3751,15 @@ TiddlyWiki.prototype.importTiddlyWiki = function(text) {
 	doc.open();
 	doc.writeln(content);
 	doc.close();
-	// Load the content into a TiddlyWiki() object
+	// Load the content into the store instance
 	var storeArea = doc.getElementById("storeArea");
-	this.loadFromDiv(storeArea, "store");
+	this.loadFromDiv(storeArea);
 	// Get rid of the iframe
 	iframe.parentNode.removeChild(iframe);
 	return this;
 };
 
-TiddlyWiki.prototype.updateTiddlers = function() {
+ArticleStore.prototype.updateTiddlers = function() {
 	this.tiddlersUpdated = true;
 	this.forEachArticle(function(title, article) {
 		article.changed();
@@ -3810,7 +3767,7 @@ TiddlyWiki.prototype.updateTiddlers = function() {
 };
 
 // Return an array of tiddlers matching a search regular expression
-TiddlyWiki.prototype.search = function(searchRegExp, sortField, excludeTag, match) {
+ArticleStore.prototype.search = function(searchRegExp, sortField, excludeTag, match) {
 	var candidates = this.reverseLookup("tags", excludeTag, !! match);
 	var results = [];
 	for (var t = 0; t < candidates.length; t++) {
@@ -3825,7 +3782,7 @@ TiddlyWiki.prototype.search = function(searchRegExp, sortField, excludeTag, matc
 // Returns a list of all tags in use
 //   excludeTag - if present, excludes tags that are themselves tagged with excludeTag
 // Returns an array of arrays where [tag][0] is the name of the tag and [tag][1] is the number of occurances
-TiddlyWiki.prototype.getTags = function(excludeTag) {
+ArticleStore.prototype.getTags = function(excludeTag) {
 	var results = [];
 	this.forEachArticle(function(title, tiddler) {
 		for (var g = 0; g < tiddler.tags.length; g++) {
@@ -3851,16 +3808,16 @@ TiddlyWiki.prototype.getTags = function(excludeTag) {
 };
 
 // Return an array of the tiddlers that are tagged with a given tag
-TiddlyWiki.prototype.getTaggedTiddlers = function(tag, sortField) {
+ArticleStore.prototype.getTaggedTiddlers = function(tag, sortField) {
 	return this.reverseLookup("tags", tag, true, sortField);
 };
 
-TiddlyWiki.prototype.getValueTiddlers = function(field, value, sortField) {
+ArticleStore.prototype.getValueTiddlers = function(field, value, sortField) {
 	return this.reverseLookup(field, value, true, sortField);
 };
 
 // Return an array of the tiddlers that link to a given tiddler
-TiddlyWiki.prototype.getReferringTiddlers = function(title, unusedParameter, sortField) {
+ArticleStore.prototype.getReferringTiddlers = function(title, unusedParameter, sortField) {
 	if (!this.tiddlersUpdated)
 		this.updateTiddlers();
 	return this.reverseLookup("links", title, true, sortField);
@@ -3869,7 +3826,7 @@ TiddlyWiki.prototype.getReferringTiddlers = function(title, unusedParameter, sor
 // Return an array of the articles that do (or must not) have a specified value in the specified field
 // If the field type is a collection, a match is found if lookupValue is present at least once in the collection.
 // matchMode == true to select matching articles, false to select all others
-TiddlyWiki.prototype.reverseLookup = function(lookupField, lookupValue, matchMode, sortField, optionalPredicate) {
+ArticleStore.prototype.reverseLookup = function(lookupField, lookupValue, matchMode, sortField, optionalPredicate) {
 	var results = [];
 	this.forEachArticle(function(title, article) {
 		var f = ! matchMode;
@@ -3877,7 +3834,7 @@ TiddlyWiki.prototype.reverseLookup = function(lookupField, lookupValue, matchMod
 		if (["links", "tags"].contains(lookupField)) {
 			values = article[lookupField];
 		} else {
-			var accessor = TiddlyWiki.standardFieldAccess[lookupField];
+			var accessor = ArticleStore.standardFieldAccess[lookupField];
 			if (accessor) {
 				values = [accessor.get(article)];
 			} else {
@@ -3908,7 +3865,7 @@ TiddlyWiki.prototype.reverseLookup = function(lookupField, lookupValue, matchMod
 		*
 		* @return {array} - Array of articles.
 	*/
-TiddlyWiki.prototype.getTiddlers = function(fieldName, excludeTag) {
+ArticleStore.prototype.getTiddlers = function(fieldName, excludeTag) {
 	var results = [];
 	this.forEachArticle(function(title, tiddler) {
 		if (excludeTag == undefined || ! tiddler.isTagged(excludeTag))
@@ -3920,7 +3877,7 @@ TiddlyWiki.prototype.getTiddlers = function(fieldName, excludeTag) {
 };
 
 // Return array of names of tiddlers that are referred to but not defined
-TiddlyWiki.prototype.getMissingLinks = function() {
+ArticleStore.prototype.getMissingLinks = function() {
 	if (! this.tiddlersUpdated) this.updateTiddlers();
 	var results = [];
 	this.forEachArticle(function (title, tiddler) {
@@ -3936,7 +3893,7 @@ TiddlyWiki.prototype.getMissingLinks = function() {
 };
 
 // Return an array of names of tiddlers that are defined but not referred to
-TiddlyWiki.prototype.getOrphans = function() {
+ArticleStore.prototype.getOrphans = function() {
 	var results = [];
 	this.forEachArticle(function (title, tiddler) {
 		if (this.getReferringTiddlers(title).length == 0 && ! tiddler.isTagged("excludeLists")) results.push(title);
@@ -3946,7 +3903,7 @@ TiddlyWiki.prototype.getOrphans = function() {
 };
 
 // Return an array of names of all the shadow tiddlers
-TiddlyWiki.prototype.getShadowed = function() {
+ArticleStore.prototype.getShadowed = function() {
 	var t,results = [];
 	for (t in config.shadowTiddlers) {
 		if (this.isShadowTiddler(t))
@@ -3957,7 +3914,7 @@ TiddlyWiki.prototype.getShadowed = function() {
 };
 
 // Return an array of tiddlers that have been touched since they were downloaded or created
-TiddlyWiki.prototype.getTouched = function() {
+ArticleStore.prototype.getTouched = function() {
 	var results = [];
 	this.forEachArticle(function(title, tiddler) {
 		if (tiddler.isTouched())
@@ -3968,13 +3925,13 @@ TiddlyWiki.prototype.getTouched = function() {
 };
 
 // Resolves a Tiddler reference or tiddler title into a Tiddler object, or null if it doesn't exist
-TiddlyWiki.prototype.resolveTiddler = function(tiddler) {
+ArticleStore.prototype.resolveTiddler = function(tiddler) {
 	var t = (typeof tiddler == "string") ? this.getTiddler(tiddler) : tiddler;
 	return t instanceof Tiddler ? t : null;
 };
 
 // Sort a list of tiddlers
-TiddlyWiki.prototype.sortTiddlers = function(tiddlers,field) {
+ArticleStore.prototype.sortTiddlers = function(tiddlers,field) {
 	var asc = +1;
 	switch(field.substr(0,1)) {
 	case "-":
@@ -3985,7 +3942,7 @@ TiddlyWiki.prototype.sortTiddlers = function(tiddlers,field) {
 		field = field.substr(1);
 		break;
 	}
-	if (TiddlyWiki.standardFieldAccess[field]) {
+	if (ArticleStore.standardFieldAccess[field]) {
 		if (field=="title") {
 			tiddlers.sort(function(a,b) {return a[field].toLowerCase() < b[field].toLowerCase() ? -asc : (a[field].toLowerCase() == b[field].toLowerCase() ? 0 : asc);});
 		} else {
@@ -4041,7 +3998,7 @@ config.filters = {
 // Fetches a filtered list of articles from the store.
 //#   filter - filter expression (eg "title [[multi word title]] [tag[systemConfig]]")
 //# Returns an array of articles that match the filter expression
-TiddlyWiki.prototype.filterTiddlers = function(filter) {
+ArticleStore.prototype.filterTiddlers = function(filter) {
 	var re = /([^\s\[\]]+)|(?:\[([ \w\.\-]+)\[([^\]]+)\]\])|(?:\[\[([^\]]+)\]\])/mg;
 
 	var results = [];
@@ -4058,14 +4015,14 @@ TiddlyWiki.prototype.filterTiddlers = function(filter) {
 
 // Returns true if path is a valid field name (path),
 // i.e. a sequence of identifiers, separated by "."
-TiddlyWiki.isValidFieldName = function(name) {
+ArticleStore.isValidFieldName = function(name) {
 	var match = /[a-zA-Z_]\w*(\.[a-zA-Z_]\w*)*/.exec(name);
 	return match && (match[0] == name);
 };
 
 // Throws an exception when name is not a valid field name.
-TiddlyWiki.checkFieldName = function(name) {
-	if (!TiddlyWiki.isValidFieldName(name))
+ArticleStore.checkFieldName = function(name) {
+	if (!ArticleStore.isValidFieldName(name))
 		throw config.messages.invalidFieldName.format([name]);
 };
 
@@ -4096,7 +4053,7 @@ function LinksFieldAccess(n) {
 	this.get = function(t) {return String.buildInternalLinksTuple(t[n]);};
 }
 
-TiddlyWiki.standardFieldAccess = {
+ArticleStore.standardFieldAccess = {
 	// The set functions return true when setting the data has changed the value.
 	"title":    new StringFieldAccess("title",true),
 	// Handle the "tiddler" field name as the title
@@ -4109,8 +4066,8 @@ TiddlyWiki.standardFieldAccess = {
 	"tags":     new LinksFieldAccess("tags")
 };
 
-TiddlyWiki.isStandardField = function(name) {
-	return TiddlyWiki.standardFieldAccess[name] != undefined;
+ArticleStore.isStandardField = function(name) {
+	return ArticleStore.standardFieldAccess[name] != undefined;
 };
 
 // Sets the value of the given field of the tiddler to the value.
@@ -4118,19 +4075,19 @@ TiddlyWiki.isStandardField = function(name) {
 // Setting a namespace to undefined removes all fields of that namespace.
 // The fieldName is case-insensitive.
 // All values will be converted to a string value.
-TiddlyWiki.prototype.setValue = function(tiddler,fieldName,value) {
-	TiddlyWiki.checkFieldName(fieldName);
+ArticleStore.prototype.setValue = function(tiddler, fieldName, value) {
+	ArticleStore.checkFieldName(fieldName);
 	var t = this.resolveTiddler(tiddler);
 	if (!t)
 		return;
 	fieldName = fieldName.toLowerCase();
 	var isRemove = (value === undefined) || (value === null);
-	var accessor = TiddlyWiki.standardFieldAccess[fieldName];
+	var accessor = ArticleStore.standardFieldAccess[fieldName];
 	if (accessor) {
 		if (isRemove)
 			// don't remove StandardFields
 			return;
-		var h = TiddlyWiki.standardFieldAccess[fieldName];
+		var h = ArticleStore.standardFieldAccess[fieldName];
 		if (!h.set(t,value))
 			return;
 	} else {
@@ -4173,7 +4130,7 @@ TiddlyWiki.prototype.setValue = function(tiddler,fieldName,value) {
 // Returns the value of the given field of the tiddler.
 // The fieldName is case-insensitive.
 // Will only return String values (or undefined).
-TiddlyWiki.prototype.getValue = function(tiddler,fieldName) {
+ArticleStore.prototype.getValue = function(tiddler, fieldName) {
 	var t = this.resolveTiddler(tiddler);
 	if (!t)
 		return undefined;
@@ -4183,7 +4140,7 @@ TiddlyWiki.prototype.getValue = function(tiddler,fieldName) {
 		return store.getTiddlerText("%0%1%2".format(t.title,sliceType,sliceName));
 	} else {
 		fieldName = fieldName.toLowerCase();
-		var accessor = TiddlyWiki.standardFieldAccess[fieldName];
+		var accessor = ArticleStore.standardFieldAccess[fieldName];
 		if (accessor) {
 			return accessor.get(t);
 		}
@@ -4196,7 +4153,7 @@ TiddlyWiki.prototype.getValue = function(tiddler,fieldName) {
 // and that value is returned.
 // The order of the fields is not defined.
 // @param callback a function(tiddler,fieldName,value).
-TiddlyWiki.prototype.forEachField = function(tiddler, callback, onlyExtendedFields) {
+ArticleStore.prototype.forEachField = function(tiddler, callback, onlyExtendedFields) {
 	var t = this.resolveTiddler(tiddler);
 	if (! t)
 		return undefined;
@@ -4208,11 +4165,11 @@ TiddlyWiki.prototype.forEachField = function(tiddler, callback, onlyExtendedFiel
 		}
 	if (onlyExtendedFields)
 		return undefined;
-	for (n in TiddlyWiki.standardFieldAccess) {
+	for (n in ArticleStore.standardFieldAccess) {
 		if (n != "tiddler") {
 			// even though the "title" field can also be referenced through the name "tiddler"
 			// we only visit this field once.
-			result = callback(t, n, TiddlyWiki.standardFieldAccess[n].get(t));
+			result = callback(t, n, ArticleStore.standardFieldAccess[n].get(t));
 			if (result)
 				return result;
 		}
@@ -4488,53 +4445,16 @@ Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFie
 Story.prototype.renderNewView = function(place, title, templateNameOrNumber, customFields) {
 	var articleView = createTiddlyElement(null, "div", this.createIdFromTitle(title), "articleView");
 	articleView.setAttribute("refresh", "tiddler");
-	// if (customFields) articleView.setAttribute("tiddlyFields", customFields); xxx
+	// if (customFields) articleView.setAttribute("tiddlyFields", customFields);
 	place.appendChild(articleView);
-	var fallbackText = null;
-	if (! store.tiddlerExists(title) && ! store.isShadowTiddler(title)) fallbackText = this.loadMissingTiddler(title, customFields);
-	this.refreshView(title, templateNameOrNumber, false, customFields, fallbackText);
+	this.refreshView(title, templateNameOrNumber, false, customFields);
 	return articleView;
 };
 
-//# Attempts to load a missing tiddler from the server specified in the custom fields
-//#   title - title of the missing tiddler
-//#   fields - string of name:"value" pairs or hashmap
-//#   callback - optional function invoked with context argument upon completion; context provides context.tiddler if successful
-Story.prototype.loadMissingTiddler = function(title, fields, callback) {
-	var getTiddlerCallback = function(context)	{
-		if (context.status) {
-			var t = context.tiddler;
-			if (! t.created)
-				t.created = new Date();
-			if (! t.modified)
-				t.modified = t.created;
-			var dirty = store.isDirty();
-			context.tiddler = store.saveTiddler(t.title, t.title, t.text, t.modifier, t.modified, t.tags, t.fields, true, t.created, t.creator);
-			if (! window.allowSave())
-				store.setDirty(dirty);
-			autoSaveChanges();
-		} else {
-			story.refreshView(context.title, null, true);
-		}
-		context.adaptor.close();
-		if (callback) {
-			callback(context);
-		}
-	};
-	var tiddler = new Tiddler(title);
-	tiddler.fields = typeof fields == "string" ? fields.decodeHashMap() : fields || {};
-	var context = {serverType: tiddler.getServerType()};
-	if (! context.serverType) return ""; // todo: check if context.serverType is ever set - doesnt'seem so.
-	context.host = tiddler.fields['server.host'];
-	context.workspace = tiddler.fields['server.workspace'];
-	var adaptor = new config.adaptors[context.serverType]();
-	adaptor.getTiddler(title, context, null, getTiddlerCallback);
-	return config.messages.loadingMissingTiddler.format([title, context.serverType, context.host, context.workspace]);
-};
-
 Story.prototype.chooseTemplateForTiddler = function(templateNameOrNumber) {
-	if (! templateNameOrNumber) // true when null or 0
-		templateNameOrNumber = DEFAULT_VIEW_TEMPLATE;
+	
+	if (! templateNameOrNumber) templateNameOrNumber = DEFAULT_VIEW_TEMPLATE; // true when null or 0
+		
 	if (templateNameOrNumber == DEFAULT_VIEW_TEMPLATE || templateNameOrNumber == DEFAULT_EDIT_TEMPLATE)
 		templateNameOrNumber = config.tiddlerTemplates[templateNameOrNumber]; // transform 0 or 1 to default names
 	return templateNameOrNumber; // return type is always string
@@ -4547,61 +4467,59 @@ Story.prototype.getTemplateForTiddler = function(templateName) {
 // Renders an article viewer / editor - for existing articles as well as for non-existing articles
 //# Apply a template to an existing tiddler if it is not already displayed using that template
 //# title - title of tiddler to update
-//# templateNameOrNumber - the name of the tiddler containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
+//# templateNameOrNumber - the name of the article containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
 //# force - if true, forces the refresh even if the template hasn't changed
 //# customFields - an optional list of name/value pairs to be assigned as tiddler fields (for edit templates)
-//# defaultText - an optional string to replace the default text for non-existent tiddlers
-Story.prototype.refreshView = function(title, templateNameOrNumber, force, customFields, defaultText) {
+Story.prototype.refreshView = function(title, templateNameOrNumber, force, customFields) {
 	var articleView = this.getArticleViewByTitle(title);
-	if (articleView) {
-		if (articleView.getAttribute("dirty") == "true" && ! force)	return articleView;
+	if (! articleView) return;
+	
+	if (articleView.getAttribute("dirty") == "true" && ! force)	return articleView;
+	
+	var templateName = this.chooseTemplateForTiddler(templateNameOrNumber);
+	
+	var currTemplate = articleView.getAttribute("template");
+	if ((templateName != currTemplate) || force) {
+		var article = store.getTiddler(title);
 		
-		var templateName = this.chooseTemplateForTiddler(templateNameOrNumber);
-		
-		var currTemplate = articleView.getAttribute("template");
-		if ((templateName != currTemplate) || force) {
-			var article = store.getTiddler(title);
-			
-			if (! article) {
-				article = new Tiddler();
-				if (store.isShadowTiddler(title)) {
-					var tags = [];
-					article.set(title, store.getTiddlerText(title), config.views.wikified.shadowModifier, version.date, tags, version.date);
-				} else {
-					var text = (templateName == "EditTemplate") ? config.views.editor.defaultText.format([title]) : config.views.wikified.defaultText.format([title]);
-					text = defaultText || text;
-					var fields = customFields ? customFields.decodeHashMap() : null;
-					article.set(title, text, config.views.wikified.defaultModifier, version.date, [], version.date, fields);
-				}
-			}
-			articleView.setAttribute("tags", article.tags.join(" "));
-			articleView.setArticleTitle(title);
-			articleView.setAttribute("template", templateName);
-			articleView.onmouseover = this.onTiddlerMouseOver;
-			articleView.onmouseout = this.onTiddlerMouseOut;
-			articleView.ondblclick = this.onTiddlerDblClick;
-			articleView[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
-			articleView.innerHTML = this.getTemplateForTiddler(templateName);
-			applyHtmlMacros(articleView, article);
-			if (store.getTaggedTiddlers(title).length > 0)
-				jQuery(articleView).addClass("isTag");
-			else
-				jQuery(articleView).removeClass("isTag");
-			if (store.tiddlerExists(title)) {
-				jQuery(articleView).removeClass("shadow");
-				jQuery(articleView).removeClass("missing");
+		if (! article) {
+			article = new Tiddler();
+			if (store.isShadowTiddler(title)) {
+				var tags = [];
+				article.set(title, store.getTiddlerText(title), config.views.wikified.shadowModifier, version.date, tags, version.date);
 			} else {
-				jQuery(articleView).addClass(store.isShadowTiddler(title) ? "shadow" : "missing");
+				var text = (templateName != "EditTemplate") ? config.views.wikified.defaultText.format([title]) : null;
+				var fields = customFields ? customFields.decodeHashMap() : null;
+				article.set(title, text, config.views.wikified.defaultModifier, version.date, [], version.date, fields);
 			}
-			if (customFields)
-				this.addCustomFields(articleView, customFields);
 		}
+		articleView.setAttribute("tags", article.tags.join(" "));
+		articleView.setArticleTitle(title);
+		articleView.setAttribute("template", templateName);
+		articleView.onmouseover = this.onTiddlerMouseOver;
+		articleView.onmouseout = this.onTiddlerMouseOut;
+		articleView.ondblclick = this.onTiddlerDblClick;
+		articleView[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
+		articleView.innerHTML = this.getTemplateForTiddler(templateName);
+		applyHtmlMacros(articleView, article);
+		if (store.getTaggedTiddlers(title).length > 0)
+			jQuery(articleView).addClass("isTag");
+		else
+			jQuery(articleView).removeClass("isTag");
+		if (store.tiddlerExists(title)) {
+			jQuery(articleView).removeClass("shadow");
+			jQuery(articleView).removeClass("missing");
+		} else {
+			jQuery(articleView).addClass(store.isShadowTiddler(title) ? "shadow" : "missing");
+		}
+		if (customFields)
+			this.addCustomFields(articleView, customFields);
 	}
 	return articleView;
 };
 
 // renders hidden fields for customFields (alias "extended fields"), because later on it will be synced back to the entity (see mergeInputElementsToEditBuffer)
-Story.prototype.addCustomFields = function(place, customFields) { // todo: get rid of all custom fields stuff and make parenttiddler a native property (alias "TiddlyWiki.isStandardField")
+Story.prototype.addCustomFields = function(place, customFields) { // todo: get rid of all custom fields stuff and make parenttiddler a native property (alias "ArticleStore.isStandardField")
 	var fields = customFields.decodeHashMap();
 	var w = createTiddlyElement(place, "div", null, "customFields");
 	w.style.display = "none";
@@ -4885,24 +4803,25 @@ Story.prototype.hasChanges = function(title) {
 		* @return {string} - The title usable as internal id (e.g. 'articleMy_great_foo__article')
 	*/
 Story.prototype.saveTiddler = function(title, minorUpdate) {
-	var articleView = this.getArticleViewByTitle(title);
 	
+	var articleView = this.getArticleViewByTitle(title);	
 	if (! articleView) return null;
 	
 	var editBuffer = {};
 	this.mergeInputElementsToEditBuffer(articleView, editBuffer);
+	
 	var newTitle = editBuffer.title || title;
 	if (! store.tiddlerExists(newTitle)) {
 		newTitle = newTitle.trim();
 		var creator = config.options.txtUserName;
 	}
 	if (store.tiddlerExists(newTitle) && newTitle != title) {
-		if (!confirm(config.messages.overwriteWarning.format([newTitle.toString()])))
-			return null;
-			title = newTitle;
+		if (! confirm(config.messages.overwriteWarning.format([newTitle.toString()]))) return null;
+		title = newTitle;
 	}
-	if (newTitle != title) // todo: warum kann sich der titel ändern?
-		this.closeView(newTitle);
+	
+	if (newTitle != title) this.closeView(newTitle);
+	
 	articleView.id = this.createIdFromTitle(newTitle);
 	articleView.setArticleTitle(newTitle);
 	articleView.setAttribute("template", DEFAULT_VIEW_TEMPLATE); // hack hier wird ein integer eingesetzt - sollte aber besser string sein!
@@ -4915,7 +4834,7 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 		creator = article.creator;
 	}
 	for (var fieldName in editBuffer) {
-		if (! TiddlyWiki.isStandardField(fieldName)) extendedFields[fieldName] = editBuffer[fieldName];
+		if (! ArticleStore.isStandardField(fieldName)) extendedFields[fieldName] = editBuffer[fieldName];
 	}
 	var tiddler = store.saveTiddler(title, newTitle, editBuffer.text, config.options.txtUserName, newDate, editBuffer.tags, extendedFields, null, null, creator);
 	autoSaveChanges(null, [tiddler]);
@@ -5465,29 +5384,27 @@ config.macros.importTiddlers.doImport = function(e) {
 	return false;
 };
 
-config.macros.importTiddlers.onGetTiddler = function(context,wizard) {
+config.macros.importTiddlers.onGetTiddler = function(context, wizard) {
 	var me = config.macros.importTiddlers;
-	if (!context.status)
+	if (! context.status)
 		displayMessage("Error in importTiddlers.onGetTiddler: " + context.statusText);
 	var tiddler = context.tiddler;
 	store.suspendNotifications();
 	store.saveTiddler(tiddler.title, tiddler.title, tiddler.text, tiddler.modifier, tiddler.modified, tiddler.tags, tiddler.fields, true, tiddler.created);
-	if (!wizard.getValue("sync")) {
-		store.setValue(tiddler.title,'server',null);
+	if (! wizard.getValue("sync")) {
+		store.setValue(tiddler.title, 'server', null);
 	}
 	store.resumeNotifications();
-	if (!context.isSynchronous)
+	if (! context.isSynchronous)
 		store.notify(tiddler.title, true);
 	var remainingImports = wizard.getValue("remainingImports")-1;
-	wizard.setValue("remainingImports",remainingImports);
+	wizard.setValue("remainingImports", remainingImports);
 	if (remainingImports == 0) {
 		if (context.isSynchronous) {
 			store.notifyAll();
 			refreshDisplay();
 		}
-		wizard.setButtons([
-				{caption: me.doneLabel, tooltip: me.donePrompt, onClick: me.onClose}
-			],me.statusDoneImport);
+		wizard.setButtons([{caption: me.doneLabel, tooltip: me.donePrompt, onClick: me.onClose}], me.statusDoneImport);
 		autoSaveChanges();
 	}
 };
@@ -5515,29 +5432,29 @@ config.macros.upgrade.onClickUpgrade = function(e) {
 		return false;
 	}
 	var localPath = getLocalPath(document.location.toString());
-	var backupPath = getBackupPath(localPath,me.backupExtension);
-	w.setValue("backupPath",backupPath);
-	w.setButtons([],me.statusPreparingBackup);
+	var backupPath = getBackupPath(localPath, me.backupExtension);
+	w.setValue("backupPath", backupPath);
+	w.setButtons([], me.statusPreparingBackup);
 	var original = loadOriginal(localPath);
-	w.setButtons([],me.statusSavingBackup);
+	w.setButtons([], me.statusSavingBackup);
 	var backup = copyFile(backupPath,localPath);
 	if (!backup)
-		backup = saveFile(backupPath,original);
+		backup = saveFile(backupPath, original);
 	if (!backup) {
-		w.setButtons([],me.errorSavingBackup);
+		w.setButtons([], me.errorSavingBackup);
 		alert(me.errorSavingBackup);
 		return false;
 	}
-	w.setButtons([],me.statusLoadingCore);
+	w.setButtons([], me.statusLoadingCore);
 	var options = {
 		type:"GET",
 		url:me.source,
 		processData:false,
-		success:function(data,textStatus,jqXHR) {
-			me.onLoadCore(true,w,jqXHR.responseText,me.source,jqXHR);
+		success:function(data, textStatus, jqXHR) {
+			me.onLoadCore(true, w, jqXHR.responseText, me.source, jqXHR);
 		},
-		error:function(jqXHR,textStatus,errorThrown) {
-			me.onLoadCore(false,w,null,me.source,jqXHR);
+		error:function(jqXHR, textStatus, errorThrown) {
+			me.onLoadCore(false, w, null, me.source, jqXHR);
 		}
 	};
 	ajaxReq(options);
@@ -5587,10 +5504,9 @@ config.macros.upgrade.extractVersion = function(upgradeFile) {
 };
 
 function upgradeFrom(path) {
-	var importStore = new TiddlyWiki();
+	var importStore = new ArticleStore();
 	var tw = loadFile(path);
-	if (window.netscape !== undefined)
-		tw = convertUTF8ToUnicode(tw);
+	if (window.netscape !== undefined) tw = convertUTF8ToUnicode(tw);
 	importStore.importTiddlyWiki(tw);
 	importStore.forEachArticle(function(title,tiddler) {
 		if (!store.getTiddler(title)) {
@@ -5600,7 +5516,7 @@ function upgradeFrom(path) {
 	refreshDisplay();
 	saveChanges(); //# To create appropriate Markup* sections
 	alert(config.messages.upgradeDone.format([formatVersion()]));
-	window.location = window.location.toString().substr(0,window.location.toString().lastIndexOf("?"));
+	window.location = window.location.toString().substr(0, window.location.toString().lastIndexOf("?"));
 }
 
 //--
@@ -6297,7 +6213,7 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 	var article = store.getTiddler(title);
 	if (article) article.rescuedScrollTop = articleView.scrollTop;
 	
-	//var fields = articleView.getAttribute("tiddlyFields"); xxx
+	//var fields = articleView.getAttribute("tiddlyFields");
 	var fields = null;
 	
 	story.displayTiddler(title, DEFAULT_EDIT_TEMPLATE, fields);
@@ -6351,8 +6267,8 @@ config.commands.navigateForward = {
 config.commands.saveTiddler.handlerBase = config.commands.saveTiddler.handler; // ToDo: patch the base method instead of hijacking
 
 config.commands.saveTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
-	var pos = story.getTiddlerField(title,"text").selectionStart;
-	var baseResult = config.commands.saveTiddler.handlerBase(event,src,title);
+	var pos = story.getTiddlerField(title, "text").selectionStart;
+	var baseResult = config.commands.saveTiddler.handlerBase(event, src, title);
 	story.getArticleViewByTitle(title).rescuedCaretPosition = pos;
 	return baseResult;
 };
@@ -7862,14 +7778,14 @@ var renderLimitedText = function(place, s, maxLen) {
 
 // When any tiddler are changed reset the result.
 // 
-var oldTiddlyWikiSaveTiddler = TiddlyWiki.prototype.saveTiddler;
-TiddlyWiki.prototype.saveTiddler = function(title,newTitle,newBody,modifier,modified,tags,fields) {
+var oldTiddlyWikiSaveTiddler = ArticleStore.prototype.saveTiddler;
+ArticleStore.prototype.saveTiddler = function(title, newTitle, newBody, modifier, modified, tags, fields) {
 	oldTiddlyWikiSaveTiddler.apply(this, arguments);
 	invalidateResult();
 };
 
-var oldTiddlyWikiRemoveTiddler = TiddlyWiki.prototype.removeTiddler;
-TiddlyWiki.prototype.removeTiddler = function(title) {
+var oldTiddlyWikiRemoveTiddler = ArticleStore.prototype.removeTiddler;
+ArticleStore.prototype.removeTiddler = function(title) {
 	oldTiddlyWikiRemoveTiddler.apply(this, arguments);
 	invalidateResult();
 };
@@ -8304,23 +8220,6 @@ function checkUnsavedChanges() {
 	}
 }
 
-function updateLanguageAttribute(s) {
-	if (config.locale) {
-		var mRE = /(<html(?:.*?)?)(?: xml:lang\="([a-z]+)")?(?: lang\="([a-z]+)")?>/;
-		var m = mRE.exec(s);
-		if (m) {
-			var t = m[1];
-			if (m[2])
-				t += ' xml:lang="' + config.locale + '"';
-			if (m[3])
-				t += ' lang="' + config.locale + '"';
-			t += ">";
-			s = s.substr(0,m.index) + t + s.substr(m.index+m[0].length);
-		}
-	}
-	return s;
-}
-
 function updateMarkupBlock(s,blockName,tiddlerName) {
 	return s.replaceChunk(
 		"<!--%0-START-->".format([blockName]),
@@ -8329,29 +8228,24 @@ function updateMarkupBlock(s,blockName,tiddlerName) {
 	);
 }
 
-function updateOriginal(original, posDiv, localPath) {
-	if (!posDiv) posDiv = locateStoreArea(original);
-	if (!posDiv) {
+function updateOriginal(original, storeAreaRange, localPath) {
+	if (!storeAreaRange) storeAreaRange = locateStoreArea(original);
+	if (!storeAreaRange) {
 		alert(config.messages.invalidFileError.format([localPath]));
 		return null;
 	}
-	var revised = original.substr(0, posDiv[0] + startSaveArea.length) + "\n" +
+	var revised = original.substr(0, storeAreaRange[0] + startSaveArea.length) + "\n" +
 								store.allTiddlersAsHtml() + "\n" +
-								original.substr(posDiv[1]);
+								original.substr(storeAreaRange[1]);
 								
 	var newSiteTitle = getPageTitle().htmlEncode();
 	revised = revised.replaceChunk("<title"+">", "</title"+">", " " + newSiteTitle + " ");
-	revised = updateLanguageAttribute(revised);
-	revised = updateMarkupBlock(revised, "PRE-HEAD", "MarkupPreHead");
-	revised = updateMarkupBlock(revised, "POST-HEAD", "MarkupPostHead");
-	revised = updateMarkupBlock(revised, "PRE-BODY", "MarkupPreBody");
-	revised = updateMarkupBlock(revised, "POST-SCRIPT", "MarkupPostBody");
 	return revised;
 }
 
 function locateStoreArea(original) {
 	// Locate the storeArea divs
-	if (!original) return null;
+	if (! original) return null;
 	var posOpeningDiv = original.search(startSaveAreaRE);
 	var limitClosingDiv = original.indexOf("<"+"!--POST-STOREAREA--"+">");
 	if (limitClosingDiv == -1)
@@ -8360,7 +8254,7 @@ function locateStoreArea(original) {
 	var posClosingDiv = original.lastIndexOf(endSaveArea,start);
 	if (posClosingDiv == -1)
 		posClosingDiv = original.lastIndexOf(endSaveAreaCaps,start);
-	return (posOpeningDiv != -1 && posClosingDiv != -1) ? [posOpeningDiv,posClosingDiv] : null;
+	return (posOpeningDiv != -1 && posClosingDiv != -1) ? [posOpeningDiv, posClosingDiv] : null;
 }
 
 function autoSaveChanges(onlyIfDirty, tiddlers) {
@@ -8368,35 +8262,42 @@ function autoSaveChanges(onlyIfDirty, tiddlers) {
 }
 
 function loadOriginal(localPath) {
-	var content=loadFile(localPath);
-	if (!content) content = window.originalHTML || recreateOriginal();
+	var content = loadFile(localPath);
+	if (! content) content = window.originalHTML || recreateOriginal();
 	return content;
 }
 
+// Fix document.documentElement.outerHTML returning a crappy mutation of the original HTML source
 function recreateOriginal() {
-	// construct doctype
+	
+	//  DOCTYPE is completely missing and has to be rebuilt from scratch
+	
 	var content = "<!DOCTYPE ";
 	var t = document.doctype;
-	if (!t) 
+	if (! t) {
 		content += "html"
-	else {
+	} else {
 		content += t.name;
-		if      (t.publicId)		content += ' PUBLIC "' + t.publicId + '"';
-		else if (t.systemId)		content += ' SYSTEM "' + t.systemId + '"';
+		if      (t.publicId) content += ' PUBLIC "' + t.publicId + '"';
+		else if (t.systemId) content += ' SYSTEM "' + t.systemId + '"';
 	}
 	content += ' "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"';
 	content += '>\n';
 
-	// append current document content
+	// Append browser's output of "original" HTML (broken)
 	content += document.documentElement.outerHTML;
 
-	content=content.replace(/<div id="saveTest">savetest<\/div>/,'<div id="saveTest"></div>');
-	content=content.replace(/script><applet [^\>]*><\/applet>/g,'script>');
-	content=content.replace(/><head>/,'>\n<head>');
-	content=content.replace(/\n\n<\/body><\/html>$/,'</body>\n</html>\n');
-	content=content.replace(/(<(meta) [^\>]*[^\/])>/g,'$1 />');
-	content=content.replace(/<noscript>[^\<]*<\/noscript>/,
-		function(m) {return m.replace(/&lt;/g,'<').replace(/&gt;/g,'>');});
+	// Fix stuff
+
+	content = content.replace(/<div id="saveTest">savetest<\/div>/, '<div id="saveTest"></div>'); // clear 'savetest' marker
+	// xxx hier mehr krempel leeren, dann kann in main() auf den riesen snapshot der Ursprungsseite verzichtet werden
+	// alles was dynamisch erzeugt wurde
+	// z.B. der ganze Backstage-Kram (suche nach "var backstage =")
+	
+	content = content.replace(/><head>/, '>\n<head>'); //newline before head tag
+	content = content.replace(/\n\n<\/body><\/html>$/, '</body>\n</html>\n'); // newlines before/after end of body/html tags
+	content = content.replace(/(<(meta) [^\>]*[^\/])>/g, '$1 />'); // meta tag terminators
+	content = content.replace(/<noscript>[^\<]*<\/noscript>/,	function(m) {return m.replace(/&lt;/g,'<').replace(/&gt;/g,'>');}); // decode LT/GT entities in noscript (obsolete?)
 	
 	return content;
 }
@@ -8408,7 +8309,7 @@ function saveChanges(onlyIfDirty, tiddlers) {
 	clearMessage();	
 	var msg = config.messages;
 	var originalPath = document.location.toString();
-	if (!window.allowSave()) {
+	if (! window.allowSave()) {
 		alert(msg.notFileUrlError);		
 		return;
 	}
@@ -8418,27 +8319,27 @@ function saveChanges(onlyIfDirty, tiddlers) {
 		alert(msg.cantSaveError);
 		return;
 	}
-	var posDiv = locateStoreArea(original);
-	if (!posDiv) {
+	var storeAreaRange = locateStoreArea(original);
+	if (! storeAreaRange) {
 		alert(msg.invalidFileError.format([localPath]));
 		return;
 	}
 	var co = config.options; //# abbreviation
 	config.saveByDownload = false;
 	config.saveByManualDownload = false;
-	saveMain(localPath, original, posDiv);
+	saveMain(localPath, original, storeAreaRange);
 	if (! config.saveByDownload && ! config.saveByManualDownload) {
 		if (co.chkSaveEmptyTemplate)
-			saveEmpty(localPath, original, posDiv);
+			saveEmpty(localPath, original, storeAreaRange);
 		if (co.chkGenerateAnRssFeed && saveRss instanceof Function)
 			saveRss(localPath);
 	}	
 }
 
-function saveMain(localPath, original, posDiv) {
+function saveMain(localPath, original, storeAreaRange) {
 	var save;
 	try {
-		var revised = updateOriginal(original, posDiv, localPath);
+		var revised = updateOriginal(original, storeAreaRange, localPath);
 		save = saveFile(localPath, revised);
 	} catch (ex) {
 		showException(ex);
@@ -8548,7 +8449,7 @@ tiddlerToRssItem = function(tiddler,uri) {
 	return s;
 };
 
-function generateRss() {
+function generateRss() { // xxx
 	var s = [];
 	var d = new Date();
 	var u = store.getTiddlerText("SiteUrl");
@@ -8560,7 +8461,7 @@ function generateRss() {
 	if (u)
 		s.push("<link>" + u.htmlEncode() + "</link>");
 	s.push("<description>" + wikifyPlainText(store.getTiddlerText("SiteSubtitle",""),null,tiddler).htmlEncode() + "</description>");
-	s.push("<language>" + config.locale + "</language>");
+	s.push("<language>en</language>");
 	s.push("<copyright>Copyright " + d.getFullYear() + " " + config.options.txtUserName.htmlEncode() + "</copyright>");
 	s.push("<pubDate>" + d.toGMTString() + "</pubDate>");
 	s.push("<lastBuildDate>" + d.toGMTString() + "</lastBuildDate>");
@@ -8598,8 +8499,8 @@ window.saveFile = window.saveFile || function(fileUrl,content) {
 }
 
 // Load a file from filesystem [Preemption]
-window.loadFile = window.loadFile || function(fileUrl) {
-	var r = mozillaLoadFile(fileUrl);
+window.loadFile = window.loadFile || function(fileUrl) { // xxx funktioniert alles nicht.
+	var r = mozillaLoadFile(fileUrl); // xxx
 	if ((r == null) || (r == false))
 		r = ieLoadFile(fileUrl);
 	if ((r == null) || (r == false))
@@ -8685,7 +8586,7 @@ function mozillaSaveFile(filePath,content) {
 }
 
 // Returns null if it can't do it, false if there's an error, or a string of the content if successful
-function mozillaLoadFile(filePath) {
+function mozillaLoadFile(filePath) { // xxx
 	if (window.Components) {
 		try {
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -8945,8 +8846,7 @@ AdaptorBase.prototype.close = function() {
 };
 
 AdaptorBase.prototype.fullHostName = function(host) {
-	if (!host)
-		return '';
+	if (! host) return '';
 	host = host.trim();
 	if (!host.match(/:\/\//))
 		host = 'http://' + host;
@@ -8959,7 +8859,7 @@ AdaptorBase.minHostName = function(host) {
 	return host;
 };
 
-AdaptorBase.prototype.setContext = function(context,userParams,callback) {
+AdaptorBase.prototype.setContext = function(context, userParams, callback) {
 	if (!context) context = {};
 	context.userParams = userParams;
 	if (callback) context.callback = callback;
@@ -8993,7 +8893,7 @@ AdaptorBase.prototype.openWorkspace = function(workspace,context,userParams,call
 };
 
 //--
-//-- Server adaptor for talking to static TiddlyWiki files
+//-- Server adaptor for talking to static Wiki files
 //--
 
 function FileAdaptor() {
@@ -9002,12 +8902,12 @@ function FileAdaptor() {
 FileAdaptor.prototype = new AdaptorBase();
 
 FileAdaptor.serverType = 'file';
-FileAdaptor.serverLabel = 'TiddlyWiki';
+FileAdaptor.serverLabel = 'ArticleStore';
 
 FileAdaptor.loadTiddlyWikiSuccess = function(context,jqXHR) {
 	context.status = true;
-	context.adaptor.store = new TiddlyWiki();
-	if (!context.adaptor.store.importTiddlyWiki(jqXHR.responseText)) {
+	context.adaptor.store = new ArticleStore();
+	if (! context.adaptor.store.importTiddlyWiki(jqXHR.responseText)) {
 		context.statusText = config.messages.invalidFileError.format([context.host]);
 		context.status = false;
 	}
@@ -9212,10 +9112,10 @@ function httpReq(type,url,callback,params,headers,data,contentType,username,pass
 }
 
 //--
-//-- TiddlyWiki-specific utility functions
+//-- Utility functions
 //--
 
-// Returns TiddlyWiki version string
+// Returns version string
 function formatVersion(v) {
 	v = v || version;
 	return v.major + "." + v.minor + "." + v.revision +
@@ -9470,7 +9370,7 @@ function createTiddlyDropDown(place, onchange, options, defaultValue) {
 }
 
 //--
-//-- TiddlyWiki-specific popup utility functions
+//-- Popup utility functions
 //--
 
 /**
@@ -10718,24 +10618,23 @@ function removeStyleSheet(id) {
 
 function LoaderBase() {}
 
-LoaderBase.prototype.loadTiddler = function(store, node, articles) {
-	var title = this.getTitle(store, node);
-	if (safeMode && store.isShadowTiddler(title))
-		return;
-	if (title) {
-		var tiddler = store.createArticle(title);
-		this.internalizeTiddler(store,tiddler,title,node);
-		articles.push(tiddler);
-	}
+LoaderBase.prototype.loadTiddler = function(sourceElement, destinationStore, articles) {
+	var title = this.getTitle(sourceElement);
+	if (! title) return;
+	if (safeMode && destinationStore.isShadowTiddler(title)) return;
+		
+	var article = destinationStore.getOrAddNewArticle(title);
+	this.populateArticleFromElement(article, title, sourceElement);
+	articles.push(article);
 };
 
-LoaderBase.prototype.loadTiddlers = function(store, nodes) {
+LoaderBase.prototype.loadArticles = function(sourceElements, destinationStore) {
 	var articles = [];
-	for (var t = 0; t < nodes.length; t++) {
+	for (var i = 0; i < sourceElements.length; i++) {
 		try {
-			this.loadTiddler(store, nodes[t], articles);
+			this.loadTiddler(sourceElements[i], destinationStore, articles);
 		} catch(ex) {
-			showException(ex,config.messages.tiddlerLoadError.format([this.getTitle(store,nodes[t])]));
+			showException(ex, config.messages.tiddlerLoadError.format([this.getTitle(sourceElements[i])]));
 		}
 	}
 	return articles;
@@ -10760,49 +10659,34 @@ function TW21Loader() {}
 
 TW21Loader.prototype = new LoaderBase();
 
-TW21Loader.prototype.getTitle = function(store, node) {
-	var title = null;
-	if (node.getAttribute) {
-		title = node.getAttribute("title");
-		if (! title)
-			title = node.getAttribute("tiddler");
-	}
-	if (! title && node.id) {
-		var lenPrefix = store.idPrefix.length;
-		if (node.id.substr(0, lenPrefix) == store.idPrefix)
-			title = node.id.substr(lenPrefix);
-	}
-	return title;
+TW21Loader.prototype.getTitle = function(node) {
+	// Line breaks in HTML source appear as "text elements" here which don't have "getAttribute" and must be ignored
+	return (node.getAttribute) ? node.getAttribute("title") : null;	
 };
 
-TW21Loader.prototype.internalizeTiddler = function(store, tiddler, title, node) {
-	var e = node.firstChild;
-	var text = null;
-	if (node.getAttribute("tiddler")) {
-		text = getNodeText(e).unescapeLineBreaks();
-	} else {
-		while (e.nodeName!="PRE" && e.nodeName!="pre") {
-			e = e.nextSibling;
-		}
-		text = e.innerHTML.replace(/\r/mg,"").htmlDecode();
+TW21Loader.prototype.populateArticleFromElement = function(targetArticle, title, sourceDivElement) {
+	var preElement = sourceDivElement.firstChild;
+	while (preElement.nodeName != "PRE" && preElement.nodeName != "pre") { // Line breaks in HTML source appear as "text elements" here which must be skipped
+		preElement = preElement.nextSibling;
 	}
-	var creator = node.getAttribute("creator");
-	var modifier = node.getAttribute("modifier");
-	var c = node.getAttribute("created");
-	var m = node.getAttribute("modified");
+	var text = preElement.innerHTML.replace(/\r/mg,"").htmlDecode(); // Remove CR (keep LF), unescape HTML stuff like "&lt;&gt;" to "<>"
+
+	var creator = sourceDivElement.getAttribute("creator");
+	var modifier = sourceDivElement.getAttribute("modifier");
+	var c = sourceDivElement.getAttribute("created");
+	var m = sourceDivElement.getAttribute("modified");
 	var created = c ? Date.convertFromYYYYMMDDHHMMSS(c) : version.date;
 	var modified = m ? Date.convertFromYYYYMMDDHHMMSS(m) : created;
-	var tags = node.getAttribute("tags");
+	var tags = sourceDivElement.getAttribute("tags");
 	var fields = {};
-	var i,attrs = node.attributes;
-	for (i = attrs.length-1; i >= 0; i--) {
+	var attrs = sourceDivElement.attributes;
+	for (var i = attrs.length-1; i >= 0; i--) {
 		var name = attrs[i].name;
-		if (attrs[i].specified && !TiddlyWiki.isStandardField(name)) {
+		if (attrs[i].specified && ! ArticleStore.isStandardField(name)) {
 			fields[name] = attrs[i].value.unescapeLineBreaks();
 		}
 	}
-	tiddler.assign(title,text,modifier,modified,tags,created,fields,creator);
-	return tiddler;
+	targetArticle.assign(title, text, modifier, modified, tags, created, fields, creator);
 };
 
 //--
@@ -10885,8 +10769,8 @@ Crypto.sha1Str = function(str) {
 };
 
 // Calculate the SHA-1 hash of an array of blen bytes of big-endian 32-bit words
-Crypto.sha1 = function(x,blen) {
-	return jQuery.encoding.digests.sha1(x,blen);
+Crypto.sha1 = function(x, blen) {
+	return jQuery.encoding.digests.sha1(x, blen);
 };
 
 //--
@@ -10900,47 +10784,17 @@ Array.prototype.find = function(item) {
 	return i == -1 ? null : i;
 };
 
-// Load a tiddler from an HTML DIV. The caller should make sure to later call Tiddler.changed()
-// @Deprecated: Use store.getLoader().internalizeTiddler instead
-Tiddler.prototype.loadFromDiv = function(divRef, title) {
-	return store.getLoader().internalizeTiddler(store, this, title, divRef);
-};
-
-// Format the text for storage in an HTML DIV
-// @Deprecated Use store.getSaver().externalizeTiddler instead.
-Tiddler.prototype.saveToDiv = function() {
-	return store.getSaver().externalizeTiddler(store,this);
-};
-
-//--
-//-- Deprecated FileAdaptor functions
-//--
-
-FileAdaptor.loadTiddlyWikiCallback = function(status,context,responseText,url,xhr) {
-	context.status = status;
-	if (!status) {
-		context.statusText = "Error reading file";
-	} else {
-		context.adaptor.store = new TiddlyWiki();
-		if (!context.adaptor.store.importTiddlyWiki(responseText)) {
-			context.statusText = config.messages.invalidFileError.format([url]);
-			context.status = false;
-		}
-	}
-	context.complete(context,context.userParams);
-};
-
 //--
 //-- Deprecated HTTP request code
 //-- Use the jQuery ajax functions directly instead
 //--
 
-function loadRemoteFile(url,callback,params) {
-	return httpReq("GET",url,callback,params);
+function loadRemoteFile(url, callback, params) {
+	return httpReq("GET", url, callback, params);
 }
 
-function doHttp(type,url,data,contentType,username,password,callback,params,headers,allowCache) {
-	return httpReq(type,url,callback,params,headers,data,contentType,username,password,allowCache);
+function doHttp(type, url, data, contentType, username, password, callback, params, headers, allowCache) {
+	return httpReq(type, url, callback, params, headers, data, contentType, username, password, allowCache);
 }
 
 //--
