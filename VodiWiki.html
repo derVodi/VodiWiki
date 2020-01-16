@@ -34,9 +34,9 @@ html, body, #contentWrapper, #displayArea, #tiddlerDisplay {height: 100%; overfl
 #backstagePanel {display:none; z-index:900; box-sizing:border-box; max-width: calc(100% - 4em); max-height:calc(100% - 3em); margin-left:3em; padding:1em; position:absolute; overflow: auto;}
 .backstagePanelBody {position:relative;}
 
-#menuBar {float: left; min-width: 1em; width: auto; height:100%; position:relative; padding: 9px 1px 0 0;}
-#menuCollapser {position:absolute; top: 5px; right: 0; z-index:200;}
-#mainMenu {position:static; height:100%;}
+#navigationArea {float: left; min-width: 1em; width: auto; height:100%; position:relative; padding: 9px 1px 0 0;}
+#navigationCollapser {position:absolute; top: 5px; right: 0; z-index:200;}
+#navigationPanel {position:static; height:100%;}
 
 #navAndSearch {margin-bottom: 0.3em;}
 #treePath {border: 1px inset grey; padding: 0 0.3em; line-height: 1.3em; }
@@ -73,7 +73,7 @@ table td {vertical-align: top;}
 
 /* Text */
 
-body, #mainMenu, .articleContentContainer, .editor, h3, h4 {font-size: 11.5pt;}
+body, #navigationPanel, .articleContentContainer, .editor, h3, h4 {font-size: 11.5pt;}
 h5, #search {font-size: 10pt;}
 .licenseText, .yourSearchResult .summary .chkBoxLabel {font-size: 8pt;}
 .licenseText {display: inline-block; line-height: 1em; width: 51em; text-align: justify;}
@@ -93,8 +93,8 @@ pre {padding: 4pt;}
 code {white-space: nowrap;}
 textarea, .articleContentContainer pre {tab-size: 2; -moz-tab-size: 2}
 .twtable thead td {font-weight: bold;}
-#mainMenu, #sidebarContent {line-height: 1.3em;}
-.menuTree {line-height: 1.4em;}
+#navigationPanel, #sidebarContent {line-height: 1.3em;}
+.articleTreePanel {line-height: 1.4em;}
 .title {font-size: 18pt; font-weight: normal;}
 #tiddlerDisplay .title {margin:-0.5em 0 12pt 0;}
 table.listView {font-size: 0.85em;}
@@ -129,15 +129,15 @@ blockquote::before {position:absolute;top:0.3em;left:0.2em;content:'\275D'; font
 .tabContents li.listLink {margin-left:.75em;}
 .tabContents {position: relative; height: 100%; height: calc(100% - 49px); overflow-y: scroll; padding-right: 0.8em;}
 
-#mainMenu .tabsetWrapper {height:100%; position:relative;}
-#mainMenu .button {display: block; border: 0;}
-#mainMenu li {list-style: none;}
-.menuTree > .subtree {margin-left: 0;}
-.subtree {margin-left: 0.5em;}
+#navigationPanel .tabsetWrapper {height:100%; position:relative;}
+#navigationPanel .button {display: block; border: 0;}
+#navigationPanel li {list-style: none;}
+.articleTreePanel > .nodesWrapper {margin-left: 0;}
+.nodesWrapper {margin-left: 1em;}
 .branch {position: relative;}
 .branch a {display: block;}
 .branch, .leaf {display: block; margin-left: 1.3em;}
-.treeButtons {display: block; margin-top: 0.5em;}
+.articleTreeButtons {display: block; margin-top: 0.5em;}
 
 #backstageCloak {display:none; z-index:500; position:absolute; width:100%; height:100%; background: black; opacity:0.6; filter:alpha(opacity=60);}
 
@@ -191,7 +191,7 @@ blockquote::before {position:absolute;top:0.3em;left:0.2em;content:'\275D'; font
 
 a, a:hover {color:blue;}
 
-#mainMenu .button, .editorFooter {color: darkgray;}
+#navigationPanel .button, .editorFooter {color: darkgray;}
 .yourSearchResult .summary {border-color: darkgray;}
 table.twtable, .twtable td, .twtable thead td, .twtable th, .wizard, .yourSearchResult {border-color: darkgray;}
 h5, .popup li.disabled, #backstageTabBar {color: gray;}
@@ -275,9 +275,9 @@ body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {b
 </div>
 <div title="PageTemplate">
 <pre>&lt;!--{{{--&gt;
-&lt;div id='menuBar'&gt;
-	&lt;div id='menuCollapser' macro='collapseArea mainMenu'&gt;&lt;/div&gt;
-	&lt;div id='mainMenu' refresh='content' force='true' tiddler='MainMenu'&gt;&lt;/div&gt;
+&lt;div id='navigationArea'&gt;
+	&lt;div id='navigationCollapser' macro='collapseArea navigationPanel'&gt;&lt;/div&gt;
+	&lt;div id='navigationPanel' refresh='content' force='true' tiddler='NavigationPanel'&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;div id='sidebar'&gt;
 	&lt;div id='sidebarCollapser' macro='collapseArea sidebarContent true "Side Bar" "»«"'&gt;&lt;/div&gt;
@@ -325,7 +325,7 @@ code.escaped {white-space:nowrap;}
 <div title="StyleSheetPrint">
 <pre>/*{{{*/
 @media print {
-#mainMenu, #sidebar, #messageArea, .toolbar, #backstageButton, #backstageArea {display: none !important;}
+#navigationPanel, #sidebar, #messageArea, .toolbar, #backstageButton, #backstageArea {display: none !important;}
 noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print preview displays the noscript content */
 }
 /*}}}*/
@@ -343,7 +343,7 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="- Home -" modifier="YourName" created="201904232038" modified="201904232156" parenttiddler="." changecount="6">
+<div title="- Home -" modifier="YourName" created="201904232038" modified="201904232156" changecount="6">
 <pre>!Welcome to VodiWiki
 
 * This is a freeware open source monolithic (= single HTML file) wiki with built-in viewer and editor.
@@ -447,7 +447,7 @@ The following code...
 |&lt;&lt;tiddler [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;|
 </pre>
 </div>
-<div title="Getting Started" modifier="YourName" created="201904231951" modified="201904231951" parenttiddler="." changecount="1">
+<div title="Getting Started" modifier="YourName" created="201904231951" modified="201904231951" changecount="1">
 <pre></pre>
 </div>
 <div title="How to Customize Stuff" modifier="YourName" created="201904232039" modified="201904232059" parenttiddler="Getting Started" changecount="6">
@@ -558,121 +558,6 @@ Demo code, directly followed by it's output:
 
 Some dummy text.
 </pre>
-</div>
-<div title="MenuTree" modifier="YourName" created="201212211816" modified="201701290853" tags="excludeLists excludeSearch" parenttiddler="" changecount="6">
-<pre>{{menuTree{&lt;&lt;tagsTree &quot;.&quot; null 6 &gt;&gt;{{treeButtons{&lt;&lt;newArticleButton &quot;🕀 New Article&quot; true&gt;&gt;&lt;&lt;newArticleButton &quot;🕁 New Sub Article&quot; false&gt;&gt;}}}}}}</pre>
-</div>
-<div title="SinglePageModeByVodi" modifier="YourName" created="201304041401" modified="201910120916" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="22">
-<pre>/***
-|''Name:''|SinglePageModeByVodi|
-|''Version:''|2019.10.12|
-|''Author:''|Mark Vodicka|
-!!!!!Code
-***/
-//{{{
-version.extensions.SinglePageModePlugin= {major: 1, minor: 0, revision: 0, date: new Date(2014,11,28)};
-//}}}
-//{{{
-
-story.history = {
-	currentIdx: -1,
-	backStopper: -1,
-	fowardStopper: -1,
-	limit: 10,
-	titles: [],
-	add: function(title) {
-		if (title == this.titles[this.currentIdx]) return;
-		var mayMoveBackStopper = false;
-		if (this.currentIdx == this.backStopper) mayMoveBackStopper = true;
-		this.currentIdx++;
-		if (this.currentIdx == this.limit) {
-			this.currentIdx = 0;
-		}
-		this.titles[this.currentIdx] = title;
-		this.fowardStopper = this.currentIdx;
-		if (mayMoveBackStopper) this.backStopper = this.currentIdx;
-	},
-	back: function() {
-		var index = this.currentIdx - 1;
-		if (index &lt; 0) index = this.limit - 1;
-		if (index == this.backStopper || this.titles[index] == undefined) return;
-		this.currentIdx = index;
-		story.displayTiddler(this.titles[index]);
-	},
-	forward: function() {
-		if (this.currentIdx == this.fowardStopper) return;
-		var index = this.currentIdx + 1;
-		if (index &gt;= this.limit) index = 0;
-		this.currentIdx = index;
-		story.displayTiddler(this.titles[index]);
-	}
-}
-
-config.commands.navigateBack = {
-	text: 'Back',
-	tooltip: 'View the previous page.',
-	handler: function(event, src, title) { // Implements ICommand.handler()
-		story.history.back();
-		return false;
-	}
-};
-
-config.commands.navigateForward = {
-	text: 'Forward',
-	tooltip: 'View the previous page.',
-	handler: function(event, src, title) { // Implements ICommand.handler()
-		story.history.forward();
-		return false;
-	}
-};
-
-config.macros.navigate = {};
-
-config.macros.navigate.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
-	renderTiddlyButton(place, '←', "Navigate Backwards", function() {config.commands.navigateBack.handler();},	null, null, null);
-	renderTiddlyButton(place, '→', "Navigate Foward", function() {config.commands.navigateForward.handler();},	null, null, null);
-};
-
-function highlightMenuTree() {
-	if (typeof _PreviousCurrentMenuTreeElement !== 'undefined') _PreviousCurrentMenuTreeElement.classList.remove('current');
-
-	if (! store.currentTiddler) return; // todo: current darf nicht im store leben, sondern nur in story!
-
-	var menuTree = document.getElementsByClassName('menuTree')[0];
-	var nodeElement = document.querySelector('[tiddlylink=&quot;' + store.currentTiddler.title + '&quot;]');
-	
-	if (!nodeElement) {
-		return;
-	}
-	
-	nodeElement.classList.add('current');	 
-
-	_PreviousCurrentMenuTreeElement = nodeElement;
-
-	var container = menuTree.parentNode;	
-
-	var offsetToContainer = calcOffsetTo(nodeElement, container);
-
-	if (offsetToContainer &lt; container.scrollTop) container.scrollTop =  Math.max(0, offsetToContainer - nodeElement.offsetHeight);
-
-	var visibleBottom = container.scrollTop + container.clientHeight;
-	var elementBottom = offsetToContainer + nodeElement.offsetHeight;
-
-	if (elementBottom &gt; visibleBottom) {
-		container.scrollTop =  elementBottom - container.clientHeight + nodeElement.offsetHeight;
-	}		 
-}
-
-function calcOffsetTo(inner, outer) {
-	var curtop = 0;
-	while (inner.offsetParent) {		
-		curtop += inner.offsetTop;
-		if (inner.offsetParent == outer) break;
-		inner = inner.offsetParent;		
-	}
-	return curtop;
-}
-//}}}</pre>
 </div>
 <div title="SiteSubtitle" modifier="YourName" created="201305200104" modified="201910120923" changecount="3" parenttiddler="">
 <pre>19.11.12</pre>
@@ -842,145 +727,6 @@ Several lines of blockquoted text.
 <div title="SystemSettings" creator="Fuzzi" modifier="Fuzzi" created="201912221052" parenttiddler="" changecount="3">
 <pre>txtUserName: Anonymous</pre>
 </div>
-<div title="TagsTreePlugin" modifier="YourName" created="201208271709" modified="201701301925" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="1">
-<pre>/***
-|''Name:''|TagsTreePlugin|
-|''Description:''|Displays tags hierachy as a tree of tagged tiddlers.&lt;br&gt;Can be used to create dynamic outline navigation.|
-|''Version:''|2.0.0|
-|''Date:''|Oct 14,2011|
-|''Source:''|http://visualtw.ouvaton.org/VisualTW.html|
-|''Author:''|Pascal Collin - 2.0.0 Amendments - Simon Huggins - patched by Vodi|
-|''License:''|[[BSD open source license|License]]|
-|''~CoreVersion:''|2.1.0|
-|''Browser:''|Firefox 2.0; InternetExplorer 6.0|
-!Demo
-On the plugin [[homepage|http://visualtw.ouvaton.org/VisualTW.html]] :
-*Look at some tags like [[Plugins]] or [[menu]].
-!Installation
-#import the plugin,
-#save and reload,
-#optionally, edit TagsTreeStyleSheet.
-! Usage
-{{{&lt;&lt;tagsTree&gt;&gt;}}} macro accepts the following //optional// parameters.
-|!#|!parameter|!description|!by default|
-|1|{{{root}}}|Uses {{{root}}} tag as tree root|- In a //tiddler// content or template : uses the tiddler as root tag.&lt;br&gt;- In the //page// content or template (by ex MainMenu) : displays all untagged tags.|
-|2|{{{excludeTag}}}|Excludes tiddlers with a specified tag (and their children) from the tree - changed 2.0.0|exclude|
-|3|{{{level}}}|Expands nodes until level {{{level}}}.&lt;br&gt;Value {{{0}}} hides expand/collapse buttons.|Nodes are collapsed on first level|
-|4|{{{depth}}}|Hierachy depth|6 levels depth (H1 to H6 header styles)|
-|5|{{{sortField}}}|Alternate sort field. By example : &quot;index&quot;.|Sorts tags and tiddlers alphabetically (on their title)|
-|6|{{{labelField}}}|Alternate label field. By example : &quot;label&quot;.|Displays tiddler's title|
-|7|{{{expandedTag}}}|Tag to ensure tiddler is expanded by default - added 2.0.0|expanded|
-|8|{{{collapsedTag}}}|Tag to ensure tiddler is collapsed by default - added 2.0.0|collapsed|
-
-!Useful addons
-*[[FieldsEditorPlugin]] : //create//, //edit//, //view// and //delete// commands in toolbar &lt;&lt;toolbar fields&gt;&gt;.
-*[[TaggerPlugin]] : Provides a drop down listing current tiddler tags, and allowing toggling of tags.
-!Advanced Users
-You can change the global defaults for TagsTreePlugin, like default {{{level}}} value or level styles, by editing or overriding the first config.macros.tagsTree attributes below.
-!Code
-***/
-//{{{
-config.macros.tagsTree = {
-	expand : &quot;+&quot;,
-	collapse : &quot;–&quot;,
-	depth : 6,
-	level : 6,
-	sortField : &quot;&quot;,	
-	labelField : &quot;&quot;,
-	styles : [&quot;h1&quot;,&quot;h2&quot;,&quot;h3&quot;,&quot;h4&quot;,&quot;h5&quot;,&quot;h6&quot;],
-	trees : {},
-		expandedTag : &quot;expanded&quot;,
-		collapsedTag : &quot;collapsed&quot;,
-		excludedTag : &quot;exclude&quot;
-}
-
-config.macros.tagsTree.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
-	var root = params[0] ? params[0] : (tiddler ? tiddler.title : null);
-	if (params[1]) config.macros.tagsTree.excludedTag = params[1];
-	var level = params[2] ? params[2] : config.macros.tagsTree.level;
-	var depth = params[3] ? params[3] : config.macros.tagsTree.depth;
-	var sortField = params[4] ? params[4] : config.macros.tagsTree.sortField;
-	var labelField = params[5] ? params[5] : config.macros.tagsTree.labelField;
-	if (params[6]) config.macros.tagsTree.expandedTag = params[6];
-	if (params[7]) config.macros.tagsTree.collapsedTag = params[7];
-	var collapsedField = params[5] ? params[5] : config.macros.tagsTree.labelField;
-	var showButtons = (level&gt;0);
-	var id = config.macros.tagsTree.getId(place);
-	if (config.macros.tagsTree.trees[id]==undefined) config.macros.tagsTree.trees[id]={};
-	config.macros.tagsTree.createSubTree(place,id,root,[],level&gt;0 ? level : 1,depth, sortField, labelField,showButtons);
-}
-
-config.macros.tagsTree.createSubTree = function(place, id, root, ancestors, level, depth, sortField, labelField,showButtons) {
-	var childNodes = root ? this.getChildNodes(root, ancestors) : new Array();
-	var isOpen = (level&gt;0) || (!showButtons);
-	if (root &amp;&amp; this.trees[id][root]!=undefined) isOpen = this.trees[id][root]; 
-	if (root &amp;&amp; ancestors.length) {
-		var t = store.getTiddler(root);
-		if (childNodes.length &amp;&amp; depth&gt;0) {
-			var wrapper = createTiddlyElement(place , this.styles[Math.min(Math.max(ancestors.length, 1), 6) - 1], null, &quot;branch&quot;);
-			if (showButtons) {
-				if (t.tags.contains(config.macros.tagsTree.collapsedTag)) isOpen = false;
-				if (t.tags.contains(config.macros.tagsTree.expandedTag)) isOpen = true;
-				b = renderTiddlyButton(wrapper, isOpen ? config.macros.tagsTree.collapse : config.macros.tagsTree.expand, null, config.macros.tagsTree.onClick);
-				b.setAttribute(&quot;treeId&quot;, id);
-				b.setAttribute(&quot;tiddler&quot;, root);					
-			}
-			createTiddlyText(renderLinkElement(wrapper, root), t &amp;&amp; labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
-		}
-		else 
-			createTiddlyText(renderLinkElement(place, root, false, &quot;leaf&quot;), t &amp;&amp; labelField ? t.fields[labelField] ? t.fields[labelField] : root : root);
-	}
-	if (childNodes.length &amp;&amp; depth) {
-		var d = createTiddlyElement(place,&quot;div&quot;,null,&quot;subtree&quot;);
-		d.style.display= isOpen ? &quot;block&quot; : &quot;none&quot;;
-		if (sortField)
-			childNodes.sort(function(a, b) {
-				var fa = a.fields[sortField];
-				var fb = b.fields[sortField];
-				return (fa == undefined &amp;&amp; fb == undefined) ? a.title &lt; b.title ? -1 : a.title &gt; b.title ? 1 : 0 : (fa == undefined &amp;&amp; fb != undefined) ? 1 :(fa != undefined &amp;&amp; fb == undefined) ? -1 : fa &lt; fb ? -1 : fa &gt; fb ? 1 : 0;
-			})
-		for (var cpt=0; cpt&lt;childNodes.length; cpt++)
-			this.createSubTree(d, id, childNodes[cpt].title, ancestors.concat(root), level - 1, depth - 1, sortField, labelField, showButtons);	
-	}	
-}
-
-config.macros.tagsTree.onClick = function(e) {
-	var id = this.getAttribute(&quot;treeId&quot;);
-	var tiddler = this.getAttribute(&quot;tiddler&quot;);	
-	var n = this.parentNode.nextSibling;
-	var isOpen = n.style.display != &quot;none&quot;;
-	n.style.display = isOpen ? &quot;none&quot; : &quot;block&quot;;
-	this.firstChild.nodeValue = isOpen ? config.macros.tagsTree.expand : config.macros.tagsTree.collapse;
-	config.macros.tagsTree.trees[id][tiddler]=!isOpen;
-	return false;
-}
-
-config.macros.tagsTree.getChildNodes = function(root, ancestors) {
-	var childs = store.reverseLookup('parenttiddler',root,true);
-	var result = new Array();
-	for (var cpt=0; cpt&lt;childs.length; cpt++)
-		if (childs[cpt].title!=root &amp;&amp; ancestors.indexOf(childs[cpt].title)==-1 &amp;&amp; !childs[cpt].tags.contains(config.macros.tagsTree.excludedTag))
-			result.push(childs[cpt]);
-	return result;
-}
-
-config.macros.tagsTree.getId = function(element) {
-	while (!element.id &amp;&amp; element.parentNode) element=element.parentNode;
-	return element.id ? element.id : &quot;&lt;html&gt;&quot;;
-}
-
-// todo: auch diese styles hart codieren
-
-config.shadowTiddlers.TagsTreeStyleSheet = &quot;/*{{{*/\n&quot;;
-config.shadowTiddlers.TagsTreeStyleSheet +=&quot;.leaf, .subtree {display:block; margin-left : 0.5em}\n&quot;;
-config.shadowTiddlers.TagsTreeStyleSheet +=&quot;.subtree {margin-bottom:0.5em}\n&quot;;
-config.shadowTiddlers.TagsTreeStyleSheet +=&quot;#mainMenu {text-align:left}\n&quot;;
-config.shadowTiddlers.TagsTreeStyleSheet +=&quot;/*}}}*/&quot;;
-
-store.addNotification(&quot;TagsTreeStyleSheet&quot;, refreshStyles); 
-
-//}}}</pre>
-</div>
 <div title="Unicode Collection" modifier="YourName" created="201907110746" modified="201909151030" parenttiddler="​Reference" changecount="123">
 <pre>!Spaces
 
@@ -1081,29 +827,24 @@ store.addNotification(&quot;TagsTreeStyleSheet&quot;, refreshStyles);
 ***/
 //{{{
 
-config.shadowTiddlers.TagsTreeStyleSheet = &quot;&quot;;
-config.macros.tagsTree.expand = &quot;▷&quot;;
-config.macros.tagsTree.collapse = &quot;◿&quot;;
-config.macros.tagsTree.styles = [&quot;div&quot;,&quot;div&quot;,&quot;div&quot;,&quot;div&quot;,&quot;div&quot;,&quot;div&quot;];
-config.shadowTiddlers.MainMenu='&lt;&lt;tabs menuTabSet &quot;╘&quot; &quot;Structured tree&quot; MenuTree &quot;A-Z&quot; &quot;Sorted list&quot; TabAll &quot;🕓&quot; &quot;Timeline&quot; TabTimeline&gt;&gt;'
-config.options.chkInsertTabs=true;
+config.options.chkInsertTabs = true;
 
 // import default setting &quot;Keep these tiddlers linked to this server...&quot; (Checkbox 'chkSync') had to be patched, since it isn't reachable via script
 
 if (window.displayMessageBase == undefined)
 	window.displayMessageBase = window.displayMessage;
 
-window.displayMessage = function(text,linkText) {
-	window.displayMessageBase.apply(this,arguments);
+window.displayMessage = function(text, linkText) {
+	window.displayMessageBase.apply(this, arguments);
 	setTimeout(clearMessage, 3000);
 }
 
 //}}}</pre>
 </div>
-<div title="​Advanced Use Cases" modifier="YourName" created="201906080756" modified="201906080757" parenttiddler="." changecount="1">
+<div title="​Advanced Use Cases" modifier="YourName" created="201906080756" modified="201906080757" changecount="1">
 <pre></pre>
 </div>
-<div title="​Reference" modifier="YourName" created="201906080803" modified="201906080807" parenttiddler="." changecount="8">
+<div title="​Reference" modifier="YourName" created="201906080803" modified="201906080807" changecount="8">
 <pre></pre>
 </div>
 </div>
@@ -1282,23 +1023,24 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 	config.textPrimitives.brackettedLink + ")|(?:" +
 	config.textPrimitives.urlPattern + ")","mg");
 
-
 //--
 //-- Shadow tiddlers - these are programmatic, in contrast to those which were collected from the "shadowArea" div. See loadShadowTiddlers()
 //--
 
 config.shadowTiddlers = {	
-	MarkupPreHead: "",
-	MarkupPostHead: "",
-	MarkupPreBody: "",
-	MarkupPostBody: "",
-	TabTimeline: '<<timeline>>',
-	TabAll: '<<list all>>',
+	ArticleTreePanel: '{{articleTreePanel{<<articleTree>>{{articleTreeButtons{<<newArticleButton "🕀 New Article" true>><<newArticleButton "🕁 New Sub Article" false>>}}}}}}',
+	MarkupPreHead: "", // xxx
+	MarkupPostHead: "", // xxx
+	MarkupPreBody: "", // xxx
+	MarkupPostBody: "", // xxx
+	NavigationPanel: '<<tabs navigationTabSetWrapper "╘" "Structured tree" ArticleTreePanel "A-Z" "Sorted list" SortedListPanel "🕓" "Timeline" TimelinePanel>>',
+	PluginManager: '<<plugins>>',
+	SortedListPanel: '<<list all>>',
+	SystemSettings: '',	
 	TabTags: '<<allTags excludeLists>>',
 	TabMoreMissing: 'Pages with no menu entry: <<list orphans>> Broken Links <<list missing>>',
 	TabMoreShadowed: '<<list shadowed>>',
-	PluginManager: '<<plugins>>',
-	SystemSettings: '',	
+	TimelinePanel: '<<timeline>>',
 	WindowTitle: '<<tiddler SiteTitle>> - <<tiddler SiteSubtitle>>'
 };
 
@@ -1777,7 +1519,7 @@ function saveTest() {
 function loadShadowTiddlers() {
 	var shadows = new TiddlyWiki();
 	shadows.loadFromDiv("shadowArea", "shadows", true);
-	shadows.forEachArticle(function(title,tiddler) {config.shadowTiddlers[title] = tiddler.text;});
+	shadows.forEachArticle(function(title, tiddler) {config.shadowTiddlers[title] = tiddler.text;});
 }
 
 function loadPlugins(tag) {
@@ -1883,7 +1625,7 @@ config.paramifiers = {};
 
 config.paramifiers.open = {
 	onstart: function(title) {
-		if (!readOnly || store.tiddlerExists(title) || store.isShadowTiddler(title))
+		if (! readOnly || store.tiddlerExists(title) || store.isShadowTiddler(title))
 			story.displayTiddler(title);
 	}
 };
@@ -2395,8 +2137,7 @@ config.formatters = [
 {
 	name: "customFormat",
 	match: "@@|\\{\\{",
-	handler: function(w)
-	{
+	handler: function(w) {
 		switch(w.matchText) {
 		case "@@":
 			var e = createTiddlyElement(w.output,"span");
@@ -2424,8 +2165,7 @@ config.formatters = [
 {
 	name: "mdash",
 	match: "--",
-	handler: function(w)
-	{
+	handler: function(w) {
 		createTiddlyElement(w.output,"span").innerHTML = "&mdash;";
 	}
 },
@@ -2442,7 +2182,7 @@ config.formatters = [
 	name: "rawText",
 	match: "\"{3}|<nowiki>",
 	lookaheadRegExp: /(?:\"{3}|<nowiki>)((?:.|\n)*?)(?:\"{3}|<\/nowiki>)/mg,
-	handler: function(w)	{
+	handler: function(w) {
 		this.lookaheadRegExp.lastIndex = w.matchStart;
 		var lookaheadMatch = this.lookaheadRegExp.exec(w.source);
 		if (lookaheadMatch && lookaheadMatch.index == w.matchStart) {
@@ -2856,9 +2596,68 @@ config.macros.allTags.handler = function(place, macroName, params) { // Implemen
 	}
 };
 
-var macro = config.macros.timeline;
+config.macros.articleTree = {
+	expand : "▹",
+	collapse : "◿",
+	collapsedTag : "collapsed"	
+}
+
+config.macros.articleTree.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
+	var id = config.macros.articleTree.getId(place);
+	config.macros.articleTree.createSubTree(place, id, "", 0);
+}
+
+config.macros.articleTree.createSubTree = function(place, id, parentTitle, level) {
+	var isOpen = true;
+	
+	var subArticles = store.reverseLookup(
+		'parenttiddler', parentTitle, true, null, 
+		function(title, article) { return ! (store.isShadowTiddler(title) || article.isTagged("systemConfig") || article.isTagged("excludeLists"))}
+	);
+	
+	if (! subArticles.length) {
+		createTiddlyText(renderLinkElement(place, parentTitle, false, "leaf"), parentTitle); // leaf
+		return;
+	}
+		
+	if (parentTitle != ""){
+		var parentArticle = store.getTiddler(parentTitle);
+		if (parentArticle.tags.contains("collapsed")) isOpen = false;
+
+		// render branch head (row with collapser button - will stay visible even when collapsed)
+		var branchElement = createTiddlyElement(place , "div", null, "branch"); 
+		renderTiddlyButton(branchElement, isOpen ? this.collapse : this.expand, null, this.onClick);
+		renderLinkElement(branchElement, parentTitle, true);
+	}
+	
+	var nodesWrapper; // the (collapsible) nodes are NOT nested inside their branch, they are underneath! Otherwise collapsing would be hard to realize.
+	for (var i = 0; i < subArticles.length; i++){
+		var title = subArticles[i].title;
+		if (! nodesWrapper){
+			nodesWrapper = createTiddlyElement(place, "div", null, "nodesWrapper");
+			nodesWrapper.style.display = isOpen ? "block" : "none";
+		}
+		this.createSubTree(nodesWrapper, id, title, level + 1); // RECURSION
+	}
+}
+
+config.macros.articleTree.onClick = function(e) {
+	var n = this.parentNode.nextSibling;
+	var isOpen = n.style.display != "none";
+	n.style.display = isOpen ? "none" : "block";
+	this.firstChild.nodeValue = isOpen ? config.macros.articleTree.expand : config.macros.articleTree.collapse;
+	return false;
+}
+
+config.macros.articleTree.getId = function(element) {
+	while (! element.id && element.parentNode) element = element.parentNode;
+	return element.id ? element.id : "<html>";
+}
+
+var macro = config.macros.timeline; // HACK
+
 merge(macro, {
-	handler: function(place,macroName,params, wikifier, paramString, tiddler) {
+	handler: function(place, macroName, params, wikifier, paramString, tiddler) {
 		var container = jQuery("<div />").attr("params", paramString).attr("macroName", macroName).appendTo(place)[0];
 		macro.refresh(container);
 	},
@@ -3220,18 +3019,18 @@ config.macros.tabs.handler = function(place, macroName, params) { // Implements 
 	var tabSetName = params[0];
 	var numTabs = (params.length - 1) / 3;
 	var wrapper = createTiddlyElement(null, "div", null, "tabsetWrapper " + tabSetName);
-	var tabset = createTiddlyElement(wrapper, "div", null, "tabset");		
+	var tabSet = createTiddlyElement(wrapper, "div", null, "tabSet");		
 	var t;
 	for (t = 0; t < numTabs; t++) {
 		var label = params[t * 3 + 1];
 		var tooltip = params[t * 3 + 2];
 		var content = params[t * 3 + 3];
-		var tab = renderTiddlyButton(tabset, label, tooltip, this.onClickTab, "tab tabUnselected");		
+		var tab = renderTiddlyButton(tabSet, label, tooltip, this.onClickTab, "tab tabUnselected");		
 		tab.setAttribute("tab", label);
 		tab.setAttribute("content", content);
 	}	
 	place.appendChild(wrapper);
-	this.switchTab(tabset, params[1]);
+	this.switchTab(tabSet, params[1]);
 };
 
 config.macros.tabs.onClickTab = function(e) {
@@ -3239,9 +3038,9 @@ config.macros.tabs.onClickTab = function(e) {
 	return false;
 };
 
-config.macros.tabs.switchTab = function(tabset, tab) {	
+config.macros.tabs.switchTab = function(tabSet, tab) {	
 	var tabElement = null;
-	var nodes = tabset.childNodes;
+	var nodes = tabSet.childNodes;
 	var t;
 	for (t = 0; t < nodes.length; t++) {
 		if (nodes[t].getAttribute && nodes[t].getAttribute("tab") == tab) {
@@ -3252,10 +3051,10 @@ config.macros.tabs.switchTab = function(tabset, tab) {
 		}
 	}
 	if (tabElement) {
-		if (tabset.nextSibling && tabset.nextSibling.className == "tabContents")
-			jQuery(tabset.nextSibling).remove();
+		if (tabSet.nextSibling && tabSet.nextSibling.className == "tabContents")
+			jQuery(tabSet.nextSibling).remove();
 		var tabContent = createTiddlyElement(null, "div", null, "tabContents");
-		tabset.parentNode.insertBefore(tabContent, tabset.nextSibling);
+		tabSet.parentNode.insertBefore(tabContent, tabSet.nextSibling);
 		var contentTitle = tabElement.getAttribute("content");
 		wikify(store.getTiddlerText(contentTitle), tabContent, null, store.getTiddler(contentTitle));		
 	}
@@ -3662,8 +3461,7 @@ function TiddlyWiki(params) {
 		var t;
 		for (t in tiddlers) {
 			var tiddler = tiddlers[t];
-			if (tiddler instanceof Tiddler)
-				callback.call(this,t,tiddler);
+			if (tiddler instanceof Tiddler)	callback.call(this, t, tiddler);
 		}
 	};
 }
@@ -3689,8 +3487,8 @@ TiddlyWiki.prototype.isAvailable = function(title) {
 	if (!title)
 		return false;
 	var s = title ? title.indexOf(config.textPrimitives.sectionSeparator) : -1;
-	if (s!=-1)
-		title = title.substr(0,s);
+	if (s != -1)
+		title = title.substr(0, s);
 	return this.tiddlerExists(title) || this.isShadowTiddler(title);
 };
 
@@ -3737,7 +3535,7 @@ TiddlyWiki.prototype.getTiddlerText = function(title, defaultText) {
 	}
 	var tiddler = this.fetchTiddler(title);
 	var text = tiddler ? tiddler.text : null;
-	if (!tiddler && this.isShadowTiddler(title)) {
+	if (! tiddler && this.isShadowTiddler(title)) {
 		text = this.getShadowTiddlerText(title);
 	}
 	if (text) {
@@ -4012,22 +3810,21 @@ TiddlyWiki.prototype.importTiddlyWiki = function(text) {
 
 TiddlyWiki.prototype.updateTiddlers = function() {
 	this.tiddlersUpdated = true;
-	this.forEachArticle(function(title,tiddler) {
-		tiddler.changed();
+	this.forEachArticle(function(title, article) {
+		article.changed();
 	});
 };
 
 // Return an array of tiddlers matching a search regular expression
-TiddlyWiki.prototype.search = function(searchRegExp,sortField,excludeTag,match) {
-	var candidates = this.reverseLookup("tags",excludeTag,!!match);
-	var t,results = [];
-	for (t=0; t<candidates.length; t++) {
+TiddlyWiki.prototype.search = function(searchRegExp, sortField, excludeTag, match) {
+	var candidates = this.reverseLookup("tags", excludeTag, !! match);
+	var results = [];
+	for (var t = 0; t < candidates.length; t++) {
 		if ((candidates[t].title.search(searchRegExp) != -1) || (candidates[t].text.search(searchRegExp) != -1))
 			results.push(candidates[t]);
 	}
-	if (!sortField)
-		sortField = "title";
-	results.sort(function(a,b) {return a[sortField] < b[sortField] ? -1 : (a[sortField] == b[sortField] ? 0 : +1);});
+	if (! sortField) sortField = "title";
+	results.sort(function(a, b) {return a[sortField] < b[sortField] ? -1 : (a[sortField] == b[sortField] ? 0 : +1);});
 	return results;
 };
 
@@ -4040,7 +3837,7 @@ TiddlyWiki.prototype.getTags = function(excludeTag) {
 		for (var g = 0; g < tiddler.tags.length; g++) {
 			var tag = tiddler.tags[g];
 			var n = true;
-			for (var c=0; c < results.length; c++) {
+			for (var c = 0; c < results.length; c++) {
 				if (results[c][0] == tag) {
 					n = false;
 					results[c][1]++;
@@ -4060,53 +3857,57 @@ TiddlyWiki.prototype.getTags = function(excludeTag) {
 };
 
 // Return an array of the tiddlers that are tagged with a given tag
-TiddlyWiki.prototype.getTaggedTiddlers = function(tag,sortField) {
-	return this.reverseLookup("tags",tag,true,sortField);
+TiddlyWiki.prototype.getTaggedTiddlers = function(tag, sortField) {
+	return this.reverseLookup("tags", tag, true, sortField);
 };
 
-TiddlyWiki.prototype.getValueTiddlers = function(field,value,sortField) {
-	return this.reverseLookup(field,value,true,sortField);
+TiddlyWiki.prototype.getValueTiddlers = function(field, value, sortField) {
+	return this.reverseLookup(field, value, true, sortField);
 };
 
 // Return an array of the tiddlers that link to a given tiddler
-TiddlyWiki.prototype.getReferringTiddlers = function(title,unusedParameter,sortField) {
+TiddlyWiki.prototype.getReferringTiddlers = function(title, unusedParameter, sortField) {
 	if (!this.tiddlersUpdated)
 		this.updateTiddlers();
-	return this.reverseLookup("links",title,true,sortField);
+	return this.reverseLookup("links", title, true, sortField);
 };
 
-// Return an array of the tiddlers that do or do not have a specified entry in the specified storage array (ie, "links" or "tags")
-// lookupMatch == true to match tiddlers, false to exclude tiddlers
-TiddlyWiki.prototype.reverseLookup = function(lookupField,lookupValue,lookupMatch,sortField) {
+// Return an array of the articles that do (or must not) have a specified value in the specified field
+// If the field type is a collection, a match is found if lookupValue is present at least once in the collection.
+// matchMode == true to select matching articles, false to select all others
+TiddlyWiki.prototype.reverseLookup = function(lookupField, lookupValue, matchMode, sortField, optionalPredicate) {
 	var results = [];
-	this.forEachArticle(function(title,tiddler) {
-		var f = !lookupMatch;
+	this.forEachArticle(function(title, article) {
+		var f = ! matchMode;
 		var values;
 		if (["links", "tags"].contains(lookupField)) {
-			values = tiddler[lookupField];
+			values = article[lookupField];
 		} else {
 			var accessor = TiddlyWiki.standardFieldAccess[lookupField];
 			if (accessor) {
-				values = [ accessor.get(tiddler) ];
+				values = [accessor.get(article)];
 			} else {
-				values = tiddler.fields[lookupField] ? [tiddler.fields[lookupField]] : [];
+				values = article.fields[lookupField] ? [article.fields[lookupField]] : [""]; // Remeber: JS interprets an empty string as "false", so the right part will be executed!
 			}
 		}
-		var lookup;
-		for (lookup=0; lookup<values.length; lookup++) {
-			if (values[lookup] == lookupValue)
-				f = lookupMatch;
+		for (var i = 0; i < values.length; i++) {
+			if (values[i] == lookupValue){
+				f = matchMode;
+				break;
+			}
 		}
-		if (f)
-			results.push(tiddler);
+		if (f && optionalPredicate){
+			f = optionalPredicate.call(this, title, article);
+		}
+		if (f) results.push(article);
 	});
-	if (!sortField)
+	if (! sortField)
 		sortField = "title";
-	return this.sortTiddlers(results,sortField);
+	return this.sortTiddlers(results, sortField);
 };
 
 /**
-		* Transforms a user friendly title to an internal id by replacing spaces by underscores.
+		* Gets a (sorted) collection of articles without those carrying the excludeTag.
 		*
 		* @param {string} fieldName  - Sort the result set by this field
 		* @param {string} excludeTag - Filter out articles by this tag
@@ -4126,12 +3927,10 @@ TiddlyWiki.prototype.getTiddlers = function(fieldName, excludeTag) {
 
 // Return array of names of tiddlers that are referred to but not defined
 TiddlyWiki.prototype.getMissingLinks = function() {
-	if (!this.tiddlersUpdated)
-		this.updateTiddlers();
+	if (! this.tiddlersUpdated) this.updateTiddlers();
 	var results = [];
 	this.forEachArticle(function (title, tiddler) {
-		if (tiddler.isTagged("excludeMissing") || tiddler.isTagged("systemConfig"))
-			return;
+		if (tiddler.isTagged("excludeMissing") || tiddler.isTagged("systemConfig")) return;
 		var n;
 		for (n = 0; n < tiddler.links.length; n++) {
 			var link = tiddler.links[n];
@@ -4145,9 +3944,8 @@ TiddlyWiki.prototype.getMissingLinks = function() {
 // Return an array of names of tiddlers that are defined but not referred to
 TiddlyWiki.prototype.getOrphans = function() {
 	var results = [];
-	this.forEachArticle(function (title,tiddler) {
-		if (this.getReferringTiddlers(title).length == 0 && !tiddler.isTagged("excludeLists"))
-			results.push(title);
+	this.forEachArticle(function (title, tiddler) {
+		if (this.getReferringTiddlers(title).length == 0 && ! tiddler.isTagged("excludeLists")) results.push(title);
 	});
 	results.sort();
 	return results;
@@ -4167,7 +3965,7 @@ TiddlyWiki.prototype.getShadowed = function() {
 // Return an array of tiddlers that have been touched since they were downloaded or created
 TiddlyWiki.prototype.getTouched = function() {
 	var results = [];
-	this.forEachArticle(function(title,tiddler) {
+	this.forEachArticle(function(title, tiddler) {
 		if (tiddler.isTouched())
 			results.push(tiddler);
 		});
@@ -4585,6 +4383,40 @@ Story.prototype.forEachArticleView = function(callbackFunction) {
 	}
 };
 
+Story.prototype.history = {
+	currentIdx: -1,
+	backStopper: -1,
+	fowardStopper: -1,
+	limit: 10,
+	titles: [],
+	add: function(title) {
+		if (title == this.titles[this.currentIdx]) return;
+		var mayMoveBackStopper = false;
+		if (this.currentIdx == this.backStopper) mayMoveBackStopper = true;
+		this.currentIdx++;
+		if (this.currentIdx == this.limit) {
+			this.currentIdx = 0;
+		}
+		this.titles[this.currentIdx] = title;
+		this.fowardStopper = this.currentIdx;
+		if (mayMoveBackStopper) this.backStopper = this.currentIdx;
+	},
+	back: function() {
+		var index = this.currentIdx - 1;
+		if (index < 0) index = this.limit - 1;
+		if (index == this.backStopper || this.titles[index] == undefined) return;
+		this.currentIdx = index;
+		story.displayTiddler(this.titles[index]);
+	},
+	forward: function() {
+		if (this.currentIdx == this.fowardStopper) return;
+		var index = this.currentIdx + 1;
+		if (index >= this.limit) index = 0;
+		this.currentIdx = index;
+		story.displayTiddler(this.titles[index]);
+	}
+}
+
 Story.prototype.displayDefaultTiddlers = function() { // todo: instead of having a "DefaultTiddlers" tiddler, make an option!
 	this.displayTiddlers(null, store.filterTiddlers(store.getTiddlerText("DefaultTiddlers")));
 };
@@ -4643,6 +4475,13 @@ Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFie
 		returningView = this.renderArticleView(place, title, templateNameOrNumber, customFields);
 	}
 	story.scrollToSection(title, sectionName);
+	
+	store.currentTiddler = store.getTiddler(title);	// HACK: store shouldn't know anything about "current" - it has to be kept in the UI layer!
+	if (store.currentTiddler) returningView.scrollTop = store.currentTiddler.rescuedScrollTop;
+	story.history.add(title);
+	refreshTreePath();
+	highlightArticleTree();
+	
 	return returningView;
 };
 
@@ -4799,12 +4638,12 @@ Story.prototype.refreshAllTiddlers = function(force) {
 
 Story.prototype.scrollToSection = function(title, sectionName) {
 	
-	if (! title|| ! sectionName) return;
+	if (! title || ! sectionName) return;
 	
-	var t = this.getArticleViewByTitle(title);
-	if (! t) return null;
+	var articleView = this.getArticleViewByTitle(title);
+	if (! articleView) return null;
 	
-	var elems = t.getElementsByTagName('*');
+	var elems = articleView.getElementsByTagName('*');
 	var heads = [];
 	var anchors = [];
 	var cells = [];
@@ -4823,14 +4662,14 @@ Story.prototype.scrollToSection = function(title, sectionName) {
 	for (var i = 0; i < heads.length; i++)
 		if (getPlainText(heads[i]).trim() == sectionName) { foundElement = heads[i]; break; }
 	
-	if (!foundElement) for (var i = 0; i < anchors.length; i++)
+	if (! foundElement) for (var i = 0; i < anchors.length; i++)
 		if (anchors[i].getAttribute('name') == sectionName) { foundElement = anchors[i]; break; }
 	
-	if (!foundElement) for (var i = 0; i < cells.length; i++)
+	if (! foundElement) for (var i = 0; i < cells.length; i++)
 		if (getPlainText(cells[i]).trim() == sectionName) { foundElement = cells[i]; break; }
 	
 	if (foundElement) {
-		story.currentTiddler.scrollTop = findPosY(foundElement) - story.currentTiddler.clientHeight / 2;
+		articleView.scrollTop = findPosY(foundElement) - articleView.clientHeight / 2;		
 		return foundElement;
 	}
 }
@@ -6048,7 +5887,7 @@ function refreshPageTitle() {
 }
 
 function getPageTitle() {
-	return wikifyPlainText(store.getTiddlerText("WindowTitle",""),null,tiddler);
+	return wikifyPlainText(store.getTiddlerText("WindowTitle",""),null,tiddler); // todo: setting instead of tiddler. default: beautified url!
 }
 
 function refreshStyles(title, doc) {
@@ -6320,6 +6159,13 @@ config.macros.anchor.handler = function(place, macroName, params) { // Implement
 	e.className = "anchor";
 };
 
+config.macros.navigate = {};
+
+config.macros.navigate.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
+	renderTiddlyButton(place, '←', "Navigate Backwards", function() {config.commands.navigateBack.handler();},	null, null, null);
+	renderTiddlyButton(place, '→', "Navigate Foward", function() {config.commands.navigateForward.handler();},	null, null, null);
+};
+
 config.macros.newArticleButton = {};
 
 // This will render the button
@@ -6335,12 +6181,10 @@ config.macros.newArticleButton.handler = function(place, macroName, params) { //
 };
 
 config.macros.newArticleButton.onClick = function(createRoot) {
-	var currentTiddlerTitle = store.currentTiddler.title;	
-	if (createRoot || ! currentTiddlerTitle || currentTiddlerTitle == "Untitled"){
-		currentTiddlerTitle = ".";
-	}
-	var newTiddler = store.createArticle("Untitled");
-	newTiddler.fields['parenttiddler'] = currentTiddlerTitle;
+	var parentTitle = store.currentTiddler.title;	
+	if (createRoot || ! parentTitle || parentTitle == "Untitled")	parentTitle = "";
+	var newArticle = store.createArticle("Untitled");
+	newArticle.fields['parenttiddler'] = parentTitle;
 	story.displayTiddler("Untitled", DEFAULT_EDIT_TEMPLATE);
 	story.focusTiddler("Untitled", "title");
 };
@@ -6348,7 +6192,7 @@ config.macros.newArticleButton.onClick = function(createRoot) {
 config.macros.sectionTOC = { // todo: this only works when the user positions the macro at the end of the article - this should be fixed.
 	targetClass: 'sectionTOC',
 	linkFormat: '[[%0|##%0]]',
-	handler: function(place,macroName,params, wikifier, paramString,tiddler) { // search for h-elements and create local links
+	handler: function(place,macroName,params, wikifier, paramString,tiddler) {
 		var out = [];
 		var targetClass = params[0]||this.targetClass;
 		var t = story.getArticleViewByChild(place);
@@ -6396,6 +6240,46 @@ function recurseViewer(node, anchor, needle) {
 	return true;
 }
 
+function highlightArticleTree() {
+	if (typeof _PreviousCurrentArticleTreeElement !== 'undefined') _PreviousCurrentArticleTreeElement.classList.remove('current');
+
+	if (! store.currentTiddler) return; // todo: current darf nicht im store leben, sondern nur in story!
+
+	var articleTreePanel = document.getElementsByClassName('articleTreePanel')[0];
+	var nodeElement = document.querySelector('[tiddlylink="' + store.currentTiddler.title + '"]');
+	
+	if (! articleTreePanel || ! nodeElement) {
+		return;
+	}
+	
+	nodeElement.classList.add('current');	 
+
+	_PreviousCurrentArticleTreeElement = nodeElement;
+
+	var container = articleTreePanel.parentNode;	
+
+	var offsetToContainer = calcOffsetTo(nodeElement, container);
+
+	if (offsetToContainer < container.scrollTop) container.scrollTop =  Math.max(0, offsetToContainer - nodeElement.offsetHeight);
+
+	var visibleBottom = container.scrollTop + container.clientHeight;
+	var elementBottom = offsetToContainer + nodeElement.offsetHeight;
+
+	if (elementBottom > visibleBottom) {
+		container.scrollTop =  elementBottom - container.clientHeight + nodeElement.offsetHeight;
+	}		 
+}
+
+function calcOffsetTo(inner, outer) {
+	var curtop = 0;
+	while (inner.offsetParent) {		
+		curtop += inner.offsetTop;
+		if (inner.offsetParent == outer) break;
+		inner = inner.offsetParent;		
+	}
+	return curtop;
+}
+
 config.commands.editTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
 
 	var articleView;
@@ -6426,9 +6310,9 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 		recurseViewer(articleContentContainer, window.getSelection().anchorNode, selectedText);
 	}
 
-	var tiddlerSource = store.getTiddler(title);
-	if (tiddlerSource) tiddlerSource.rescuedScrollTop = articleView.scrollTop;
-	var fields = articleView.getAttribute("tiddlyFields"); // tiddlyFields
+	var article = store.getTiddler(title);
+	if (article) article.rescuedScrollTop = articleView.scrollTop;
+	var fields = articleView.getAttribute("tiddlyFields");
 	
 	story.displayTiddler(title, DEFAULT_EDIT_TEMPLATE, fields);
 	
@@ -6458,6 +6342,24 @@ config.commands.cancelTiddler.handler = function(event, src, title) { // Impleme
 	var baseResult = config.commands.cancelTiddler.handlerBase(event,src,title);
 	story.getArticleViewByTitle(title).rescuedCaretPosition = pos;
 	return baseResult;
+};
+
+config.commands.navigateBack = {
+	text: 'Back',
+	tooltip: 'View the previous page.',
+	handler: function(event, src, title) { // Implements ICommand.handler()
+		story.history.back();
+		return false;
+	}
+};
+
+config.commands.navigateForward = {
+	text: 'Forward',
+	tooltip: 'View the previous page.',
+	handler: function(event, src, title) { // Implements ICommand.handler()
+		story.history.forward();
+		return false;
+	}
 };
 
 config.commands.saveTiddler.handlerBase = config.commands.saveTiddler.handler; // ToDo: patch the base method instead of hijacking
@@ -7580,7 +7482,7 @@ var standardRankFunction = function(tiddler, query) {
 
 // @return Tiddler[]
 //
-var findMatches = function(store, searchText,caseSensitive,useRegExp,sortField,excludeTag) {
+var findMatches = function(store, searchText, caseSensitive, useRegExp, sortField, excludeTag) {
 	lastQuery = null;
 	
 	var candidates = store.reverseLookup("tags", excludeTag, false);
@@ -7610,7 +7512,7 @@ var findMatches = function(store, searchText,caseSensitive,useRegExp,sortField,e
 	}
 	
 	// sort the result, taking care of the rank and the sortField	
-	if(!sortField) {
+	if (! sortField) {
 		sortField = "title";
 	}
 	
@@ -7666,14 +7568,14 @@ var closeResult = function() {
 // Closes the Search Result window and displays the tiddler 
 // defined by the "tiddlyLink" attribute of this element
 //
-var closeResultAndDisplayTiddler = function(e) { // xxx remove old search implementation
+var closeResultAndDisplayTiddler = function(e) {
 	closeResult();
 	
 	var title = this.getAttribute("tiddlyLink");
 	if(title) {
 		var withHilite = this.getAttribute("withHilite");
 		var oldHighlightHack = highlightHack;
-		if (withHilite && withHilite=="true" && lastQuery) {
+		if (withHilite && withHilite == "true" && lastQuery) {
 			highlightHack = lastQuery.getMarkRegExp();
 		}
 		story.displayTiddler(title);
@@ -8679,7 +8581,7 @@ function generateRss() {
 	s.push("<docs>http://blogs.law.harvard.edu/tech/rss</docs>");
 	s.push("<generator>TiddlyWiki " + formatVersion() + "</generator>");
 	// The body
-	var tiddlers = store.getTiddlers("modified","excludeLists");
+	var tiddlers = store.getTiddlers("modified", "excludeLists");
 	var i,n = config.numRssItems > tiddlers.length ? 0 : tiddlers.length-config.numRssItems;
 	for (i=tiddlers.length-1; i>=n; i--) {
 		s.push("<item>\n" + tiddlerToRssItem(tiddlers[i],u) + "\n</item>");
