@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <script id="versionArea" type="text/javascript">
@@ -14,8 +14,7 @@ Copyright (c) abego Software GmbH, 2005-2012 (www.abego-software.de)
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. Neither the name of Mark Vodicka, Jeremy Ruston, the UnaMesa Association, abego Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITEDTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-/>
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITEDTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
 <!--PRE-HEAD-START-->
 <!--PRE-HEAD-END-->
 <title> VodiWiki - 19.11.12 </title>
@@ -214,7 +213,7 @@ a:hover {background-color:transparent;}
 #tiddlerDisplay, .inputDialogPanel, .wizard {background-color:white;}
 body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {background-color: whitesmoke;}
 .yourSearchResult {background: lightyellow;}
-.highlight, .marked {background: yellow;}
+.highlight, .marked, .toBeImported .tiddlyLinkExisting {background: yellow;}
 .backstageTabHead:hover, .button:hover, .wizardFooter .button:hover {background-color: khaki;}
 .dualColorTable tbody td:first-child, .listView tbody td:first-child {background-color: #DEEBF6;} /* Blue 80% */
 .error, .errorButton {background: #f88;} /* Red */
@@ -323,7 +322,7 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <div title="ViewTemplate">
 <pre>&lt;!--{{{--&gt;
-&lt;div class='toolbar'&gt;&lt;span macro='toolbar editTiddler deleteTiddler > references <'&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class='toolbar'&gt;&lt;span macro='toolbar editTiddler deleteTiddler &gt; references &lt;'&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;div class='title' macro='view title'&gt;&lt;/div&gt;
 &lt;div class='articleContentContainer' macro='view text wikified'&gt;&lt;/div&gt;
 &lt;!--}}}--&gt;
@@ -333,7 +332,7 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="- Home -" modifier="YourName" created="201904232038" modified="201904232156" changecount="6">
+<div title="- Home -" created="201904232038" modified="202001181740" modifier="Anonymous" changecount="8">
 <pre>!Welcome to VodiWiki
 
 * This is a freeware open source monolithic (= single HTML file) wiki with built-in viewer and editor.
@@ -363,7 +362,7 @@ When working with sensual data consider the following advice:
 
 </pre>
 </div>
-<div title="Anatomy Of The Main Window" modifier="YourName" created="201701242104" modified="201904232014" changecount="30" parenttiddler="Getting Started">
+<div title="Anatomy Of The Main Window" created="201701242104" modified="201904232014" modifier="YourName" changecount="30" parenttiddler="Getting Started">
 <pre>|Tree/List Toggle|← → Navigation Bar| Search|
 |Pages Tree/List&lt;br&gt;...| &lt;br&gt;&lt;br&gt;Current Page&lt;br&gt;&lt;br&gt;&lt;br&gt; |&gt;|
 
@@ -380,11 +379,11 @@ When working with sensual data consider the following advice:
 * At the top right border of the Search Field there's a &quot;Backstage&quot; button for some internal functions
 * At the top right border beside the Page there's a collapse button for some internal filters/navigation.</pre>
 </div>
-<div title="DefaultTiddlers" modifier="YourName" created="201208271046" modified="201904232039" tags="excludeLists" parenttiddler="" changecount="1">
+<div title="DefaultTiddlers" created="201208271046" modified="201904232039" modifier="YourName" tags="excludeLists" changecount="1">
 <pre>[[- Home -]]
 </pre>
 </div>
-<div title="Embedding Parts Of Other Pages" modifier="YourName" created="201906080811" modified="201906081653" parenttiddler="​Advanced Use Cases" changecount="53">
+<div title="Embedding Parts Of Other Pages" created="201906080811" modified="201906081653" modifier="YourName" changecount="53" parenttiddler="​Advanced Use Cases">
 <pre>This is useful if you want to create some kind of overview page for other pages (e.g. a thesaurus).
 
 !How To Embed
@@ -437,10 +436,10 @@ The following code...
 |&lt;&lt;tiddler [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;|
 </pre>
 </div>
-<div title="Getting Started" modifier="YourName" created="201904231951" modified="201904231951" changecount="1">
+<div title="Getting Started" created="201904231951" modified="201904231951" modifier="YourName" changecount="1">
 <pre></pre>
 </div>
-<div title="How to Customize Stuff" modifier="YourName" created="201904232039" modified="201904232059" parenttiddler="Getting Started" changecount="6">
+<div title="How to Customize Stuff" created="201904232039" modified="201904232059" modifier="YourName" changecount="6" parenttiddler="Getting Started">
 <pre>!The Startup Page
 
 * By default it's the page with the title &quot;- Home -&quot;
@@ -461,7 +460,7 @@ The following code...
 ** Turn off &quot;Automatically save changes&quot;
 ** Keep the &quot;Backstage&quot; menu visible, as you now need to save manually by clicking on &quot;save&quot; in the upper right area.</pre>
 </div>
-<div title="How to Read Content" modifier="YourName" created="201904232015" modified="201904232018" parenttiddler="Getting Started" changecount="3">
+<div title="How to Read Content" created="201904232015" modified="201904232018" modifier="YourName" changecount="3" parenttiddler="Getting Started">
 <pre>Only one page can be read at a time. There's no tabbed browsing.
 
 * Use the tree/list in the left area to directly navigate through the pages
@@ -469,7 +468,7 @@ The following code...
 * Use the search field to search for content
 * Click on links in pages to navigate to other pages</pre>
 </div>
-<div title="How to Write Content" modifier="YourName" created="201904232018" modified="201904241458" parenttiddler="Getting Started" changecount="14">
+<div title="How to Write Content" created="201904232018" modified="201904241458" modifier="YourName" changecount="14" parenttiddler="Getting Started">
 <pre>!Adding a New Page
 
 * Click on &quot;New Article&quot; to add a page on the root level
@@ -496,7 +495,7 @@ The following code...
 * Use a tag like this: {{{[img[Label|Files/Bars.svg]]}}}
 ** Example: [img[Label|Files/Bars.svg]]</pre>
 </div>
-<div title="Index Sorting" modifier="YourName" created="201906080758" modified="201906080810" parenttiddler="​Advanced Use Cases" changecount="4">
+<div title="Index Sorting" created="201906080758" modified="201906080810" modifier="YourName" changecount="4" parenttiddler="​Advanced Use Cases">
 <pre>Normally the index tree is sorted alphabetically. You can change the order of items only by using a trick:
 Add an invisible space in front of the page title to push it at the bottom.
 
@@ -504,13 +503,13 @@ Here is a non printing space you can copy &amp; paste:
 
 |Double click into the right table cell to select and copy to clipboard -&gt;|​|</pre>
 </div>
-<div title="Keyboard Shortcuts" modifier="YourName" created="201303170925" modified="201906080808" parenttiddler="​Reference" changecount="7">
+<div title="Keyboard Shortcuts" created="201303170925" modified="201906080808" modifier="YourName" changecount="7" parenttiddler="​Reference">
 <pre>|Keys|Function|Available|h
 |Ctrl-E|Search|Always|
 |Ctrl-Enter|Toggle editing|Always|
 |Ctrl-K|Edit link|When editing|</pre>
 </div>
-<div title="Link Variations" modifier="YourName" created="201701242104" modified="201911231541" changecount="42" parenttiddler="​Reference">
+<div title="Link Variations" created="201701242104" modified="201911231541" modifier="YourName" changecount="42" parenttiddler="​Reference">
 <pre>|Code|Demo|h
 |{{{[[Web link to Startpage|https://www.startpage.com]]}}}|[[Web link to Startpage|https://www.startpage.com]]|
 |{{{[[Internal link to another wiki page|Syntax Examples]]}}}|[[Internal link to another wiki page|Syntax Examples]]|
@@ -549,13 +548,13 @@ Demo code, directly followed by it's output:
 Some dummy text.
 </pre>
 </div>
-<div title="SiteSubtitle" modifier="YourName" created="201305200104" modified="201910120923" changecount="3" parenttiddler="">
+<div title="SiteSubtitle" created="201305200104" modified="201910120923" modifier="YourName" changecount="3">
 <pre>19.11.12</pre>
 </div>
-<div title="SiteTitle" modifier="YourName" created="201305200101" modified="201305200103" changecount="3">
+<div title="SiteTitle" created="201305200101" modified="201305200103" modifier="YourName" changecount="3">
 <pre>VodiWiki</pre>
 </div>
-<div title="Syntax Examples" modifier="YourName" created="201208271404" modified="201912011414" parenttiddler="​Reference" changecount="51">
+<div title="Syntax Examples" created="201208271404" modified="201912011414" modifier="YourName" changecount="51" parenttiddler="​Reference">
 <pre>!Headings
 
 {{{
@@ -701,7 +700,7 @@ Several lines of blockquoted text.
 &gt;&gt;&gt; Bla
 </pre>
 </div>
-<div title="Syntax Reference" modifier="YourName" created="201208280946" modified="201906221449" changecount="49" parenttiddler="​Reference">
+<div title="Syntax Reference" created="201208280946" modified="201906221449" modifier="YourName" changecount="49" parenttiddler="​Reference">
 <pre>|Headings|Lists|Lists|Formatting|Code|h
 |{{{!Heading 1}}}&lt;br&gt;{{{!!Heading 2}}}&lt;br&gt;{{{!!!Heading 3}}}|{{{*Unordered 1}}}&lt;br&gt;{{{**Unordered 2}}}&lt;br&gt;{{{***Unordered 3}}}|{{{#Ordered 1}}}&lt;br&gt;{{{##Ordered 2}}}&lt;br&gt;{{{###Ordered 3}}}|{{{''Bold text''}}}&lt;br&gt;{{{//Italic text//}}}&lt;br&gt;{{{--Strikethrough text--}}}&lt;br&gt;{{{@@Highlighted text@@}}}&lt;br&gt;{{{{{notice{Your notice text.}}}}}}&lt;br&gt;{{{@@css:value;css:value:text@@}}}&lt;br&gt;{{{{{class{styled text}}}}}}|&lt;html&gt;&lt;code&gt;{{{Monospaced text}}}&lt;/code&gt;&lt;/html&gt;&lt;br&gt;&quot;&quot;&quot;{{{&quot;&quot;&quot;&lt;br&gt;{{{ Code Block}}}&lt;br&gt;&quot;&quot;&quot;}}}&quot;&quot;&quot;|
 
@@ -714,10 +713,10 @@ Several lines of blockquoted text.
 
 </pre>
 </div>
-<div title="SystemSettings" creator="Fuzzi" modifier="Fuzzi" created="201912221052" parenttiddler="" changecount="3">
+<div title="SystemSettings" created="201912221052" modified="201912221052" modifier="Anonymous" changecount="3">
 <pre>txtUserName: Anonymous</pre>
 </div>
-<div title="Unicode Collection" modifier="YourName" created="201907110746" modified="201909151030" parenttiddler="​Reference" changecount="123">
+<div title="Unicode Collection" created="201907110746" modified="201909151030" modifier="YourName" changecount="123" parenttiddler="​Reference">
 <pre>!Spaces
 
 |NBSP|1 EM|½ EM|0 EM|Marker|
@@ -796,7 +795,7 @@ Several lines of blockquoted text.
 **[[Symbols|http://www.fileformat.info/info/unicode/block/miscellaneous_symbols/utf8test.htm]], [[Pictographs|http://www.fileformat.info/info/unicode/block/miscellaneous_symbols_and_pictographs/utf8test.htm]], [[Transport|http://www.fileformat.info/info/unicode/block/transport_and_map_symbols/utf8test.htm]], [[Supplemental|https://www.fileformat.info/info/unicode/block/supplemental_symbols_and_pictographs/utf8test.htm]], [[Other|https://www.fileformat.info/info/unicode/category/So/list.htm]]
 </pre>
 </div>
-<div title="Version History" modifier="YourName" created="201906081713" modified="201910120924" parenttiddler="​Reference" changecount="4">
+<div title="Version History" created="201906081713" modified="201910120924" modifier="YourName" changecount="4" parenttiddler="​Reference">
 <pre>!19.11.12
 
 *Enhanced support for [[embedding parts of other pages|Embedding Parts Of Other Pages]]
@@ -807,7 +806,7 @@ Several lines of blockquoted text.
 *Internal save method was replaced to be compatible with more browsers
 </pre>
 </div>
-<div title="VodiConfigPlugin" modifier="YourName" created="201208271031" modified="201702011759" tags="systemConfig excludeLists excludeSearch" parenttiddler="" changecount="24">
+<div title="VodiConfigPlugin" created="201208271031" modified="201702011759" modifier="YourName" tags="systemConfig excludeLists excludeSearch" changecount="24">
 <pre>/***
 |''Name:''|VodiConfigPlugin|
 |''Version:''|2016.01.08|
@@ -820,10 +819,10 @@ Several lines of blockquoted text.
 //}}}
 </pre>
 </div>
-<div title="​Advanced Use Cases" modifier="YourName" created="201906080756" modified="201906080757" changecount="1">
+<div title="​Advanced Use Cases" created="201906080756" modified="201906080757" modifier="YourName" changecount="1">
 <pre></pre>
 </div>
-<div title="​Reference" modifier="YourName" created="201906080803" modified="201906080807" changecount="8">
+<div title="​Reference" created="201906080803" modified="201906080807" modifier="YourName" changecount="8">
 <pre></pre>
 </div>
 </div>
@@ -857,10 +856,6 @@ var config = {
 // Hashmap of alternative parsers for the wikifier
 config.parsers = {};
 
-// Adaptors
-config.adaptors = {};
-config.defaultAdaptor = null;
-
 // Backstage tasks
 config.tasks = {};
 
@@ -880,7 +875,6 @@ config.options = {
 	chkToggleLinks: false,
 	chkHttpReadOnly: true,
 	chkConfirmDelete: true,
-	chkUsePreForStorage: true, // Whether to use <pre> format for storage
 	txtBackupFolder: "",
 	txtMaxEditRows: "30",
 	txtFileSystemCharSet: "UTF-8",
@@ -1086,7 +1080,6 @@ merge(config.messages,{
 	wrongSaveFormat: "Cannot save with storage format '%0'. Using standard format for save.",
 	invalidFieldName: "Invalid field name %0",
 	fieldCannotBeChanged: "Field '%0' cannot be changed",
-	upgradeDone: "The upgrade to version %0 is now complete\n\nClick 'OK' to reload the newly upgraded VodiWiki",
 	invalidCookie: "Invalid cookie '%0'"
 });
 
@@ -1229,31 +1222,28 @@ merge(config.macros.importTiddlers,{
 	readOnlyWarning: "You cannot import into a read-only Wiki file. Try opening it from a file:// URL",
 	wizardTitle: "Import articles from another wiki file",
 	step1Title: "Step 1: Locate the file",
-	step1Html: "<input type='text' size=50 name='txtPath'> <input type='file' size=50 name='fileRequester'>",
+	step1Html: "<input type='file' size=50 name='choseFileButton'>",
 	openLabel: "Inspect...",
 	openPrompt: "List up the articles of the chosen wiki.",
-	statusOpenHost: "Opening the wiki...",
-	statusGetWorkspaceList: "Getting the list of available workspaces",
 	cancelLabel: "Cancel",
 	cancelPrompt: "Cancel this import",
-	statusOpenWorkspace: "Opening the workspace",
-	statusGetTiddlerList: "Getting the list of available tiddlers",
-	errorGettingTiddlerListFile: "Error retrieving tiddlers from local file!",
+	statusRetrievingArticleList: "Retrieving the list of available articles",
+	errorRetrievingArticleListFromFile: "Error retrieving article list from local file!",
 	step2Title: "Step 2: Choose the Articles to import",
 	step2Html: "<input type='hidden' name='listViewPlaceholder'></input>",
 	importLabel: "Import",
 	importPrompt: "Import these Articles",
 	confirmOverwriteText: "Are you sure you want to overwrite these Articles:\n\n%0",
-	step4Title: "Step 4: Importing %0 tiddler(s)",
-	step4Html: "<input type='hidden' name='markReport'></input>", // DO NOT TRANSLATE
-	doneLabel: "done",
+	step3Title: "Step 3: Importing %0 article(s)",
+	step3Html: "<input type='hidden' name='markReport'></input>", // DO NOT TRANSLATE
+	doneLabel: "Done",
 	donePrompt: "Close this wizard",
-	statusDoingImport: "Importing tiddlers",
-	statusDoneImport: "All tiddlers imported",
+	statusDoingImport: "Importing articles",
+	statusDoneImport: "All articles imported",
 	listViewTemplate: {
 		columns: [
 			{name: 'Selected', field: 'Selected', rowName: 'title', type: 'Selector'},
-			{name: 'Tiddler', field: 'tiddler', title: "Tiddler", type: 'Tiddler'},
+			{name: 'Tiddler', field: 'tiddler', title: "Title", type: 'Tiddler'},
 			{name: 'Size', field: 'size', tiddlerLink: 'size', title: "Size", type: 'Size'},
 			{name: 'Tags', field: 'tags', title: "Tags", type: 'Tags'}
 		],
@@ -1617,10 +1607,8 @@ config.formatterHelpers = {
 				s = lookaheadMatch[3].unDash();
 				v = lookaheadMatch[4];
 			}
-			if (s=="bgcolor")
-				s = "backgroundColor";
-			if (s=="float")
-				s = "cssFloat";
+			if (s == "bgcolor") s = "backgroundColor";
+			if (s == "float") s = "cssFloat";
 			styles.push({style: s, value: v});
 			w.nextMatch = lookaheadMatch.index + lookaheadMatch[0].length;
 			config.textPrimitives.cssLookaheadRegExp.lastIndex = w.nextMatch;
@@ -1631,7 +1619,7 @@ config.formatterHelpers = {
 
 	applyCssHelper: function(e,styles)	{
 		var t;
-		for (t=0; t< styles.length; t++) {
+		for (t = 0; t < styles.length; t++) {
 			try {
 				e.style[styles[t].style] = styles[t].value;
 			} catch (ex) {
@@ -3172,15 +3160,14 @@ config.commands.jump.handlePopup = function(popup, title) {
 
 config.commands.fields.handlePopup = function(popup,title) {
 	var tiddler = store.fetchTiddler(title);
-	if (!tiddler)
-		return;
+	if (!tiddler)	return;
 	var items = [];
-	store.forEachField(tiddler,function(tiddler,fieldName,value) {items.push({field:fieldName,value:value});},true);
+	store.forEachField(tiddler, function(tiddler,fieldName,value) {items.push({field:fieldName,value:value});},true);
 	items.sort(function(a,b) {return a.field < b.field ? -1 : (a.field == b.field ? 0 : +1);});
 	if (items.length > 0)
 		ListView.create(popup,items,this.listViewTemplate);
 	else
-		createTiddlyElement(popup,"div",null,null,this.emptyText);
+		createTiddlyElement(popup, "div", null, null, this.emptyText);
 };
 
 //--
@@ -3197,7 +3184,7 @@ function Tiddler(title) {
 	this.links = [];
 	this.linksUpdated = false;
 	this.tags = [];
-	this.fields = {};
+	this.fields = {}; // changecount parenttiddler - coming from EditTemplate, consumed by externalizeTiddler
 	return this;
 }
 
@@ -3210,8 +3197,8 @@ Tiddler.prototype.getLinks = function() {
 // Increment the changeCount of a tiddler
 Tiddler.prototype.incChangeCount = function() {
 	var c = this.fields['changecount'];
-	c = c ? parseInt(c,10) : 0;
-	this.fields['changecount'] = String(c+1);
+	c = c ? parseInt(c, 10) : 0;
+	this.fields['changecount'] = String(c + 1);
 };
 
 // Clear the changeCount of a tiddler
@@ -3497,7 +3484,7 @@ ArticleStore.prototype.getTiddlerSlice = function(title,sliceName) {
 // Build an hashmap of the specified named slices of a tiddler
 ArticleStore.prototype.getTiddlerSlices = function(title,sliceNames) {
 	var t,r = {};
-	for (t=0; t<sliceNames.length; t++) {
+	for (t = 0; t < sliceNames.length; t++) {
 		var slice = this.getTiddlerSlice(title,sliceNames[t]);
 		if (slice)
 			r[sliceNames[t]] = slice;
@@ -3570,10 +3557,9 @@ ArticleStore.prototype.setTiddlerTag = function(title, status, tag) {
 	}
 };
 
-ArticleStore.prototype.addTiddlerFields = function(title,fields) {
+ArticleStore.prototype.addTiddlerFields = function(title, fields) {
 	var tiddler = this.fetchTiddler(title);
-	if (!tiddler)
-		return;
+	if (! tiddler)	return;
 	merge(tiddler.fields,fields);
 	tiddler.changed();
 	tiddler.incChangeCount();
@@ -3648,26 +3634,21 @@ ArticleStore.prototype.loadFromDiv = function(elementOrId, noUpdate) {
 
 // Load contents of a Wiki from a string
 // Returns null if there's an error
-ArticleStore.prototype.importTiddlyWiki = function(text) {
-	var storeAreaRange = locateStoreArea(text);
+ArticleStore.prototype.importAllArticlesFromHtmlSource = function(htmlSource) {
+	var storeAreaRange = locateStoreArea(htmlSource);
 	if (! storeAreaRange)	return null;
-	var content = "<" + "html><" + "body>" + text.substring(storeAreaRange[0], storeAreaRange[1] + endSaveArea.length) + "<" + "/body><" + "/html>";
-	// Create the iframe
+	var content = "<" + "html><" + "body>" + htmlSource.substring(storeAreaRange[0], storeAreaRange[1] + endSaveArea.length) + "<" + "/body><" + "/html>";
+	// Create an iframe as tool for converting the htmlSource to a DOM
 	var iframe = document.createElement("iframe");
 	iframe.style.display = "none";
 	document.body.appendChild(iframe);
-	var doc = iframe.document;
-	if (iframe.contentDocument)
-		doc = iframe.contentDocument; // For NS6
-	else if (iframe.contentWindow)
-		doc = iframe.contentWindow.document; // For IE5.5 and IE6
-	// Put the content in the iframe
+	var doc = iframe.contentDocument;
 	doc.open();
 	doc.writeln(content);
 	doc.close();
 	// Load the content into the store instance
-	var storeArea = doc.getElementById("storeArea");
-	this.loadFromDiv(storeArea);
+	var storeDiv = doc.getElementById("storeArea");
+	this.loadFromDiv(storeDiv);
 	// Get rid of the iframe
 	iframe.parentNode.removeChild(iframe);
 	return this;
@@ -4009,25 +3990,29 @@ ArticleStore.prototype.getValue = function(tiddler, fieldName) {
 // and that value is returned.
 // The order of the fields is not defined.
 // @param callback a function(tiddler,fieldName,value).
-ArticleStore.prototype.forEachField = function(tiddler, callback, onlyExtendedFields) {
+ArticleStore.prototype.forEachField = function(tiddler, callback, onlyExtendedFields, sortExtendedFields) {
 	var t = this.resolveTiddler(tiddler);
-	if (! t)
-		return undefined;
-	var n, result;
-	for (n in t.fields) {
-		result = callback(t, n, t.fields[n]);
-		if (result)
-			return result;
-		}
-	if (onlyExtendedFields)
-		return undefined;
-	for (n in ArticleStore.standardFieldAccess) {
+	if (! t) return undefined;
+	var result;
+		
+	// We want to sort the extended fields because they will be externalized when saving.
+	// If sorted randomly, we would produce unnecessary changes in the saved file which would pop up in any diff viewer.
+	var keys = Object.keys(t.fields); // JavaScript cannot sort t.fields hashtable directly. We rip the keys array and sort that.
+	keys.sort();
+
+	for (var i = 0; i < keys.length; i++) {
+		result = callback(t, keys[i], t.fields[keys[i]]);
+		if (result)	return result;
+	}
+
+	if (onlyExtendedFields) return undefined;
+	
+	for (var n in ArticleStore.standardFieldAccess) {
 		if (n != "tiddler") {
 			// even though the "title" field can also be referenced through the name "tiddler"
 			// we only visit this field once.
 			result = callback(t, n, ArticleStore.standardFieldAccess[n].get(t));
-			if (result)
-				return result;
+			if (result)	return result;
 		}
 	}
 	return undefined;
@@ -4919,108 +4904,44 @@ config.macros.importTiddlers.onClose = function(e) {
 config.macros.importTiddlers.restart = function(presenter) {
 	var me = config.macros.importTiddlers;
 	presenter.renderBodyContent(this.step1Title, this.step1Html);
-	var fileRequester = presenter.getElement("fileRequester");
-	fileRequester.onchange = me.onFileRequesterValueChanged;
-	fileRequester.onkeyup = me.onFileRequesterValueChanged;
-	
+	var choseFileButton = presenter.getElement("choseFileButton");
 	presenter.renderFooterContent([{caption: this.openLabel, tooltip: this.openPrompt, onClick: me.onInspectClicked}]);		
-};
-
-config.macros.importTiddlers.onFileRequesterValueChanged = function(e) {
-	
-	var path = getLocalPath(document.location.href);
-	var slashpos = path.lastIndexOf('/'); 
-	if (slashpos == -1) slashpos=path.lastIndexOf('\\'); 
-	if (slashpos != -1) path = path.substr(0, slashpos + 1); // remove filename, leave trailing 	slash
-
-	fileFullName = path + this.files[0].name;
-		
-	var presenter = new WizardPresenter(this);
-	var urlInputField = presenter.getElement("txtPath");
-	urlInputField.value = config.macros.importTiddlers.getURLFromLocalPath(fileFullName);
-	return true;
-};
-
-config.macros.importTiddlers.getURLFromLocalPath = function(v) {
-	if (!v || !v.length) return v;
-	v = v.replace(/\\/g,"/"); // use "/" for cross-platform consistency
-	var u;
-	var t = v.split(":");
-	var p = t[1] || t[0]; // remove drive letter (if any)
-	if (t[1] && (t[0] == "http" || t[0] == "https" || t[0] == "file")) {
-		u = v;
-	} else if (p.substr(0, 1) == "/") {
-		u = document.location.protocol + "//" + document.location.hostname + (t[1] ? "/" : "") + v;
-	} else {
-		var c = document.location.href.replace(/\\/g,"/");
-		var pos = c.lastIndexOf("/");
-		if (pos != -1) c = c.substr(0, pos); // remove filename
-		u = c + "/" + p;
-	}
-	return u;
 };
 
 config.macros.importTiddlers.onInspectClicked = function(e) {
 	var me = config.macros.importTiddlers;
-	var presenter = new WizardPresenter(this);
-	var urlInputField = presenter.getElement("txtPath");
-	var url = urlInputField.value;
-	var serverType = config.defaultAdaptor;
-	var adaptor = new config.adaptors[serverType]();
-	presenter.setValue("adaptor", adaptor);	
-	adaptor.openHost(url, null, presenter, me.onOpenHost);
-	presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.statusOpenHost);
+	var presenter = new WizardPresenter(this); // "this" is the clicked <a> element
+	var importWorkItem = {};
+	importWorkItem.afterAsyncGoto = [];
+	importWorkItem.presenter = presenter;
+	
+	presenter.setValue("importWorkItem", importWorkItem);
+	
+	var choseFileButton = presenter.getElement("choseFileButton");
+	if (choseFileButton.files) importWorkItem.file = choseFileButton.files[0];
+	
+	importWorkItem.afterAsyncGoto.push(me.onAfterRetrievingArticleList);
+	FileImporter.retrieveArticleListAsync(importWorkItem);
+	
+	presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.statusRetrievingArticleList);
 	return false;
 };
 
-config.macros.importTiddlers.onOpenHost = function(context, presenter) {
-	var me = config.macros.importTiddlers;
-	var adaptor = presenter.getValue("adaptor");
-	if (context.status !== true) displayMessage("Error in importTiddlers.onOpenHost: " + context.statusText);
-	adaptor.getWorkspaceList(context, presenter, me.onGetWorkspaceList);
-	presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.statusGetWorkspaceList);
-};
-
-config.macros.importTiddlers.onGetWorkspaceList = function(context, presenter) {
-	var me = config.macros.importTiddlers;
-	if (context.status !== true) displayMessage("Error in importTiddlers.onGetWorkspaceList: " + context.statusText);
-	presenter.setValue("context", context);
-	
-	var workspace = "(default)";
-	// if (context.workspaces.length == 1) workspace = context.workspaces[0].title; // xxx in context.workspaces steht immer {title:"(default)"}
-	if (workspace) {
-		context.adaptor.openWorkspace(workspace, context, presenter, me.onOpenWorkspace);
-		presenter.setValue("workspace", workspace);
-		presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.statusOpenWorkspace);
-		return;
-	}
-};
-
-config.macros.importTiddlers.onOpenWorkspace = function(context, presenter) {
-	var me = config.macros.importTiddlers;
-	if (context.status !== true) displayMessage("Error in importTiddlers.onOpenWorkspace: " + context.statusText);
-	var adaptor = presenter.getValue("adaptor");
-	var fileRequester = presenter.getElement("fileRequester");
-	if (fileRequester.files) context.file = fileRequester.files[0]; // for HTML5 FileReader
-	adaptor.getTiddlerList(context, presenter, me.onGetTiddlerList);
-	presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.statusGetTiddlerList);
-};
-
-config.macros.importTiddlers.onGetTiddlerList = function(context, presenter) {
+config.macros.importTiddlers.onAfterRetrievingArticleList = function(importWorkItem) {
 	var me = config.macros.importTiddlers;
 	
-	if (context.status !== true) { // s.th. failed...		
-		presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.errorGettingTiddlerListFile);
+	if (importWorkItem.status !== true) { // s.th. failed...		
+		importWorkItem.presenter.renderFooterContent([{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}], me.errorRetrievingArticleListFromFile);
 		return;
 	}
 	
 	// Extract data for the listview
-	var listedTiddlers = [];
-	if (context.tiddlers) {
-		for (var i = 0; i < context.tiddlers.length; i++) {
-			var tiddler = context.tiddlers[i];
+	var rowsToBeRendered = [];
+	if (importWorkItem.ArticlesToBeImported) {
+		for (var i = 0; i < importWorkItem.ArticlesToBeImported.length; i++) {
+			var tiddler = importWorkItem.ArticlesToBeImported[i];
 			if (! tiddler.tags.contains("excludeSearch")) {
-				listedTiddlers.push({
+				rowsToBeRendered.push({
 					title: tiddler.title,
 					modified: tiddler.modified,
 					modifier: tiddler.modifier,
@@ -5032,18 +4953,17 @@ config.macros.importTiddlers.onGetTiddlerList = function(context, presenter) {
 			}
 		}
 	}
-	listedTiddlers.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : +1);});
+	rowsToBeRendered.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : +1);});
 	
 	// Display the listview
 	
-	presenter.renderBodyContent(me.step2Title, me.step2Html);
-	var listViewPlaceholder = presenter.getElement("listViewPlaceholder");
+	importWorkItem.presenter.renderBodyContent(me.step2Title, me.step2Html);
+	var listViewPlaceholder = importWorkItem.presenter.getElement("listViewPlaceholder");
 	var listWrapper = document.createElement("div");
 	listViewPlaceholder.parentNode.insertBefore(listWrapper,listViewPlaceholder);
-	var listView = ListView.create(listWrapper,listedTiddlers, me.listViewTemplate);
-	presenter.setValue("listView", listView);
-	presenter.setValue("context", context);
-	presenter.renderFooterContent([
+	var listView = ListView.create(listWrapper,rowsToBeRendered, me.listViewTemplate, null, "listView twtable toBeImported");
+	importWorkItem.presenter.setValue("listView", listView);	
+	importWorkItem.presenter.renderFooterContent([
 		{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel},
 		{caption: me.importLabel, tooltip: me.importPrompt, onClick: me.onDoImportClicked}
 	]);
@@ -5053,57 +4973,78 @@ config.macros.importTiddlers.onDoImportClicked = function(e) {
 	var me = config.macros.importTiddlers;
 	var presenter = new WizardPresenter(this);	
 	var listView = presenter.getValue("listView");
-	var rowNames = ListView.getSelectedRows(listView);
-	var adaptor = presenter.getValue("adaptor");
-	var overwrite = [];
-	for (var i = 0; i < rowNames.length; i++) {
-		if (store.tiddlerExists(rowNames[i])) overwrite.push(rowNames[i]);
+	var titlesToBeImported = ListView.getSelectedRows(listView);
+		
+	// Let the user confirm overwriting of existing articles
+	
+	var existingTitles = [];
+	for (var i = 0; i < titlesToBeImported.length; i++) {
+		if (store.tiddlerExists(titlesToBeImported[i])) existingTitles.push(titlesToBeImported[i]);
 	}
-	if (overwrite.length > 0) {
-		if (!confirm(me.confirmOverwriteText.format([overwrite.join(", ")]))) return false;
+	if (existingTitles.length > 0) {
+		if (! confirm(me.confirmOverwriteText.format([existingTitles.join(", ")]))) return false;
 	}
-	presenter.renderBodyContent(me.step4Title.format([rowNames.length]),me.step4Html);
-	for (var i = 0; i < rowNames.length; i++) {
+
+	presenter.renderBodyContent(me.step3Title.format([titlesToBeImported.length]), me.step3Html);
+	for (var i = 0; i < titlesToBeImported.length; i++) {
 		var link = document.createElement("div");
-		renderLinkElement(link, rowNames[i], true);
+		renderLinkElement(link, titlesToBeImported[i], true);
 		var place = presenter.getElement("markReport");
 		place.parentNode.insertBefore(link,place);
 	}
-	presenter.setValue("remainingImports", rowNames.length);
+	presenter.setValue("remainingImports", titlesToBeImported.length);
 	presenter.renderFooterContent(
 		[{caption: me.cancelLabel, tooltip: me.cancelPrompt, onClick: me.onCancel}],
 		me.statusDoingImport
 	);
-	var wizardContext = presenter.getValue("context");
-	var tiddlers = wizardContext ? wizardContext.tiddlers : [];
-	for (var i = 0; i < rowNames.length; i++) {
-		var context = {
-			allowSynchronous:true,
-			tiddler:tiddlers[tiddlers.findByField("title", rowNames[i])]
+		
+	var importWorkItem = presenter.getValue("importWorkItem"); // this was the context which was populated while retrieving the article list
+	var articles = importWorkItem ? importWorkItem.ArticlesToBeImported : [];
+	for (var i = 0; i < titlesToBeImported.length; i++) {
+		var context = { // xxx no need to pretend async loading of each incoming article!
+			afterAsyncGoto: [],
+			allowSynchronous: true,
+			file: importWorkItem.file,
+			presenter: presenter,
+			tiddler: articles[articles.findByField("title", titlesToBeImported[i])] // xxx hä? - wird sowieso später überklatscht?!?
 		};
-		adaptor.getTiddler(rowNames[i], context, presenter, me.onGetTiddler);
+		context.afterAsyncGoto.push(me.onArticleRetrieved);
+		FileImporter.retrieveArticleAsync(titlesToBeImported[i], context);
 	}
 	return false;
 };
 
-config.macros.importTiddlers.onGetTiddler = function(context, presenter) {
+config.macros.importTiddlers.onArticleRetrieved = function(context) {
 	var me = config.macros.importTiddlers;
-	if (! context.status) displayMessage("Error in importTiddlers.onGetTiddler: " + context.statusText);
+	if (! context.status) displayMessage("Error in importTiddlers.onArticleRetrieved: " + context.statusText);
+	
+	// Internalize incoming article
+	
 	var tiddler = context.tiddler;
 	store.suspendNotifications();
 	store.saveTiddler(tiddler.title, tiddler.title, tiddler.text, tiddler.modifier, tiddler.modified, tiddler.tags, tiddler.fields, true, tiddler.created);
 	store.resumeNotifications();
+	
+	// Notify
+	
 	if (! context.isSynchronous) store.notify(tiddler.title, true);
-	var remainingImports = presenter.getValue("remainingImports") - 1;
-	presenter.setValue("remainingImports", remainingImports);
+	
+	// Update counter
+	
+	var remainingImports = context.presenter.getValue("remainingImports") - 1;
+	context.presenter.setValue("remainingImports", remainingImports);
+	
+	// if this was the last one
+	
 	if (remainingImports == 0) {
 		if (context.isSynchronous) {
 			store.notifyAll();
 			refreshDisplay();
 		}
-		presenter.renderFooterContent([{caption: me.doneLabel, tooltip: me.donePrompt, onClick: me.onClose}], me.statusDoneImport);
+		context.presenter.renderFooterContent([{caption: me.doneLabel, tooltip: me.donePrompt, onClick: me.onClose}], me.statusDoneImport);
 		autoSaveChanges();
 	}
+	
 };
 
 //--
@@ -5143,18 +5084,18 @@ config.macros.upgrade.onClickUpgrade = function(e) {
 		return false;
 	}
 	presenter.renderFooterContent([], me.statusLoadingCore);
-	var options = {
-		type:"GET",
-		url:me.source,
-		processData:false,
-		success:function(data, textStatus, jqXHR) {
+	var ajaxParameters = {
+		type: "GET",
+		url: me.source,
+		processData: false,
+		success: function(data, textStatus, jqXHR) {
 			me.onLoadCore(true, presenter, jqXHR.responseText, me.source, jqXHR);
 		},
-		error:function(jqXHR, textStatus, errorThrown) {
+		error: function(jqXHR, textStatus, errorThrown) {
 			me.onLoadCore(false, presenter, null, me.source, jqXHR);
 		}
 	};
-	ajaxReq(options);
+	ajaxReq(ajaxParameters);
 	return false;
 };
 
@@ -5199,22 +5140,6 @@ config.macros.upgrade.extractVersion = function(upgradeFile) {
 	var m = re.exec(upgradeFile);
 	return m ? {title: m[1], major: m[2], minor: m[3], revision: m[4], beta: m[6], date: new Date(m[7])} : null;
 };
-
-function upgradeFrom(path) {
-	var importStore = new ArticleStore();
-	var tw;
-	if (window.netscape !== undefined) tw = convertUTF8ToUnicode(tw);
-	importStore.importTiddlyWiki(tw);
-	importStore.forEachArticle(function(title, tiddler) {
-		if (!store.getTiddler(title)) {
-			store.addTiddler(tiddler);
-		}
-	});
-	refreshDisplay();
-	saveChanges(); //# To create appropriate Markup* sections
-	alert(config.messages.upgradeDone.format([formatVersion()]));
-	window.location = window.location.toString().substr(0, window.location.toString().lastIndexOf("?"));
-}
 
 //--
 //-- Manager UI for groups of tiddlers
@@ -7945,13 +7870,11 @@ function locateStoreArea(original) {
 	// Locate the storeArea divs
 	if (! original) return null;
 	var posOpeningDiv = original.search(startSaveAreaRE);
-	var limitClosingDiv = original.indexOf("<"+"!--POST-STOREAREA--"+">");
-	if (limitClosingDiv == -1)
-		limitClosingDiv = original.indexOf("<"+"!--POST-BODY-START--"+">");
+	var limitClosingDiv = original.indexOf("<" + "!--POST-STOREAREA--" + ">");
+	if (limitClosingDiv == -1) limitClosingDiv = original.indexOf("<" + "!--POST-BODY-START--" + ">");
 	var start = limitClosingDiv == -1 ? original.length : limitClosingDiv;
 	var posClosingDiv = original.lastIndexOf(endSaveArea,start);
-	if (posClosingDiv == -1)
-		posClosingDiv = original.lastIndexOf(endSaveAreaCaps,start);
+	if (posClosingDiv == -1) posClosingDiv = original.lastIndexOf(endSaveAreaCaps, start);
 	return (posOpeningDiv != -1 && posClosingDiv != -1) ? [posOpeningDiv, posClosingDiv] : null;
 }
 
@@ -8178,9 +8101,9 @@ function encodeBase64(data) {
 	if (!data) return "";
 	var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	var out = "";
-	var chr1,chr2,chr3="";
-	var enc1,enc2,enc3,enc4="";
-	for (var count=0,i=0; i<data.length; ) {
+	var chr1, chr2, chr3 = "";
+	var enc1, enc2, enc3, enc4 = "";
+	for (var count = 0, i = 0; i < data.length; ) {
 		chr1=data.charCodeAt(i++);
 		chr2=data.charCodeAt(i++);
 		chr3=data.charCodeAt(i++);
@@ -8188,10 +8111,10 @@ function encodeBase64(data) {
 		enc2=((chr1 & 3) << 4) | (chr2 >> 4);
 		enc3=((chr2 & 15) << 2) | (chr3 >> 6);
 		enc4=chr3 & 63;
-		if (isNaN(chr2)) enc3=enc4=64;
-		else if (isNaN(chr3)) enc4=64;
-		out+=keyStr.charAt(enc1)+keyStr.charAt(enc2)+keyStr.charAt(enc3)+keyStr.charAt(enc4);
-		chr1=chr2=chr3=enc1=enc2=enc3=enc4="";
+		if (isNaN(chr2)) enc3 = enc4 = 64;
+		else if (isNaN(chr3)) enc4 = 64;
+		out += keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+		chr1 = chr2 = chr3 = enc1 = enc2 = enc3 = enc4 = "";
 	}
 	return out;
 }
@@ -8199,47 +8122,6 @@ function encodeBase64(data) {
 //--
 //-- Filesystem utilities
 //--
-
-function convertUTF8ToUnicode(u) {
-	return config.browser.isOpera || !window.netscape ? manualConvertUTF8ToUnicode(u) : mozConvertUTF8ToUnicode(u);
-}
-
-function manualConvertUTF8ToUnicode(utf) {
-	var uni = utf;
-	var src = 0;
-	var dst = 0;
-	var b1, b2, b3;
-	var c;
-	while (src < utf.length) {
-		b1 = utf.charCodeAt(src++);
-		if (b1 < 0x80) {
-			dst++;
-		} else if (b1 < 0xE0) {
-			b2 = utf.charCodeAt(src++);
-			c = String.fromCharCode(((b1 & 0x1F) << 6) | (b2 & 0x3F));
-			uni = uni.substring(0,dst++).concat(c,utf.substr(src));
-		} else {
-			b2 = utf.charCodeAt(src++);
-			b3 = utf.charCodeAt(src++);
-			c = String.fromCharCode(((b1 & 0xF) << 12) | ((b2 & 0x3F) << 6) | (b3 & 0x3F));
-			uni = uni.substring(0,dst++).concat(c,utf.substr(src));
-		}
-	}
-	return uni;
-}
-
-function mozConvertUTF8ToUnicode(u) {
-	try {
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-		converter.charset = "UTF-8";
-	} catch(ex) {
-		return manualConvertUTF8ToUnicode(u);
-	} // fallback
-	var s = converter.ConvertToUnicode(u);
-	var fin = converter.Finish();
-	return fin.length > 0 ? s+fin : s;
-}
 
 function convertUnicodeToHtmlEntities(s) {
 	var re = /[^\u0000-\u007F]/g;
@@ -8263,221 +8145,114 @@ function convertUriToUTF8(uri,charSet) {
 }
 
 //--
-//-- Server adaptor base class
+//-- FileImporter
 //--
 
-function AdaptorBase() {
-	this.host = null;
-	this.store = null;
-	return this;
+function FileImporter() {
 }
 
-AdaptorBase.prototype.close = function() {
-	return true;
+FileImporter.onAfterRetrievingAWikiSource = function(importWorkItem, wikiHtmlSource) {
+	importWorkItem.status = true;
+	importWorkItem.incomingArticleStore = new ArticleStore();
+	if (! importWorkItem.incomingArticleStore.importAllArticlesFromHtmlSource(wikiHtmlSource)) {
+		importWorkItem.statusText = config.messages.invalidFileError.format([importWorkItem.file.name]);
+		importWorkItem.status = false;
+	}	
+	importWorkItem.afterAsyncGoto.pop()(importWorkItem);
 };
 
-AdaptorBase.prototype.fullHostName = function(host) {
-	if (! host) return '';
-	host = host.trim();
-	if (!host.match(/:\/\//))
-		host = 'http://' + host;
-	if (host.substr(host.length-1) == '/')
-		host = host.substr(0,host.length-1);
-	return host;
+FileImporter.loadTiddlyWikiError = function(importWorkItem, jqXHR) {
+	importWorkItem.status = false;
+	importWorkItem.statusText = jqXHR.message;
+	importWorkItem.afterAsyncGoto.pop()(importWorkItem);
 };
 
-AdaptorBase.minHostName = function(host) {
-	return host;
-};
-
-AdaptorBase.prototype.setContext = function(context, userParams, callback) {
-	if (! context) context = {};
-	context.userParams = userParams;
-	if (callback) context.callback = callback;
-	context.adaptor = this;
-	if (! context.host) context.host = this.host;
-	context.host = this.fullHostName(context.host); // host = "file:///D:/Data/vodi.de/VodiWiki/VodiWiki - Internal Documentation.html"
-	if (! context.workspace) context.workspace = this.workspace;
-	return context;
-};
-
-// Open the specified host
-AdaptorBase.prototype.openHost = function(host,context,userParams,callback) { // host = "file:///D:/Data/vodi.de/VodiWiki/VodiWiki - Internal Documentation.html"
-	this.host = host;
-	context = this.setContext(context,userParams,callback);
-	context.status = true;
-	if (callback)
-		window.setTimeout(function() {context.callback(context,userParams);},10);
-	return true;
-};
-
-// Open the specified workspace
-AdaptorBase.prototype.openWorkspace = function(workspace,context,userParams,callback) {
-	this.workspace = workspace;
-	context = this.setContext(context,userParams,callback);
-	context.status = true;
-	if (callback)
-		window.setTimeout(function() {callback(context,userParams);},10);
-	return true;
-};
-
-//--
-//-- Server adaptor for talking to static Wiki files
-//--
-
-function FileAdaptor() {
-}
-
-FileAdaptor.prototype = new AdaptorBase();
-
-FileAdaptor.serverType = 'file';
-
-FileAdaptor.loadTiddlyWikiSuccess = function(context, jqXHR) {
-	context.status = true;
-	context.adaptor.store = new ArticleStore();
-	if (! context.adaptor.store.importTiddlyWiki(jqXHR.responseText)) { // POI: Import
-		context.statusText = config.messages.invalidFileError.format([context.host]);
-		context.status = false;
-	}
-	context.complete(context,context.userParams);
-};
-
-FileAdaptor.loadTiddlyWikiError = function(context, jqXHR) {
-	context.status = false;
-	context.statusText = jqXHR.message;
-	context.complete(context, context.userParams);
-};
-
-// Get the list of workspaces on a given server
-FileAdaptor.prototype.getWorkspaceList = function(context, userParams, callback) {
-	context = this.setContext(context, userParams, callback);
-	context.workspaces = [{title:"(default)"}];
-	context.status = true;
-	if (callback)
-		window.setTimeout(function() {callback(context,userParams);},10);
-	return true;
-};
-
-// Gets the list of tiddlers within a given workspace
-FileAdaptor.prototype.getTiddlerList = function(context, userParams, callback) {
-	context = this.setContext(context, userParams, callback);	
-	context.complete = FileAdaptor.getTiddlerListComplete;
-	if (this.store) {
-		return context.complete(context, context.userParams);
-	}
-	var options = {
+FileImporter.retrieveArticleListAsync = function(importWorkItem) {
+	
+	importWorkItem.afterAsyncGoto.push(FileImporter.retrieveArticleList_WikiSourceRetrieved);
+	
+	var ajaxParameters = {
 		type: "GET",
-		url: context.host,
-		file: context.file, // for HTML5 FileReader
+		file: importWorkItem.file,
 		processData: false,
-		success: function(data, textStatus, jqXHR) {FileAdaptor.loadTiddlyWikiSuccess(context, jqXHR);},
-		error: function(jqXHR, textStatus, errorThrown) {context.xhr = jqXHR;	FileAdaptor.loadTiddlyWikiError(context, jqXHR);}
-	};
-	return ajaxReq(options);
+		success: function(data, textStatus, jqXHR) {FileImporter.onAfterRetrievingAWikiSource(importWorkItem, jqXHR.responseText);}, // DETOUR!
+		error: function(jqXHR, textStatus, errorThrown) {importWorkItem.xhr = jqXHR;	FileImporter.loadTiddlyWikiError(importWorkItem, jqXHR);}
+	};	
+	ajaxReq(ajaxParameters);	
 };
 
-FileAdaptor.getTiddlerListComplete = function(context, userParams) {
-	if (context.status) {
-		if (context.filter) {
-			context.tiddlers = context.adaptor.store.filterTiddlers(context.filter);
+FileImporter.retrieveArticleList_WikiSourceRetrieved = function(importWorkItem, userParams) {
+	if (importWorkItem.status) {
+		if (importWorkItem.filter) { // xxx never true
+			importWorkItem.ArticlesToBeImported = importWorkItem.incomingArticleStore.filterTiddlers(importWorkItem.filter);
 		} else {
-			context.tiddlers = [];
-			context.adaptor.store.forEachArticle(function(title,tiddler) {context.tiddlers.push(tiddler);});
+			importWorkItem.ArticlesToBeImported = [];
+			importWorkItem.incomingArticleStore.forEachArticle(function(title,tiddler) {importWorkItem.ArticlesToBeImported.push(tiddler);});
 		}
-		var i;
-		for (i = 0; i < context.tiddlers.length; i++) {
-			context.tiddlers[i].fields['server.type'] = FileAdaptor.serverType;
-			context.tiddlers[i].fields['server.host'] = AdaptorBase.minHostName(context.host);
-			context.tiddlers[i].fields['server.page.revision'] = context.tiddlers[i].modified.convertToYYYYMMDDHHMM();
-		}
-		context.status = true;
+		importWorkItem.status = true;
 	}
-	if (context.callback) {
-		window.setTimeout(function() {context.callback(context, userParams);}, 10);
-	}
-	return true;
+	
+	importWorkItem.afterAsyncGoto.pop()(importWorkItem);	
 };
 
-FileAdaptor.prototype.generateTiddlerInfo = function(tiddler) {
-	var info = {};
-	info.uri = tiddler.fields['server.host'] + "#" + tiddler.title;
-	return info;
-};
-
-// Retrieve a tiddler from a given workspace on a given server
-FileAdaptor.prototype.getTiddler = function(title, context, userParams, callback) {
-	context = this.setContext(context, userParams, callback);
-	context.title = title;
-	context.complete = FileAdaptor.getTiddlerComplete;
-	if (context.adaptor.store) {
-		return context.complete(context, context.userParams);
+FileImporter.retrieveArticleAsync = function(title, importWorkItem) { // xxx nur 1 verwender	
+	importWorkItem.title = title;
+	importWorkItem.afterAsyncGoto.push(FileImporter.retrieveArticle_WikiSourceRetrieved);
+	if (importWorkItem.incomingArticleStore) { // xxx ever true?
+		return importWorkItem.afterAsyncGoto.pop()(importWorkItem);
 	}
-	var options = {
+	var ajaxParameters = {
 		type: "GET",
-		url: context.host,
+		file: importWorkItem.file,
 		processData: false,
-		success: function(data, textStatus, jqXHR) {
-			FileAdaptor.loadTiddlyWikiSuccess(context, jqXHR);
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			FileAdaptor.loadTiddlyWikiError(context, jqXHR);
-		}
+		success: function(data, textStatus, jqXHR) { FileImporter.onAfterRetrievingAWikiSource(importWorkItem, jqXHR.responseText);	},
+		error: function(jqXHR, textStatus, errorThrown) { FileImporter.loadTiddlyWikiError(importWorkItem, jqXHR); }
 	};
-	return ajaxReq(options);
+	return ajaxReq(ajaxParameters);
 };
 
-FileAdaptor.getTiddlerComplete = function(context, userParams) {
-	var t = context.adaptor.store.fetchTiddler(context.title);
+FileImporter.retrieveArticle_WikiSourceRetrieved = function(importWorkItem, userParams) {
+	var t = importWorkItem.incomingArticleStore.fetchTiddler(importWorkItem.title);
 	if (t) {
-		t.fields['server.type'] = FileAdaptor.serverType;
-		t.fields['server.host'] = AdaptorBase.minHostName(context.host);
-		t.fields['server.page.revision'] = t.modified.convertToYYYYMMDDHHMM();
-		context.tiddler = t;
-		context.status = true;
+		importWorkItem.tiddler = t;
+		importWorkItem.status = true;
 	} else { //# tiddler does not exist in document
-		context.status = false;
+		importWorkItem.status = false;
 	}
-	if (context.allowSynchronous) {
-		context.isSynchronous = true;
-		context.callback(context,userParams);
+	if (importWorkItem.allowSynchronous) {
+		importWorkItem.isSynchronous = true;
+		importWorkItem.afterAsyncGoto.pop()(importWorkItem,userParams);
 	} else {
-		window.setTimeout(function() {context.callback(context, userParams);},10);
+		window.setTimeout(function() {importWorkItem.afterAsyncGoto.pop()(importWorkItem, userParams);},10);
 	}
 	return true;
 };
-
-FileAdaptor.prototype.close = function() {
-	this.store = null;
-};
-
-config.adaptors[FileAdaptor.serverType] = FileAdaptor;
-
-config.defaultAdaptor = FileAdaptor.serverType;
 
 //--
 //-- HTTP request code
 //--
 
-function ajaxReq(args) {
-	if (args.file || args.url.startsWith("file"))  // LOCAL FILE
-		return localAjax(args);
-	return jQuery.ajax(args);
+function ajaxReq(ajaxParameters) {
+	// HACK: ".file" is not an official member of jQuery.ajax parameters (it would be "url")
+	if (ajaxParameters.file) return localAjax(ajaxParameters);
+	return jQuery.ajax(ajaxParameters); // https://api.jquery.com/jQuery.ajax/#jqXHR
 }
 
-function localAjax(args) {
-	var success = function(data) { args.success(data,"success",{ responseText:data }); }
-	var failure = function(who) { args.error({ message: who + ": cannot read local file" }, "error", 0); }
+function localAjax(ajaxParameters) {
+	var onLoadMethod = function(fileContent) { ajaxParameters.success(fileContent, "success", { responseText: fileContent }); } 
+	// first fileContent argument is only there for spec reasons, but never consumed. responseText is.
+	
+	var onErrorMethod = function(who) { ajaxParameters.error({ message: who + ": cannot read local file" }, "error", 0); }
 
-	if (args.file) try { // HTML5 FileReader (Chrome, FF20+, Safari, etc.)
+	if (ajaxParameters.file) try {
 		var reader = new FileReader();
-		reader.onload = function(e)  { success(e.target.result); }
-		reader.onerror = function(e) { failure("FileReader"); }
-		reader.readAsText(args.file);
+		reader.onload = function(e)  { onLoadMethod(e.target.result); } // "target" is actually "sender" - here: the FileReader instance
+		reader.onerror = function(e) { onErrorMethod("FileReader"); }
+		reader.readAsText(ajaxParameters.file); // ASYNC
 		return true;
 	} catch (ex) { ; }
 
-	failure("loadFile");
-
+	onErrorMethod("loadFile");
 	return true;
 }
 
@@ -8539,20 +8314,17 @@ function formatVersion(v) {
 		(v.beta ? " (beta " + v.beta + ")" : "");
 }
 
-function compareVersions(v1,v2) {
-	var x1,x2,i,a = ["major","minor","revision"];
-	for (i = 0; i<a.length; i++) {
+function compareVersions(v1, v2) {
+	var x1, x2, i, a = ["major", "minor", "revision"];
+	for (i = 0; i < a.length; i++) {
 		x1 = v1[a[i]] || 0;
 		x2 = v2[a[i]] || 0;
-		if (x1<x2)
-			return 1;
-		if (x1>x2)
-			return -1;
+		if (x1<x2) return 1;
+		if (x1 > x2) return -1;
 	}
 	x1 = v1.beta || 9999;
 	x2 = v2.beta || 9999;
-	if (x1<x2)
-		return 1;
+	if (x1 < x2) return 1;
 	return x1 > x2 ? -1 : 0;
 }
 
@@ -8597,15 +8369,14 @@ function createTiddlyText(parent, text) {
 	return parent.appendChild(document.createTextNode(text));
 }
 
-function createTiddlyCheckbox(parent,caption,checked,onChange) {
+function createTiddlyCheckbox(parent, caption, checked, onChange) {
 	var cb = document.createElement("input");
-	cb.setAttribute("type","checkbox");
+	cb.setAttribute("type", "checkbox");
 	cb.onclick = onChange;
 	parent.appendChild(cb);
 	cb.checked = checked;
 	cb.className = "chkOptionInput";
-	if (caption)
-		wikify(caption,parent);
+	if (caption) wikify(caption, parent);
 	return cb;
 }
 
@@ -9018,14 +8789,13 @@ ListView.create = function(place, dataSource, listTemplate, callback, className)
 	
 	// Render header cells
 	
-	for (var x = 0; x < listTemplate.columns.length; x++) {
-		var columnTemplate = listTemplate.columns[x];
-		var td = createTiddlyElement(tr,"th");
+	for (var i = 0; i < listTemplate.columns.length; i++) {
+		var columnTemplate = listTemplate.columns[i];
+		var td = createTiddlyElement(tr, "th");
 		var colType = ListView.columnTypes[columnTemplate.type];
 		if (colType && colType.createHeader) {
-			colType.createHeader(td, columnTemplate, x);
-			if (columnTemplate.className)
-				jQuery(td).addClass(columnTemplate.className);
+			colType.createHeader(td, columnTemplate, i);
+			if (columnTemplate.className) jQuery(td).addClass(columnTemplate.className);
 		}
 	}
 	
@@ -9055,8 +8825,7 @@ ListView.create = function(place, dataSource, listTemplate, callback, className)
 		}
 	}
 	
-	if (callback && listTemplate.actions)
-		createTiddlyDropDown(place, ListView.getCommandHandler(callback), listTemplate.actions);
+	if (callback && listTemplate.actions) createTiddlyDropDown(place, ListView.getCommandHandler(callback), listTemplate.actions);
 	
 	if (callback && listTemplate.buttons) {
 		for (x = 0; x < listTemplate.buttons.length; x++) {
@@ -9118,8 +8887,8 @@ ListView.getSelectedRows = function(view) {
 ListView.columnTypes = {};
 
 ListView.columnTypes.String = {
-	createHeader: function(place,columnTemplate,col) {
-		createTiddlyText(place,columnTemplate.title);
+	createHeader: function(place, columnTemplate, col) {
+		createTiddlyText(place, columnTemplate.title);
 	},
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
@@ -9260,14 +9029,11 @@ ListView.columnTypes.TiddlerLink = {
 //--
 
 // Add indexOf function if browser does not support it
-if (!Array.indexOf) {
-	Array.prototype.indexOf = function(item,from) {
-		if (!from)
-			from = 0;
-		var i;
-		for (i=from; i<this.length; i++) {
-			if (this[i] === item)
-				return i;
+if (! Array.indexOf) {
+	Array.prototype.indexOf = function(item, from) {
+		if (! from) from = 0;
+		for (var i = from; i < this.length; i++) {
+			if (this[i] === item) return i;
 		}
 		return -1;
 	};
@@ -9275,10 +9041,9 @@ if (!Array.indexOf) {
 
 // Find an entry in a given field of the members of an array
 Array.prototype.findByField = function(field, value) {
-	var t;
-	for (t=0; t<this.length; t++) {
-		if (this[t][field] === value)
-			return t;
+	for (var i = 0; i < this.length; i++) {
+		if (this[i][field] === value)
+			return i;
 	}
 	return null;
 };
@@ -9322,7 +9087,7 @@ Array.prototype.containsAll = function(items) {
 };
 
 // Push a new value into an array only if it is not already present in the array. If the optional unique parameter is false, it reverts to a normal push
-Array.prototype.pushUnique = function(item,unique) {
+Array.prototype.pushUnique = function(item, unique) {
 	if (unique === false) {
 		this.push(item);
 	} else {
@@ -9897,8 +9662,7 @@ function blurElement(e) {
 // Create a non-breaking space
 function insertSpacer(place) {
 	var e = document.createTextNode(String.fromCharCode(160));
-	if (place)
-		place.appendChild(e);
+	if (place) place.appendChild(e);
 	return e;
 }
 
@@ -9974,8 +9738,7 @@ function stopEvent(e) {
 
 // Remove any event handlers or non-primitve custom attributes
 function scrubNode(e) {
-	if (!config.browser.isIE)
-		return;
+	if (!config.browser.isIE) return;
 	var att = e.attributes;
 	if (att) {
 		var t;
@@ -10089,36 +9852,34 @@ function TW21Saver() {}
 
 TW21Saver.prototype = new SaverBase();
 
-TW21Saver.prototype.externalizeTiddler = function(store, tiddler) {
+TW21Saver.prototype.externalizeTiddler = function(store, article) {
 	try {
-		var extendedAttributes = "";
-		var usePre = config.options.chkUsePreForStorage;
-		store.forEachField(tiddler,
-			function(tiddler,fieldName,value) {
+		var attributes =
+			' created="' + article.created.convertToYYYYMMDDHHMM() + '"' +
+ 			' modified="' + article.modified.convertToYYYYMMDDHHMM() + '"' +
+			' modifier="' + article.modifier.htmlEncode() + '"'
+		;
+		var tags = article.getTagsTuple();
+		if (tags) attributes += ' tags="' + tags.htmlEncode() + '"';
+		
+		var extendedAttributes = ""; // changecount parenttiddler
+		
+		store.forEachField(article,
+			function(article, fieldName, value) {
 				// don't store stuff from the temp namespace
-				if (typeof value != "string")
-					value = "";
-				if (!fieldName.match(/^temp\./))
-					extendedAttributes += ' %0="%1"'.format([fieldName,value.escapeLineBreaks().htmlEncode()]);
-			},true);
-		var created = tiddler.created;
-		var modified = tiddler.modified;
-		var attributes = tiddler.creator ? ' creator="' + tiddler.creator.htmlEncode() + '"' : "";
-		attributes += tiddler.modifier ? ' modifier="' + tiddler.modifier.htmlEncode() + '"' : "";
-		attributes += (usePre && created == version.date) ? "" :' created="' + created.convertToYYYYMMDDHHMM() + '"';
-		attributes += (usePre && modified == created) ? "" : ' modified="' + modified.convertToYYYYMMDDHHMM() +'"';
-		var tags = tiddler.getTagsTuple();
-		if (! usePre || tags)
-			attributes += ' tags="' + tags.htmlEncode() + '"';
-		return ('<div %0="%1"%2%3>%4</'+'div>').format([
-			usePre ? "title" : "tiddler",
-			tiddler.title.htmlEncode(),
+				if (typeof value != "string") value = "";
+				if (value && ! fieldName.match(/^temp\./)) extendedAttributes += ' %0="%1"'.format([fieldName, value.escapeLineBreaks().htmlEncode()]);
+			}, true
+		);
+		
+		return ('<div title="%0"%1%2>\n<pre>%3</pre>\n</'+'div>').format([
+			article.title.htmlEncode(),
 			attributes,
 			extendedAttributes,
-			usePre ? "\n<pre>" + tiddler.text.htmlEncode() + "</pre>\n" : tiddler.text.escapeLineBreaks().htmlEncode()
+			article.text.htmlEncode()
 		]);
 	} catch (ex) {
-		throw exceptionText(ex,config.messages.tiddlerSaveError.format([tiddler.title]));
+		throw exceptionText(ex, config.messages.tiddlerSaveError.format([article.title]));
 	}
 };
 
