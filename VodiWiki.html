@@ -1060,7 +1060,7 @@ merge(config.messages,{
 	invalidFileError: "The original file '%0' does not appear to be a valid Wiki",
 	emptySaved: "Empty template saved",
 	emptyFailed: "Failed to save empty template file",
-	mainSaved: "Wiki saved.",
+	mainSaved: "Wiki saved via push download.",
 	mainDownloadManual: "RIGHT CLICK HERE to download/save main Wiki file",
 	mainFailed: "Failed to save main Wiki file. Your changes have not been saved",
 	macroError: "Error in macro <<%0>>",
@@ -7983,57 +7983,43 @@ window.getLocalPath = window.getLocalPath || function(origPath) {
 //--
 
 // Save a file in filesystem [Preemption]
-window.saveFile = window.saveFile || function(fileUrl, content) {
-	r = HTML5DownloadSaveFile(fileUrl, content);
-	if (! r) r = manualSaveFile(fileUrl, content);
-	return r;
+window.saveFile = window.saveFile || function(fileUrl, htmlSource) { // xxx
+	
+	if (saveFileViaBlobApi(fileUrl, htmlSource)) return true;
+		
+	// Fallback: Create data URL link for manual download
+		
+	var dataUrl = "data:text/html;charset=UTF-8;base64," + encodeBase64(unescape(encodeURIComponent(htmlSource)));	
+	// JavaScript strings are UTF-16.
+	// encodeURIComponent() will re-encode the UTF-16 string to UTF-8, but unfortunalely escape all URL-poison-chars/spaces
+	// after calling unescape() you get pure UTF-8
+	
+	displayMessage(config.messages.mainDownloadManual, dataUrl, -1);
+		
+	return true;
 }
 
-/*
- *
- * in between when the applet has been started
- * and the user has given permission to run the applet
- * we get an applet object, but it doesn't have the methods
- * we expect yet.
- *
- */
-
-function HTML5DownloadSaveFile(filePath, content) {	
+function saveFileViaBlobApi(filePath, content) {	
 	if (document.createElement("a").download == undefined) return null;
-	config.saveByDownload = true;
-	var slashpos = filePath.lastIndexOf("/");
-	if (slashpos == -1) slashpos = filePath.lastIndexOf("\\"); 
-	var filename = filePath.substr(slashpos + 1);
-	var blob = new Blob([content], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
-	var uri = window.URL.createObjectURL(blob);
-	var link = document.createElement("a");
-	// link.setAttribute("target","_blank");
-	link.setAttribute("href", uri);
-	link.setAttribute("download", filename);
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
-	// window.URL.revokeObjectURL(uri); // edge won't save with this
+	try {
+		config.saveByDownload = true;
+		var slashpos = filePath.lastIndexOf("/");
+		if (slashpos == -1) slashpos = filePath.lastIndexOf("\\"); 
+		var filename = filePath.substr(slashpos + 1);
+		var blob = new Blob([content], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
+		var uri = window.URL.createObjectURL(blob);
+		var link = document.createElement("a");
+		// link.setAttribute("target","_blank");
+		link.setAttribute("href", uri);
+		link.setAttribute("download", filename);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		// window.URL.revokeObjectURL(uri); // todo: normally this should be done - edge won't save with this - maybe a timing problem, solution could be async
+	} catch(ex) {
+		return false;
+	}	
 	return true;
-}
-
-// Returns null if it can't do it, false if there's an error, true if it saved OK
-function manualSaveFile(filePath, content) {
-	// FALLBACK for showing a link to data: URI
-	var slashpos = filePath.lastIndexOf("/");
-	if (slashpos == -1) slashpos = filePath.lastIndexOf("\\"); 
-	var filename = filePath.substr(slashpos + 1);
-	var uri = getDataURI(content);
-	displayMessage(config.messages.mainDownloadManual, uri);
-	return true;
-}
-
-// construct data URI (using base64 encoding to preserve multi-byte encodings)
-function getDataURI(data) {
-	if (config.browser.isIE)
-		return "data:text/html,"+encodeURIComponent(data);
-	else
-		return "data:text/html;base64,"+encodeBase64(data);
 }
 
 function encodeBase64(data) {
@@ -8065,10 +8051,6 @@ function encodeBase64(data) {
 function convertUnicodeToHtmlEntities(s) {
 	var re = /[^\u0000-\u007F]/g;
 	return s.replace(re, function($0) {return "&#" + $0.charCodeAt(0).toString() + ";";});
-}
-
-function manualConvertUnicodeToUTF8(s) {
-	return unescape(encodeURIComponent(s));
 }
 
 function convertUriToUTF8(uri,charSet) {
