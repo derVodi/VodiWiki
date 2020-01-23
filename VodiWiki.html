@@ -940,8 +940,7 @@ config.macros = {
 	refreshDisplay: {},
 	importTiddlers: {},
 	upgrade: {
-		source: "http://vodi.de/VodiWiki/VodiWiki.html",
-		backupExtension: "pre.core.upgrade"
+		updateSourceUrl: "http://vodi.de/VodiWiki/VodiWiki.html"
 	}
 };
 
@@ -1060,9 +1059,8 @@ merge(config.messages,{
 	invalidFileError: "The original file '%0' does not appear to be a valid Wiki",
 	emptySaved: "Empty template saved",
 	emptyFailed: "Failed to save empty template file",
-	mainSaved: "Wiki saved via push download.",
+	mainSaved: "Wiki saved.",
 	mainDownloadManual: "RIGHT CLICK HERE to download/save main Wiki file",
-	mainFailed: "Failed to save main Wiki file. Your changes have not been saved",
 	macroError: "Error in macro <<%0>>",
 	macroErrorDetails: "Error while executing macro <<%0>>:\n%1",
 	missingMacro: "No such macro",
@@ -1424,10 +1422,8 @@ function main() {
 
 // Called on unload. All functions called conditionally since they themselves may have been unloaded.
 function unload() {
-	if (window.checkUnsavedChanges)
-		checkUnsavedChanges();
-	if (window.scrubNodes)
-		scrubNodes(document.body);
+	if (window.checkUnsavedChanges) checkUnsavedChanges();
+	if (window.scrubNodes) scrubNodes(document.body);
 }
 
 // Restarting
@@ -2726,7 +2722,7 @@ config.macros.saveChanges.handler = function(place, macroName, params) { // Impl
 };
 
 config.macros.saveChanges.onClick = function(e) {
-	saveChanges();
+	saveChangesAction();
 	return false;
 };
 
@@ -4726,7 +4722,7 @@ Story.prototype.switchTheme = function(theme) { // todo: remove theming
 //-- Backstage
 //--
 // Backstage tasks
-config.tasks.save.action = saveChanges;
+config.tasks.save.action = saveChangesAction;
 
 var backstage = {
 	tabBar: null,
@@ -5055,32 +5051,32 @@ config.macros.upgrade.onClickUpgrade = function(e) {
 	
 	var ajaxParameters = {
 		type: "GET",
-		url: me.source,
+		url: me.updateSourceUrl,
 		dataType: 'text',
 		processData: false,
 		success: function(data, textStatus, jqXHR) {
-			me.onUpgradeRetrieved(true, presenter, jqXHR.responseText, me.source, jqXHR);
+			me.onUpgradeRetrieved(true, presenter, jqXHR.responseText, jqXHR);
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			me.onUpgradeRetrieved(false, presenter, null, me.source, jqXHR);
+			me.onUpgradeRetrieved(false, presenter, null, jqXHR);
 		}
 	};
 	ajaxReq(ajaxParameters);
 	return false;
 };
 
-config.macros.upgrade.onUpgradeRetrieved = function(sucess, presenter, responseText, url, xhr) {
+config.macros.upgrade.onUpgradeRetrieved = function(sucess, presenter, newHtmlSource, xhr) {
 	var me = config.macros.upgrade;
 		
 	var errMsg;	
 	guards: {
 		if (! sucess) {errMsg = me.errorLoadingCore; break guards; }
 		
-		var newVer = me.extractVersion(responseText);
+		var newVer = me.extractVersion(newHtmlSource);
 		if (! newVer) {errMsg = me.errorCoreFormat; break guards; }
 	}		
 	if (errMsg) {
-		presenter.renderFooterContent([],errMsg);
+		presenter.renderFooterContent([], errMsg);
 		alert(errMsg);
 		return;
 	}
@@ -5088,7 +5084,7 @@ config.macros.upgrade.onUpgradeRetrieved = function(sucess, presenter, responseT
 	var onStartUpgrade = function(e) {
 		presenter.renderFooterContent([],me.statusSavingCore);
 		var localPath = getLocalPath(document.location.toString());
-		saveFile(localPath, responseText);
+		saveFile(localPath, newHtmlSource);
 		presenter.renderFooterContent([], me.statusReloadingCore);		
 		var newLoc = document.location.toString(); // + "?time=" + new Date().convertToYYYYMMDDHHMM() + "#upgrade:[[" + encodeURI(backupPath) + "]]"; // xxx
 		window.setTimeout(function () {window.location = newLoc;}, 10);
@@ -5458,7 +5454,7 @@ function saveOption(name) {
 	}
 		
 	if (config.optionsSource[name] == 'setting') {
-		saveSystemSetting(name,true);
+		saveSystemSetting(name, true);
 	}
 }
 
@@ -5474,7 +5470,7 @@ function commitSystemSettings(storeWasDirty) {
 	}, 1000);
 }
 
-function saveSystemSetting(name, saveFile) {
+function saveSystemSetting(name, doSaveFile) {
 	var title = 'SystemSettings';
 	var slice = store.getTiddlerSlice(title,name);
 	if (readOnly || slice === getOption(name)) {
@@ -5501,7 +5497,7 @@ function saveSystemSetting(name, saveFile) {
 	} else {
 		tiddler = store.saveTiddler(title, title, text, 'System', new Date(), ['excludeLists'], null);
 	}
-	if (saveFile) {
+	if (doSaveFile) {
 		commitSystemSettings(storeWasDirty);
 	}
 }
@@ -7810,8 +7806,7 @@ function confirmExit() {
 // Give the user a chance to save changes before exitting
 function checkUnsavedChanges() {
 	if (store && store.isDirty && store.isDirty() && window.hadConfirmExit === false) {
-		if (confirm(config.messages.unsavedChangesWarning))
-			saveChanges();
+		if (confirm(config.messages.unsavedChangesWarning))	saveChangesAction();
 	}
 }
 
@@ -7823,19 +7818,19 @@ function updateMarkupBlock(s, blockName, tiddlerName) {
 	);
 }
 
-function updateOriginal(original, storeAreaRange, localPath) {
-	if (!storeAreaRange) storeAreaRange = locateStoreArea(original);
+function injectAllArticles(htmlSource, storeAreaRange, localPath) {
+	if (!storeAreaRange) storeAreaRange = locateStoreArea(htmlSource);
 	if (!storeAreaRange) {
 		alert(config.messages.invalidFileError.format([localPath]));
 		return null;
 	}
-	var revised = original.substr(0, storeAreaRange[0] + startSaveArea.length) + "\n" +
+	var revisedHtmlSource = htmlSource.substr(0, storeAreaRange[0] + startSaveArea.length) + "\n" +
 								store.allTiddlersAsHtml() + "\n" +
-								original.substr(storeAreaRange[1]);
+								htmlSource.substr(storeAreaRange[1]);
 								
 	var newSiteTitle = getPageTitle().htmlEncode();
-	revised = revised.replaceChunk("<title"+">", "</title"+">", " " + newSiteTitle + " ");
-	return revised;
+	revisedHtmlSource = revisedHtmlSource.replaceChunk("<title"+">", "</title"+">", " " + newSiteTitle + " ");
+	return revisedHtmlSource;
 }
 
 function locateStoreArea(original) {
@@ -7851,10 +7846,10 @@ function locateStoreArea(original) {
 }
 
 function autoSaveChanges(onlyIfDirty, tiddlers) {
-	if (config.options.chkAutoSave) saveChanges(onlyIfDirty, tiddlers);
+	if (config.options.chkAutoSave) saveChangesAction(onlyIfDirty, tiddlers);
 }
 
-function loadOriginal(localPath) {
+function getHtmlSourceWithoutDynamicallyAddedContent() {
 	var content = window.originalHTML || recreateOriginal();
 	return content;
 }
@@ -7895,41 +7890,37 @@ function recreateOriginal() {
 }
 
 // Save this tiddlywiki with the pending changes
-function saveChanges(onlyIfDirty, tiddlers) {
-	if (onlyIfDirty && ! store.isDirty())
-		return;
+function saveChangesAction(onlyIfDirty, tiddlers) {
+	if (onlyIfDirty && ! store.isDirty()) return;
 	clearMessage();	
 	var msg = config.messages;
-	var originalPath = document.location.toString();
-	var localPath = getLocalPath(originalPath);
-	var original = loadOriginal(localPath);
-	if (original == null) {
+	var originalUrl = decodeURIComponent(document.location.toString()); // document.location is URL escaped like "file:///C:/Foo/V%C3%B6di%F0%9F%92%ADWiki.html"
+	var localPath = getLocalPath(originalUrl);
+	var outdatedHtmlSource = getHtmlSourceWithoutDynamicallyAddedContent();
+	if (outdatedHtmlSource == null) {
 		alert(msg.cantSaveError);
 		return;
 	}
-	var storeAreaRange = locateStoreArea(original);
+	var storeAreaRange = locateStoreArea(outdatedHtmlSource);
 	if (! storeAreaRange) {
 		alert(msg.invalidFileError.format([localPath]));
 		return;
 	}
 	var co = config.options; //# abbreviation
-	config.saveByDownload = false;
-	saveMain(localPath, original, storeAreaRange);
+	var couldBeSavedAutomatically = injectArticlesAndSave(localPath, outdatedHtmlSource, storeAreaRange);
+	if (couldBeSavedAutomatically){
+		store.setDirty(false);	
+		displayMessage(config.messages.mainSaved);
+	}
 }
 
-function saveMain(localPath, original, storeAreaRange) {
-	var save;
+function injectArticlesAndSave(localPath, outdatedHtmlSource, storeAreaRange) {
 	try {
-		var revised = updateOriginal(original, storeAreaRange, localPath);
-		save = saveFile(localPath, revised);
+		var revisedHtmlSource = injectAllArticles(outdatedHtmlSource, storeAreaRange, localPath);
+		return saveFile(localPath, revisedHtmlSource);
 	} catch (ex) {
 		showException(ex);
-	}
-	if (save) {
-		displayMessage(config.messages.mainSaved);
-		store.setDirty(false);
-	} else {
-		alert(config.messages.mainFailed);
+		return false;
 	}
 }
 
@@ -7950,31 +7941,29 @@ function saveEmpty(localPath, original, posDiv) { // todo create UI entry point 
 		alert(config.messages.emptyFailed);
 }
 
-// Translate URL to local path [Preemption]
-window.getLocalPath = window.getLocalPath || function(origPath) {
-	var originalPath = convertUriToUTF8(origPath, config.options.txtFileSystemCharSet);
+// Translate escaped URL to unescaped local path [Preemption]
+// e.g. "file:///C:/Foo/Bar/Batz.html" =>
+//              "C:\\Foo\\Bar\\Batz.html"
+window.getLocalPath = window.getLocalPath || function(uri) {	
 	// Remove any location or query part of the URL
-	var argPos = originalPath.indexOf("?");
-	if (argPos != -1)
-		originalPath = originalPath.substr(0,argPos);
-	var hashPos = originalPath.indexOf("#");
-	if (hashPos != -1)
-		originalPath = originalPath.substr(0,hashPos);
-	// Convert file://localhost/ to file:///
-	if (originalPath.indexOf("file://localhost/") == 0)
-		originalPath = "file://" + originalPath.substr(16);
+	var argPos = uri.indexOf("?");
+	if (argPos != -1) uri = uri.substr(0, argPos);
+	var hashPos = uri.indexOf("#");
+	if (hashPos != -1) uri = uri.substr(0, hashPos);	
+	if (uri.indexOf("file://localhost/") == 0) uri = "file://" + uri.substr(16); // Convert file://localhost/ to file:///
 	// Convert to a native file format
 	var localPath;
-	if (originalPath.charAt(9) == ":") // pc local file
-		localPath = unescape(originalPath.substr(8)).replace(new RegExp("/","g"),"\\");
-	else if (originalPath.indexOf("file://///") == 0) // FireFox pc network file
-		localPath = "\\\\" + unescape(originalPath.substr(10)).replace(new RegExp("/","g"),"\\");
-	else if (originalPath.indexOf("file:///") == 0) // mac/unix local file
-		localPath = unescape(originalPath.substr(7));
-	else if (originalPath.indexOf("file:/") == 0) // mac/unix local file
-		localPath = unescape(originalPath.substr(5));
+	if (uri.charAt(9) == ":") // pc local file
+		localPath = uri.substr(8).replace(new RegExp("/","g"),"\\");
+	else if (uri.indexOf("file://///") == 0) // FireFox pc network file
+		localPath = "\\\\" + uri.substr(10).replace(new RegExp("/","g"),"\\");
+	else if (uri.indexOf("file:///") == 0) // mac/unix local file
+		localPath = uri.substr(7);
+	else if (uri.indexOf("file:/") == 0) // mac/unix local file
+		localPath = uri.substr(5);
 	else // pc network file
-		localPath = "\\\\" + unescape(originalPath.substr(7)).replace(new RegExp("/","g"),"\\");
+		localPath = "\\\\" + uri.substr(7).replace(new RegExp("/","g"),"\\");
+				
 	return localPath;
 }
 
@@ -7983,7 +7972,8 @@ window.getLocalPath = window.getLocalPath || function(origPath) {
 //--
 
 // Save a file in filesystem [Preemption]
-window.saveFile = window.saveFile || function(fileUrl, htmlSource) { // xxx
+// Returns true, if saving was possible unattendedly (without forcing the user to download manually)
+window.saveFile = window.saveFile || function(fileUrl, htmlSource) {
 	
 	if (saveFileViaBlobApi(fileUrl, htmlSource)) return true;
 		
@@ -7994,26 +7984,28 @@ window.saveFile = window.saveFile || function(fileUrl, htmlSource) { // xxx
 	// encodeURIComponent() will re-encode the UTF-16 string to UTF-8, but unfortunalely escape all URL-poison-chars/spaces
 	// after calling unescape() you get pure UTF-8
 	
-	displayMessage(config.messages.mainDownloadManual, dataUrl, -1);
-		
-	return true;
+	displayMessage(config.messages.mainDownloadManual, dataUrl, -1);		
+	return false;
 }
 
-function saveFileViaBlobApi(filePath, content) {	
+function saveFileViaBlobApi(fileUrl, htmlSource) {	
 	if (document.createElement("a").download == undefined) return null;
 	try {
-		config.saveByDownload = true;
-		var slashpos = filePath.lastIndexOf("/");
-		if (slashpos == -1) slashpos = filePath.lastIndexOf("\\"); 
-		var filename = filePath.substr(slashpos + 1);
-		var blob = new Blob([content], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
+		
+		var slashpos = fileUrl.lastIndexOf("/");
+		if (slashpos == -1) slashpos = fileUrl.lastIndexOf("\\"); 
+		var filename = fileUrl.substr(slashpos + 1);
+		
+		var blob = new Blob([htmlSource], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
 		var uri = window.URL.createObjectURL(blob);
 		var link = document.createElement("a");
 		// link.setAttribute("target","_blank");
 		link.setAttribute("href", uri);
 		link.setAttribute("download", filename);
 		document.body.appendChild(link);
+		
 		link.click();
+		
 		document.body.removeChild(link);
 		// window.URL.revokeObjectURL(uri); // todo: normally this should be done - edge won't save with this - maybe a timing problem, solution could be async
 	} catch(ex) {
@@ -8051,18 +8043,6 @@ function encodeBase64(data) {
 function convertUnicodeToHtmlEntities(s) {
 	var re = /[^\u0000-\u007F]/g;
 	return s.replace(re, function($0) {return "&#" + $0.charCodeAt(0).toString() + ";";});
-}
-
-function convertUriToUTF8(uri,charSet) {
-	if (window.netscape == undefined || charSet == undefined || charSet == "")
-		return uri;
-	try {
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		var converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].getService(Components.interfaces.nsIUTF8ConverterService);
-	} catch(ex) {
-		return uri;
-	}
-	return converter.convertURISpecToUTF8(uri,charSet);
 }
 
 //--
