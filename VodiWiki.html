@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 2020, minor: 1, revision: 1, date: new Date("June 23, 2013"), extensions: {}};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 0};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -17,7 +17,7 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITEDTO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
 <!--PRE-HEAD-START-->
 <!--PRE-HEAD-END-->
-<title> VodiWiki - 19.11.12 </title>
+<title> VodiWiki </title>
 <style id="styleArea" type="text/css">
 
 /* Anatomy */
@@ -451,7 +451,7 @@ The following code...
 !The Window Title / Subtitle
 
 * By default this is &quot;VodiWiki&quot; / &quot;1.0&quot;
-* This can be changed by editing the internal &quot;[[SiteTitle]]&quot; and/or &quot;[[SiteSubtitle]]&quot; page
+* This can be changed by editing the internal &quot;[[SiteTitle]]&quot; page
 
 !Turn Auto-Save On/Off
 
@@ -548,9 +548,6 @@ Demo code, directly followed by it's output:
 
 Some dummy text.
 </pre>
-</div>
-<div title="SiteSubtitle" created="201305200104" modified="201910120923" modifier="YourName" changecount="3">
-<pre>19.11.12</pre>
 </div>
 <div title="SiteTitle" created="201305200101" modified="201305200103" modifier="YourName" changecount="3">
 <pre>VodiWiki</pre>
@@ -940,7 +937,7 @@ config.macros = {
 	refreshDisplay: {},
 	importTiddlers: {},
 	upgrade: {
-		updateSourceUrl: "http://vodi.de/VodiWiki/VodiWiki.html"
+		updateSourceUrl: "http://vodi.de/VodiWiki/Updates/%0.html"
 	}
 };
 
@@ -1002,8 +999,7 @@ config.shadowTiddlers = {
 	TabTags: '<<allTags excludeLists>>',
 	TabMoreMissing: 'Pages with no menu entry: <<list orphans>> Broken Links <<list missing>>',
 	TabMoreShadowed: '<<list shadowed>>',
-	TimelinePanel: '<<timeline>>',
-	WindowTitle: '<<tiddler SiteTitle>> - <<tiddler SiteSubtitle>>'
+	TimelinePanel: '<<timeline>>',	
 };
 
 // Browser detection... In a very few places, there's nothing else for it but to know what browser we're using.
@@ -1266,7 +1262,7 @@ merge(config.macros.upgrade,{
 	errorLoadingCore: "Error retrieving update!",
 	errorCoreFormat: "Error with the recieved update code!",
 	statusSavingCore: "Saving the updated wiki",
-	statusReloadingCore: "Reloading the new core code",
+	statusUpdateSaved: "The updated wiki has been saved to your download location.",
 	startLabel: "Start",
 	startPrompt: "Start the upgrade process",
 	cancelLabel: "Cancel",
@@ -1333,9 +1329,8 @@ merge(config.commands.fields,{
 
 merge(config.shadowTiddlers,{	
 	SiteTitle: "VodiWiki",
-	SiteSubtitle: "",
 	SiteUrl: "",
-	SideBarTabs: '<<tabs sideBarTabSet "Missing" "Missing links & pages" TabMoreMissing "Tags" "All tags" TabTags "Shadowed" "Shadowed tiddlers" TabMoreShadowed>>'
+	SideBarTabs: '<<tabs sideBarTabSet "Missing" "Missing links & pages" TabMoreMissing "Tags" "All tags" TabTags "Internal" "Internal Articles" TabMoreShadowed>>'
 });
 
 //--
@@ -2287,9 +2282,8 @@ function wikify(wikiSyntaxText, targetDomElement, highlightRegExp, tiddler) {
 }
 
 function wikifyPlainText(text,limit,tiddler) {
-	if (limit > 0)
-		text = text.substr(0,limit);
-	var wikifier = new Wikifier(text,formatter,null,tiddler);
+	if (limit > 0) text = text.substr(0, limit);
+	var wikifier = new Wikifier(text, formatter, null, tiddler);
 	return wikifier.wikifyPlain();
 }
 
@@ -4307,13 +4301,14 @@ Story.prototype.refreshView = function(title, templateNameOrNumber, force, custo
 		
 		if (! article) {
 			article = new Tiddler();
+			var now = new Date();
 			if (store.isShadowTiddler(title)) {
 				var tags = [];
-				article.set(title, store.getTiddlerText(title), config.views.wikified.shadowModifier, version.date, tags, version.date);
+				article.set(title, store.getTiddlerText(title), config.views.wikified.shadowModifier, now, tags, now);
 			} else {
 				var text = (templateName != "EditTemplate") ? config.views.wikified.defaultText.format([title]) : null;
 				var fields = customFields ? customFields.decodeHashMap() : null;
-				article.set(title, text, config.views.wikified.defaultModifier, version.date, [], version.date, fields);
+				article.set(title, text, config.views.wikified.defaultModifier, now, [], now, fields);
 			}
 		}
 		articleView.setAttribute("tags", article.tags.join(" "));
@@ -4759,6 +4754,7 @@ var backstage = {
 			jQuery(btn).addClass(task.action ? "backstageAction" : "backstageTask");
 			btn.setAttribute("task", taskName);
 		}
+		createTiddlyText(this.tabBar, formatVersion());
 		this.hide();
 	},
 
@@ -5048,22 +5044,38 @@ config.macros.upgrade.onClickUpgrade = function(e) {
 		return false;
 	}	
 	presenter.renderFooterContent([], me.statusRetrievingUpdate);
+
+	var secondTry = function(jqXHR, textStatus, errorThrown) {
+		me.tryRetrieveUpdateAsync(presenter, version.major, function(jqXHR, textStatus, errorThrown) {me.onUpgradeRetrieved(false, presenter, null, jqXHR);})
+	}
 	
-	var ajaxParameters = {
-		type: "GET",
-		url: me.updateSourceUrl,
-		dataType: 'text',
-		processData: false,
-		success: function(data, textStatus, jqXHR) {
-			me.onUpgradeRetrieved(true, presenter, jqXHR.responseText, jqXHR);
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			me.onUpgradeRetrieved(false, presenter, null, jqXHR);
-		}
-	};
-	ajaxReq(ajaxParameters);
+	me.tryRetrieveUpdateAsync(presenter, version.major + 1, secondTry);
+	
+	// var ajaxParameters = {
+		// type: "GET",
+		// url: me.updateSourceUrl.format([version.major + 1]),
+		// dataType: 'text',
+		// processData: false,
+		// success: function(data, textStatus, jqXHR) {me.onUpgradeRetrieved(true, presenter, jqXHR.responseText, jqXHR);},
+		// error: function(jqXHR, textStatus, errorThrown) {me.onUpgradeRetrieved(false, presenter, null, jqXHR);}
+	// };
+	// ajaxReq(ajaxParameters);
+	
 	return false;
 };
+
+config.macros.upgrade.tryRetrieveUpdateAsync = function(presenter, majorVersion, onFail){
+	var me = config.macros.upgrade;
+	var ajaxParameters = {
+		type: "GET",
+		url: me.updateSourceUrl.format(majorVersion),
+		dataType: 'text',
+		processData: false,
+		success: function(data, textStatus, jqXHR) {me.onUpgradeRetrieved(true, presenter, jqXHR.responseText, jqXHR);},
+		error: onFail
+	};
+	ajaxReq(ajaxParameters);
+}
 
 config.macros.upgrade.onUpgradeRetrieved = function(sucess, presenter, newHtmlSource, xhr) {
 	var me = config.macros.upgrade;
@@ -5084,10 +5096,8 @@ config.macros.upgrade.onUpgradeRetrieved = function(sucess, presenter, newHtmlSo
 	var onStartUpgrade = function(e) {
 		presenter.renderFooterContent([],me.statusSavingCore);
 		var localPath = getLocalPath(document.location.toString());
-		saveFile(localPath, newHtmlSource);
-		presenter.renderFooterContent([], me.statusReloadingCore);		
-		var newLoc = document.location.toString(); // + "?time=" + new Date().convertToYYYYMMDDHHMM() + "#upgrade:[[" + encodeURI(backupPath) + "]]"; // xxx
-		window.setTimeout(function () {window.location = newLoc;}, 10);
+		injectArticlesAndSave(localPath, newHtmlSource);
+		presenter.renderFooterContent([], me.statusUpdateSaved);
 	};
 	
 	var step2 = [me.step2Html_downgrade, me.step2Html_restore, me.step2Html_upgrade][compareVersions(version, newVer) + 1];
@@ -5103,9 +5113,9 @@ config.macros.upgrade.onCancel = function(e) {
 	return false;
 };
 
-config.macros.upgrade.extractVersion = function(upgradeFile) {
-	var re = /^var version = \{title: "([^"]+)", major: (\d+), minor: (\d+), revision: (\d+)(, beta: (\d+)){0,1}, date: new Date\("([^"]+)"\)/mg;
-	var m = re.exec(upgradeFile);
+config.macros.upgrade.extractVersion = function(htmlSource) {
+	var re = /^var version = \{title: "([^"]+)", major: (\d+), minor: (\d+), revision: (\d+)/mg;
+	var m = re.exec(htmlSource);
 	return m ? {title: m[1], major: m[2], minor: m[3], revision: m[4], beta: m[6], date: new Date(m[7])} : null;
 };
 
@@ -5252,8 +5262,6 @@ config.notifyTiddlers = [
 	{name: "StyleSheetPrint", notify: refreshStyles},
 	{name: "PageTemplate", notify: refreshPageTemplate},
 	{name: "SiteTitle", notify: refreshPageTitle},
-	{name: "SiteSubtitle", notify: refreshPageTitle},
-	{name: "WindowTitle", notify: refreshPageTitle},
 	{name: null, notify: refreshDisplay}
 ];
 
@@ -5382,7 +5390,7 @@ function refreshPageTitle() {
 }
 
 function getPageTitle() {
-	return wikifyPlainText(store.getTiddlerText("WindowTitle",""),null,tiddler); // todo: setting instead of tiddler. default: beautified url!
+	return wikifyPlainText(store.getTiddlerText("SiteTitle",""), null, null); // todo: setting instead of tiddler. default: beautified url!
 }
 
 function refreshStyles(title, doc) {
@@ -5974,11 +5982,9 @@ inputDialog = {
 
 // YourSearch
 
-if (!version.extensions.YourSearchPlugin) { // Ensure_that_the_Plugin_is_only_installed_once.
+if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 
-version.extensions.YourSearchPlugin = {};
-
-if (!window.abego) window.abego = {};
+window.abego = {};
 
 // define the Array forEach when not yet defined (e.g. by Mozilla)
 if (!Array.forEach) {
@@ -7818,15 +7824,14 @@ function updateMarkupBlock(s, blockName, tiddlerName) {
 	);
 }
 
-function injectAllArticles(htmlSource, storeAreaRange, localPath) {
-	if (!storeAreaRange) storeAreaRange = locateStoreArea(htmlSource);
-	if (!storeAreaRange) {
-		alert(config.messages.invalidFileError.format([localPath]));
-		return null;
-	}
+function injectAllArticles(htmlSource) {
+	
+	storeAreaRange = locateStoreArea(htmlSource);
+	if (! storeAreaRange) throw "storeAreaRange not found!";
+	
 	var revisedHtmlSource = htmlSource.substr(0, storeAreaRange[0] + startSaveArea.length) + "\n" +
-								store.allTiddlersAsHtml() + "\n" +
-								htmlSource.substr(storeAreaRange[1]);
+													store.allTiddlersAsHtml() + "\n" +
+													htmlSource.substr(storeAreaRange[1]);
 								
 	var newSiteTitle = getPageTitle().htmlEncode();
 	revisedHtmlSource = revisedHtmlSource.replaceChunk("<title"+">", "</title"+">", " " + newSiteTitle + " ");
@@ -7900,23 +7905,17 @@ function saveChangesAction(onlyIfDirty, tiddlers) {
 	if (outdatedHtmlSource == null) {
 		alert(msg.cantSaveError);
 		return;
-	}
-	var storeAreaRange = locateStoreArea(outdatedHtmlSource);
-	if (! storeAreaRange) {
-		alert(msg.invalidFileError.format([localPath]));
-		return;
-	}
-	var co = config.options; //# abbreviation
-	var couldBeSavedAutomatically = injectArticlesAndSave(localPath, outdatedHtmlSource, storeAreaRange);
+	}		
+	var couldBeSavedAutomatically = injectArticlesAndSave(localPath, outdatedHtmlSource);
 	if (couldBeSavedAutomatically){
 		store.setDirty(false);	
 		displayMessage(config.messages.mainSaved);
 	}
 }
 
-function injectArticlesAndSave(localPath, outdatedHtmlSource, storeAreaRange) {
+function injectArticlesAndSave(localPath, htmlSource) {
 	try {
-		var revisedHtmlSource = injectAllArticles(outdatedHtmlSource, storeAreaRange, localPath);
+		var revisedHtmlSource = injectAllArticles(htmlSource);
 		return saveFile(localPath, revisedHtmlSource);
 	} catch (ex) {
 		showException(ex);
@@ -7925,6 +7924,7 @@ function injectArticlesAndSave(localPath, outdatedHtmlSource, storeAreaRange) {
 }
 
 function saveEmpty(localPath, original, posDiv) { // todo create UI entry point for this
+	
 	var emptyPath, p;
 	if ((p = localPath.lastIndexOf("/")) != -1)
 		emptyPath = localPath.substr(0,p) + "/";
@@ -7932,9 +7932,13 @@ function saveEmpty(localPath, original, posDiv) { // todo create UI entry point 
 		emptyPath = localPath.substr(0,p) + "\\";
 	else
 		emptyPath = localPath + ".";
+	
 	emptyPath += "empty.html";
+	
 	var empty = original.substr(0, posDiv[0] + startSaveArea.length) + original.substr(posDiv[1]);
+	
 	var emptySave = saveFile(emptyPath, empty);
+	
 	if (emptySave)
 		displayMessage(config.messages.emptySaved, "file://" + emptyPath);
 	else
@@ -8210,9 +8214,7 @@ function httpReq(type,url,callback,params,headers,data,contentType,username,pass
 // Returns version string
 function formatVersion(v) {
 	v = v || version;
-	return v.major + "." + v.minor + "." + v.revision +
-		(v.alpha ? " (alpha " + v.alpha + ")" : "") +
-		(v.beta ? " (beta " + v.beta + ")" : "");
+	return v.major + "." + v.minor + "." + v.revision;
 }
 
 function compareVersions(v1, v2) {
@@ -9731,7 +9733,7 @@ TW21Loader.prototype.populateArticleFromElement = function(targetArticle, title,
 	var modifier = sourceDivElement.getAttribute("modifier");
 	var c = sourceDivElement.getAttribute("created");
 	var m = sourceDivElement.getAttribute("modified");
-	var created = c ? Date.convertFromYYYYMMDDHHMMSS(c) : version.date;
+	var created = c ? Date.convertFromYYYYMMDDHHMMSS(c) : new Date();
 	var modified = m ? Date.convertFromYYYYMMDDHHMMSS(m) : created;
 	var tags = sourceDivElement.getAttribute("tags");
 	var fields = {};
