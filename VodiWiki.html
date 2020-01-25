@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 0};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 1};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -25,8 +25,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND 
 body {margin: 0; padding: 0;}
 html, body, #contentWrapper, #displayArea, #tiddlerDisplay {height: 100%; overflow:hidden;}
 #backstageTabBar {position:relative; padding: 0 0.3em; z-index:900;}
-.backstageTabHead {padding: 0.3em 1em; display: inline-block;}
-#backstagePanel {display:none; z-index:900; box-sizing:border-box; max-width: calc(100% - 4em); max-height:calc(100% - 3em); margin-left:3em; padding:1em; position:absolute; overflow: auto;}
+.backstageTabHead {display: inline-block; margin: 1px 1px 0 1px; padding: 0.3em 1em; border-radius: 4px 4px 0 0;}
+#backstagePanel {display:none; z-index:900; box-sizing:border-box; max-width: calc(100% - 4em); max-height:calc(100% - 3em); margin-left:4.9em; padding:1em; position:absolute; overflow: auto;}
 .backstagePanelBody {position:relative;}
 
 #navigationArea {float: left; min-width: 1em; width: auto; height:100%; position:relative; padding: 9px 1px 0 0;}
@@ -35,7 +35,7 @@ html, body, #contentWrapper, #displayArea, #tiddlerDisplay {height: 100%; overfl
 
 #navAndSearch {margin-bottom: 0.3em;}
 #treePath {border: 1px inset grey; padding: 0 0.3em; line-height: 1.3em; }
-#navToolbar, #search, #navButtons, #treePath {display: table-cell; vertical-align: top;}
+#navToolbar, #search, #navButtons, #treePath {display: table-cell;}
 #navToolbar, #treePath {width: 100%;}
 #search, #treePath {white-space: nowrap;}
 .searchField {margin-left: 1em;}
@@ -50,7 +50,7 @@ table td {vertical-align: top;}
 #displayArea {padding-top: 3px}
 #pageWrapper {position:relative; height:100%;}
 #tiddlerDisplay {position:relative;}
-.articleView {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0; padding: 6pt 6pt 0;}
+.articleView {bottom: 3em; left: 0; overflow: auto; position: absolute; right: 0; top: 0; padding: 6pt 8pt 0;}
 
 #saveTest {display:none;}
 
@@ -115,6 +115,9 @@ blockquote::before {position:absolute;top:0.3em;left:0.2em;content:'\275D'; font
 /* Interactivity */
 
 .button {border-width:1px; border-style: solid; border-radius: 3px; padding: 0.1em 0.5em; font-weight: bold;}
+.buttonWithIcon {display: block; position: relative; padding-left: 1.75em; margin-bottom: 0.5em;}
+.buttonWithIcon *:first-child {position: absolute; left: 0;}
+
 .listView input:not([type=checkbox]) {width:  11em; border:0;} /* These are nested in table cells */
 .tiddlerPopupButton {padding: 0.2em;}
 .branch .button {position: absolute; left: -1.3em; padding: 0;}
@@ -180,9 +183,9 @@ blockquote::before {position:absolute;top:0.3em;left:0.2em;content:'\275D'; font
 
 /* Colors.Foregrounds (sorting: getting lighter) */
 
-.twtable thead td, .backstageTabHead:hover, #backstageShow {color: black;}
+.twtable thead td, .backstageTabHead:hover, #backstageShow, a.backstageSelTab {color: black;}
 .anchor, .anchor:hover, .title, .inputDialogPanel {color: black;}
-.button, .button:hover {color: darkblue;}
+.button, .button:hover, .button a {color: darkblue;}
 
 a, a:hover {color:blue;}
 
@@ -211,7 +214,7 @@ h2, h3, h4, h5 {color: #366092;}
 
 a:hover {background-color:transparent;}
 #tiddlerDisplay, .inputDialogPanel, .wizard {background-color:white;}
-body, .twtable thead td, .twtable th, #backstagePanel, pre, .popup, .readOnly {background-color: whitesmoke;}
+body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .popup, .readOnly {background-color: whitesmoke;}
 .yourSearchResult {background: lightyellow;}
 .highlight, .marked, .toBeImported .tiddlyLinkExisting {background: yellow;}
 .backstageTabHead:hover, .button:hover, .wizardFooter .button:hover {background-color: khaki;}
@@ -332,20 +335,33 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="- Home -" created="201904232038" modified="202001181740" modifier="Anonymous" changecount="8">
-<pre>!Welcome to VodiWiki
+<div title="- Home -" created="201904232038" modified="202001251815" modifier="Anonymous" changecount="14">
+<pre>!What is VodiWiki
 
-* This is a freeware open source monolithic (= single HTML file) wiki with built-in viewer and editor.
-* It's purpose is to make any kind of documentation accessible, portable, publishable, platform independent.
-* Although it's running in a browser you can work completely offline (using a local file).
-* There is no cloud connection - none of your data will be uploaded anywhere.
+* It's a single HTML file containing many documents 
+* Built-in viewer with search function
+* Built-in editor with local save function
+* No cloud, no need to be online
+* Portable
+* Easy to publish
 
-!! Usage scenarios
+!Is It For Me?
 
-* ... write a documentation for your product and deliver it for offline reading
-* ... put the HTML file on a public server for online reading
+!!Private Usage
 
-!Get Started
+* Use it to keep your notes together in a single file instead of having them spread in several files
+* Create your private reference books 
+
+!!Productive Usage
+
+* Use it to document your product
+* Put the HTML file on a web server and you're done (no CMS needed)
+
+!!Collaborative Usage? Sync between devices?
+
+* No. (not yet, but in the long term pipeline)
+
+!Getting Started
 
 * Just go here: [[Anatomy Of The Main Window]] (and following pages)
 
@@ -354,31 +370,46 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 When working with sensitive data consider the following advice:
 
 * Disable all browser plugins - they can read everything in a browser (even password fields, single key strokes, etc.).
-* If you can't get around using Microsoft Windows, at least make sure you turned off the &quot;cloud clipboard&quot; (= copy &amp; paste contents will be transferred to Microsoft).
-* Consider blocking your browser using a firewall
+* Turned off all &quot;cloud clipboard&quot; functionalities (copy &amp; paste contents will be transferred to your trusted(?) provider.).
+** Note: Windows 10 comes with such a &quot;feature&quot; - check if it's enabled.
+* Consider using an extra browser for the wiki that is blocked by a firewall
+
+!Sources
+
+* https://github.com/derVodi/VodiWiki
+
+* https://trello.com/b/QffB4q5s/vodiwiki
 
 !License
 
 &lt;&lt;licenseText&gt;&gt;
-
 </pre>
 </div>
-<div title="Anatomy Of The Main Window" created="201701242104" modified="201904232014" modifier="YourName" changecount="30" parenttiddler="Getting Started">
-<pre>|Tree/List Toggle|← → Navigation Bar| Search|
-|Pages Tree/List&lt;br&gt;...| &lt;br&gt;&lt;br&gt;Current Page&lt;br&gt;&lt;br&gt;&lt;br&gt; |&gt;|
+<div title="Anatomy Of The Main Window" created="201701242104" modified="202001251729" modifier="Anonymous" changecount="37" parenttiddler="Getting Started">
+<pre>|Backstage Menu (hidden)|&gt;|&gt;|
+|Navigation Tabs|← → Navigation Bar| Search|
+|Navigation&lt;br&gt;tree or&lt;br&gt;list views|&lt;br&gt;&lt;br&gt;Current Page&lt;br&gt;&lt;br&gt;&lt;br&gt; |&gt;|
 
-* Tree/List Toggle - Views available pages as structured tree or flat list 
+!Backstage
+
+* Can be shown by clicking ⌵ at the upper right
+* Provides functions like New, Save, Import, Update, etc.
+
+!Navigation Tabs
+
+* Offer different kinds of views of the contained articles
+* Can be hidden by clicking « at the left of the navigation bar
+
+!Navigation Bar
+
+* Offers relative navigation
 * ← → - Navigates back/forward in view history
-* Navigation Bar - Shows where you are
-* Search - Full text search for the content of all pages
-* Pages Tree/List - Shows all available pages. At the bottom there are buttons to add new pages.
-* Current Page - Only one page at a time can be shown (no tabbed browsing). At the upper right there are buttons to edit/delete the current page.
+* You can click into the bar to jump directly to a parent article
 
-! Hidden Controls
+!Search
 
-* Between Tree/List Toggle and Navigation Bar there's a collapse button for the left area
-* At the top right border of the Search Field there's a &quot;Backstage&quot; button for some internal functions
-* At the top right border beside the Page there's a collapse button for some internal filters/navigation.</pre>
+* Search the content of all articles
+</pre>
 </div>
 <div title="DefaultTiddlers" created="201208271046" modified="201904232039" modifier="YourName" tags="excludeLists" changecount="1">
 <pre>[[- Home -]]
@@ -440,26 +471,18 @@ The following code...
 <div title="Getting Started" created="201904231951" modified="201904231951" modifier="YourName" changecount="1">
 <pre></pre>
 </div>
-<div title="How to Customize Stuff" created="201904232039" modified="201904232059" modifier="YourName" changecount="6" parenttiddler="Getting Started">
+<div title="How to Customize Stuff" created="201904232039" modified="202001251730" modifier="Anonymous" changecount="7" parenttiddler="Getting Started">
 <pre>!The Startup Page
 
 * By default it's the page with the title &quot;- Home -&quot;
-* This can be changed by editing the internal &quot;DefaultTiddlers&quot; page
-** Search for &quot;DefaultTiddlers&quot; (or just click [[here|DefaultTiddlers]])
-** Edit the page and replace the link by anything of your choice, e.g. {{{[[My Start Page]]}}}
+* This can be changed by editing the internal [[DefaultTiddlers]] page
+* Edit the page and replace the link by anything of your choice, e.g. {{{[[My Start Page]]}}}
 
-!The Window Title / Subtitle
+!The Window Title
 
-* By default this is &quot;VodiWiki&quot; / &quot;1.0&quot;
+* By default this is &quot;VodiWiki&quot;
 * This can be changed by editing the internal &quot;[[SiteTitle]]&quot; page
-
-!Turn Auto-Save On/Off
-
-* By default it's on.
-* This can be change via the &quot;Backstage&quot; menu (click the hidden button in the upper right corner of the search menu)
-** &quot;Tweak&quot;
-** Turn off &quot;Automatically save changes&quot;
-** Keep the &quot;Backstage&quot; menu visible, as you now need to save manually by clicking on &quot;save&quot; in the upper right area.</pre>
+</pre>
 </div>
 <div title="How to Read Content" created="201904232015" modified="201904232018" modifier="YourName" changecount="3" parenttiddler="Getting Started">
 <pre>Only one page can be read at a time. There's no tabbed browsing.
@@ -469,7 +492,7 @@ The following code...
 * Use the search field to search for content
 * Click on links in pages to navigate to other pages</pre>
 </div>
-<div title="How to Write Content" created="201904232018" modified="201904241458" modifier="YourName" changecount="14" parenttiddler="Getting Started">
+<div title="How to Write Content" created="201904232018" modified="202001251823" modifier="Anonymous" changecount="17" parenttiddler="Getting Started">
 <pre>!Adding a New Page
 
 * Click on &quot;New Article&quot; to add a page on the root level
@@ -494,7 +517,18 @@ The following code...
 
 * Place the image file besides the Wiki-File (or create a sub directory, e.g. &quot;Files&quot;)
 * Use a tag like this: {{{[img[Label|Files/Bars.svg]]}}}
-** Example: [img[Label|Files/Bars.svg]]</pre>
+** Example: [img[Label|Files/Bars.svg]]
+
+!Saving
+
+{{notice{
+Never use the browser File/Save functions - this would save the file without your changes!
+}}}
+
+* Saving will be done automatically after every change
+* &quot;Saving&quot; means: The changed wiki is pushed as a download.
+** Due to browser restrictions the wiki cannot overwrite it's original file - therefore the download strategy is the only possible way (yet)
+</pre>
 </div>
 <div title="Index Sorting" created="201906080758" modified="201906080810" modifier="YourName" changecount="4" parenttiddler="​Advanced Use Cases">
 <pre>Normally the index tree is sorted alphabetically. You can change the order of items only by using a trick:
@@ -793,17 +827,6 @@ Several lines of blockquoted text.
 **[[Symbols|http://www.fileformat.info/info/unicode/block/miscellaneous_symbols/utf8test.htm]], [[Pictographs|http://www.fileformat.info/info/unicode/block/miscellaneous_symbols_and_pictographs/utf8test.htm]], [[Transport|http://www.fileformat.info/info/unicode/block/transport_and_map_symbols/utf8test.htm]], [[Supplemental|https://www.fileformat.info/info/unicode/block/supplemental_symbols_and_pictographs/utf8test.htm]], [[Other|https://www.fileformat.info/info/unicode/category/So/list.htm]]
 </pre>
 </div>
-<div title="Version History" created="201906081713" modified="201910120924" modifier="YourName" changecount="4" parenttiddler="​Reference">
-<pre>!19.11.12
-
-*Enhanced support for [[embedding parts of other pages|Embedding Parts Of Other Pages]]
-*Added CSS syntax description to [[reference|Syntax Reference]]
-*Added documentation [[Index Sorting]]
-*Anchor has now 2 parameters: Name, InnerText (see [[Link Variations]])
-*Current page is highlighted in menu tree (and menu is scrolled, if necessary)
-*Internal save method was replaced to be compatible with more browsers
-</pre>
-</div>
 <div title="VodiConfigPlugin" created="201208271031" modified="201702011759" modifier="YourName" tags="systemConfig excludeLists excludeSearch" changecount="24">
 <pre>/***
 |''Name:''|VodiConfigPlugin|
@@ -831,22 +854,6 @@ Several lines of blockquoted text.
 <script id="jsArea" type="text/javascript">
 //<![CDATA[
 
-//
-// Please note:
-//
-// * This code is designed to be readable but for compactness it only includes brief comments. You can see fuller comments
-//   in the project repository at https://github.com/TiddlyWiki/tiddlywiki
-//
-// * You should never need to modify this source code directly. Please consult the development group at http://groups.google.com/group/TiddlyWikiDev
-//
-// JSLint directives
-/*global jQuery:false, version:false */
-/*jslint bitwise:true, browser:true, confusion:true, eqeq:true, evil:true, forin:true, maxerr:100, plusplus:true, regexp:true, sloppy:true, sub:true, undef:true, unparam:true, vars:true, white:true */
-//--
-//-- Configuration repository
-//--
-
-// Miscellaneous options
 var config = {
 	numRssItems: 20 // Number of items in the RSS feed	
 };
@@ -1020,7 +1027,7 @@ config.browser = {
 merge(config.options, {txtUserName: ""});
 
 merge(config.tasks, {
-	save: {text: "Save", tooltip: "Save your changes to this wiki"},
+	save: {text: "File", tooltip: "New, Save, ...", content: '<<fileTasks>>'},
 	importTask: {text: "Import", tooltip: "Import content and plugins from other wiki files and servers", content: '<<importTiddlers>>'},
 	tweak: {text: "Tweak", tooltip: "Tweak some options", content: '<<options>>'},
 	upgrade: {text: "About / Upgrade", tooltip: "Upgrade integrated viewer and editor", content: '<<upgrade>>'},
@@ -1053,8 +1060,8 @@ merge(config.messages,{
 	noTags: "There are no tagged tiddlers",
 	cantSaveError: "It's not possible to save changes. Possible reasons include:\n- your browser doesn't support saving (Firefox, Internet Explorer, Safari and Opera all work if properly configured)\n- the pathname to your Wiki file contains illegal characters\n- the Wiki HTML file has been moved or renamed",
 	invalidFileError: "The original file '%0' does not appear to be a valid Wiki",
-	emptySaved: "Empty template saved",
-	emptyFailed: "Failed to save empty template file",
+	emptySaved: "Empty Wiki created in your download location.",
+	emptyFailed: "Failed to create empty Wiki file",
 	mainSaved: "Wiki saved.",
 	mainDownloadManual: "RIGHT CLICK HERE to download/save main Wiki file",
 	macroError: "Error in macro <<%0>>",
@@ -1133,6 +1140,14 @@ merge(config.macros.saveChanges, {
 	hint: "Save all articles to create a new Wiki",
 	accessKey: "S"
 });
+
+config.macros.fileTasks = {};
+
+config.macros.fileTasks.handler = function(place, macroName, params, wikifier, paramString) { // Implements IMacroResolver.handler()
+	renderTiddlyButton(place, "New", "Create and save an empty wiki file.", function(e){createEmptyWikiAction();}, null, null, null, null, "📄")
+	renderTiddlyButton(place, "Save", "Automatically find the best save method.", function(e){saveChangesAction();}, null, null, null, null, "💾")
+	renderTiddlyButton(place, "Save Manually...", "Create a download link (in case normal saving doesn't work).", function(e){saveChangesAction(true);}, null, null, null, null, "⤓")
+}
 
 merge(config.macros.options, {
 	wizardTitle: "Tweak advanced options",
@@ -3613,7 +3628,7 @@ ArticleStore.prototype.loadFromDiv = function(elementOrId, noUpdate) {
 ArticleStore.prototype.importAllArticlesFromHtmlSource = function(htmlSource) {
 	var storeAreaRange = locateStoreArea(htmlSource);
 	if (! storeAreaRange)	return null;
-	var content = "<" + "html><" + "body>" + htmlSource.substring(storeAreaRange[0], storeAreaRange[1] + endSaveArea.length) + "<" + "/body><" + "/html>";
+	var content = "<" + "html><" + "body>" + htmlSource.substring(storeAreaRange[0], storeAreaRange[1] + storeAreaEndString.length) + "<" + "/body><" + "/html>";
 	// Create an iframe as tool for converting the htmlSource to a DOM
 	var iframe = document.createElement("iframe");
 	iframe.style.display = "none";
@@ -4654,8 +4669,8 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 	for (var fieldName in editBuffer) {
 		if (! ArticleStore.isStandardField(fieldName)) extendedFields[fieldName] = editBuffer[fieldName];
 	}
-	var tiddler = store.saveTiddler(title, newTitle, editBuffer.text, config.options.txtUserName, newDate, editBuffer.tags, extendedFields, null, null, creator);
-	autoSaveChanges(null, [tiddler]);
+	store.saveTiddler(title, newTitle, editBuffer.text, config.options.txtUserName, newDate, editBuffer.tags, extendedFields, null, null, creator);
+	autoSaveChanges();
 	return newTitle;
 };
 
@@ -4716,8 +4731,6 @@ Story.prototype.switchTheme = function(theme) { // todo: remove theming
 //--
 //-- Backstage
 //--
-// Backstage tasks
-config.tasks.save.action = saveChangesAction;
 
 var backstage = {
 	tabBar: null,
@@ -4726,8 +4739,8 @@ var backstage = {
 	hideButton: null,
 	cloak: null,
 	panel: null,
-	currTabName: null,
-	currTabElem: null,
+	currentTaskName: null,
+	currentTaskButton: null,
 
 	init: function() {
 		
@@ -4739,22 +4752,41 @@ var backstage = {
 		this.showButton = renderTiddlyButton(this.button, "⌵", null, function(e) {backstage.show(); return false;}, null, "backstageShow");
 		this.hideButton = renderTiddlyButton(this.button, "🗙", null,	function(e) {backstage.hide(); return false;}, null, "backstageHide");
 		
-		this.cloak.onmousedown = function(e) {backstage.switchTab(null);};
+		this.cloak.onmousedown = function(e) {backstage.showTaskView(null);};
 		
 		this.panelBody = createTiddlyElement(this.panel, "div", null, "backstagePanelBody");
 		
 		createTiddlyText(this.tabBar, "Backstage: ");
 		
+		// If a task has an action, then it's button will be rendered without an arrow and it'll be performed immediately
+		// Otherwise a wizard will pop up.
+		// e.g. config.tasks.save.action = saveChangesAction;
+		
 		for (var i = 0; i < config.backstageTasks.length; i++) {
 			var taskName = config.backstageTasks[i];
 			var task = config.tasks[taskName];
-			var handler = task.action ? this.onClickCommand : this.onClickTab;
+			
+			var onButtonClicked = (
+				task.action ?
+				function(e) {
+					backstage.showTaskView(null);
+					config.tasks[this.getAttribute("task")].action();
+					return false;
+				} : 
+				function(e) {
+					backstage.showTaskView(this.getAttribute("task"));
+					return false;
+				}
+			);
+			
 			var text = task.text + (task.action ? "" : "▾");
-			var btn = renderTiddlyButton(this.tabBar, text, task.tooltip, handler, "backstageTabHead");
+			var btn = renderTiddlyButton(this.tabBar, text, task.tooltip, onButtonClicked, "backstageTabHead");
 			jQuery(btn).addClass(task.action ? "backstageAction" : "backstageTask");
 			btn.setAttribute("task", taskName);
 		}
+		
 		createTiddlyText(this.tabBar, formatVersion());
+		
 		this.hide();
 	},
 
@@ -4769,8 +4801,8 @@ var backstage = {
 	},
 
 	hide: function() {
-		if (this.currTabElem) {
-			this.switchTab(null);
+		if (this.currentTaskButton) {
+			this.showTaskView(null);
 		} else {
 			this.tabBar.style.display = "none";			
 			this.showButton.style.display = "block";
@@ -4778,47 +4810,40 @@ var backstage = {
 		}
 	},
 
-	onClickCommand: function(e) {
-		var task = config.tasks[this.getAttribute("task")];
-		if (task.action) {
-			backstage.switchTab(null);
-			task.action();
-		}
-		return false;
-	},
-
-	onClickTab: function(e) {
-		backstage.switchTab(this.getAttribute("task"));
-		return false;
-	},
-
-	// Switch to a given tab, or none if null is passed
-	switchTab: function(tabName) {
-		var tabElem = null;
-		var e = this.tabBar.firstChild;
-		while (e) {
-			if (e.getAttribute && e.getAttribute("task") == tabName)
-				tabElem = e;
-			e = e.nextSibling;
-		}
-		if (tabName == backstage.currTabName) {
+	// Switch to a given taskView, or none if null is passed
+	showTaskView: function(taskName) {
+		
+		 // Toggle show/hide for repetetive taskName
+		
+		if (taskName == backstage.currentTaskName) {
 			backstage.hidePanel();
 			return;
 		}
-		if (backstage.currTabElem) {
-			jQuery(this.currTabElem).removeClass("backstageSelTab");
+		
+		// Locate the upcoming menu Button
+		
+		var taskButton = null;
+		var e = this.tabBar.firstChild;
+		while (e) {
+			if (e.getAttribute && e.getAttribute("task") == taskName) taskButton = e;
+			e = e.nextSibling;
 		}
-		if (tabElem && tabName) {
+		
+		// Fulfill changing the current view
+		
+		if (backstage.currentTaskButton) jQuery(this.currentTaskButton).removeClass("backstageSelTab");
+		
+		if (taskButton && taskName) {
 			backstage.preparePanel();
-			jQuery(tabElem).addClass("backstageSelTab");
-			var task = config.tasks[tabName];
-			wikify(task.content, backstage.panelBody, null, null);
+			jQuery(taskButton).addClass("backstageSelTab");			
+			wikify(config.tasks[taskName].content, backstage.panelBody, null, null); // POI: Task content template will be rendered
 			backstage.showPanel();
-		} else if (backstage.currTabElem) {
+		} else if (backstage.currentTaskButton) {
 			backstage.hidePanel();
 		}
-		backstage.currTabName = tabName;
-		backstage.currTabElem = tabElem;
+		
+		backstage.currentTaskName = taskName;
+		backstage.currentTaskButton = taskButton;
 	},
 
 	isPanelVisible: function() {
@@ -4836,10 +4861,10 @@ var backstage = {
 	},
 
 	hidePanel: function() {
-		if (backstage.currTabElem)
-			jQuery(backstage.currTabElem).removeClass("backstageSelTab");
-		backstage.currTabElem = null;
-		backstage.currTabName = null;
+		if (backstage.currentTaskButton)
+			jQuery(backstage.currentTaskButton).removeClass("backstageSelTab");
+		backstage.currentTaskButton = null;
+		backstage.currentTaskName = null;
 		backstage.panel.style.display = "none";
 		backstage.cloak.style.display = "none";
 	}
@@ -4850,7 +4875,7 @@ config.macros.backstage = {};
 config.macros.backstage.handler = function(place,macroName,params) { // Implements IMacroResolver.handler()
 	var backstageTask = config.tasks[params[0]];
 	if (backstageTask)
-		renderTiddlyButton(place, backstageTask.text, backstageTask.tooltip, function(e) {backstage.switchTab(params[0]); return false;});
+		renderTiddlyButton(place, backstageTask.text, backstageTask.tooltip, function(e) {backstage.showTaskView(params[0]); return false;});
 };
 
 //--
@@ -5050,16 +5075,6 @@ config.macros.upgrade.onClickUpgrade = function(e) {
 	}
 	
 	me.tryRetrieveUpdateAsync(presenter, version.major + 1, secondTry);
-	
-	// var ajaxParameters = {
-		// type: "GET",
-		// url: me.updateSourceUrl.format([version.major + 1]),
-		// dataType: 'text',
-		// processData: false,
-		// success: function(data, textStatus, jqXHR) {me.onUpgradeRetrieved(true, presenter, jqXHR.responseText, jqXHR);},
-		// error: function(jqXHR, textStatus, errorThrown) {me.onUpgradeRetrieved(false, presenter, null, jqXHR);}
-	// };
-	// ajaxReq(ajaxParameters);
 	
 	return false;
 };
@@ -5469,13 +5484,8 @@ function saveOption(name) {
 var systemSettingSave;
 
 function commitSystemSettings(storeWasDirty) {
-	if (systemSettingSave) {
-		window.clearTimeout(systemSettingSave);
-	}
-	systemSettingSave = window.setTimeout(function() {
-		var tiddler = store.getTiddler('SystemSettings');
-		autoSaveChanges(null,[tiddler]);
-	}, 1000);
+	if (systemSettingSave) window.clearTimeout(systemSettingSave);
+	systemSettingSave = window.setTimeout(function() {autoSaveChanges();}, 1000);
 }
 
 function saveSystemSetting(name, doSaveFile) {
@@ -5682,7 +5692,7 @@ config.macros.newArticleButton.handler = function(place, macroName, params) { //
 };
 
 config.macros.newArticleButton.onClick = function(createRoot) {
-	var parentTitle = store.currentTiddler.title;	
+	var parentTitle = store.currentTiddler ? store.currentTiddler.title : null;
 	if (createRoot || ! parentTitle || parentTitle == "Untitled")	parentTitle = "";
 	story.displayTiddler("Untitled", DEFAULT_EDIT_TEMPLATE, parentTitle ? "parenttiddler:[[" + parentTitle + "]]" : null);
 	story.focusTiddler("Untitled", "title");
@@ -7309,7 +7319,7 @@ var myMacroSearchHandler = function(place, macroName, params, wikifier, paramStr
 	};
 	
 	var args = paramString.parseParams("list",null,true);		
-	var txt = createTiddlyElement(null,"input",null,"txtOptionInput searchField",null);
+	var txt = createTiddlyElement(null, "input", null, "txtOptionInput searchField", null);
 	if (params[0])
 		txt.value = params[0];
 	txt.onkeyup = keyHandler;
@@ -7797,10 +7807,10 @@ window.onkeydown = function(e) {
 //-- Saving
 //--
 
-var startSaveArea = '<div id="' + 'storeArea">'; // Split up into two so that indexOf() of this source doesn't find it
-var startSaveAreaRE = /<((div)|(DIV)) ((id)|(ID))=["']?storeArea['"]?>/; // Used for IE6
-var endSaveArea = '</d' + 'iv>';
-var endSaveAreaCaps = '</D' + 'IV>';
+var storeAreaStartString = '<div id="' + 'storeArea">'; // Split up into two so that indexOf() of this source doesn't find it
+var storeAreaStartRE = /<((div)|(DIV)) ((id)|(ID))=["']?storeArea['"]?>/; // Used for IE6
+var storeAreaEndString = '</d' + 'iv>';
+var storeAreaEndStringUpperCase = '</D' + 'IV>';
 
 // If there are unsaved changes, force the user to confirm before exitting
 function confirmExit() {
@@ -7829,7 +7839,7 @@ function injectAllArticles(htmlSource) {
 	storeAreaRange = locateStoreArea(htmlSource);
 	if (! storeAreaRange) throw "storeAreaRange not found!";
 	
-	var revisedHtmlSource = htmlSource.substr(0, storeAreaRange[0] + startSaveArea.length) + "\n" +
+	var revisedHtmlSource = htmlSource.substr(0, storeAreaRange[0] + storeAreaStartString.length) + "\n" +
 													store.allTiddlersAsHtml() + "\n" +
 													htmlSource.substr(storeAreaRange[1]);
 								
@@ -7841,17 +7851,17 @@ function injectAllArticles(htmlSource) {
 function locateStoreArea(original) {
 	// Locate the storeArea divs
 	if (! original) return null;
-	var posOpeningDiv = original.search(startSaveAreaRE);
+	var posOpeningDiv = original.search(storeAreaStartRE);
 	var limitClosingDiv = original.indexOf("<" + "!--POST-STOREAREA--" + ">");
 	if (limitClosingDiv == -1) limitClosingDiv = original.indexOf("<" + "!--POST-BODY-START--" + ">");
 	var start = limitClosingDiv == -1 ? original.length : limitClosingDiv;
-	var posClosingDiv = original.lastIndexOf(endSaveArea, start);
-	if (posClosingDiv == -1) posClosingDiv = original.lastIndexOf(endSaveAreaCaps, start);
+	var posClosingDiv = original.lastIndexOf(storeAreaEndString, start);
+	if (posClosingDiv == -1) posClosingDiv = original.lastIndexOf(storeAreaEndStringUpperCase, start);
 	return (posOpeningDiv != -1 && posClosingDiv != -1) ? [posOpeningDiv, posClosingDiv] : null;
 }
 
-function autoSaveChanges(onlyIfDirty, tiddlers) {
-	if (config.options.chkAutoSave) saveChangesAction(onlyIfDirty, tiddlers);
+function autoSaveChanges() {
+	if (config.options.chkAutoSave) saveChangesAction();
 }
 
 function getHtmlSourceWithoutDynamicallyAddedContent() {
@@ -7895,8 +7905,7 @@ function recreateOriginal() {
 }
 
 // Save this tiddlywiki with the pending changes
-function saveChangesAction(onlyIfDirty, tiddlers) {
-	if (onlyIfDirty && ! store.isDirty()) return;
+function saveChangesAction(forceManualMode) {
 	clearMessage();	
 	var msg = config.messages;
 	var originalUrl = decodeURIComponent(document.location.toString()); // document.location is URL escaped like "file:///C:/Foo/V%C3%B6di%F0%9F%92%ADWiki.html"
@@ -7906,24 +7915,27 @@ function saveChangesAction(onlyIfDirty, tiddlers) {
 		alert(msg.cantSaveError);
 		return;
 	}		
-	var couldBeSavedAutomatically = injectArticlesAndSave(localPath, outdatedHtmlSource);
+	var couldBeSavedAutomatically = injectArticlesAndSave(localPath, outdatedHtmlSource, forceManualMode);
 	if (couldBeSavedAutomatically){
 		store.setDirty(false);	
 		displayMessage(config.messages.mainSaved);
 	}
 }
 
-function injectArticlesAndSave(localPath, htmlSource) {
+function injectArticlesAndSave(localPath, htmlSource, forceManualMode) {
 	try {
 		var revisedHtmlSource = injectAllArticles(htmlSource);
-		return saveFile(localPath, revisedHtmlSource);
+		return saveFile(localPath, revisedHtmlSource, forceManualMode);
 	} catch (ex) {
 		showException(ex);
 		return false;
 	}
 }
 
-function saveEmpty(localPath, original, posDiv) { // todo create UI entry point for this
+function createEmptyWikiAction() {
+	
+	var originalPath = document.location.toString();
+	var localPath = getLocalPath(originalPath);
 	
 	var emptyPath, p;
 	if ((p = localPath.lastIndexOf("/")) != -1)
@@ -7933,16 +7945,20 @@ function saveEmpty(localPath, original, posDiv) { // todo create UI entry point 
 	else
 		emptyPath = localPath + ".";
 	
-	emptyPath += "empty.html";
+	emptyPath += "New Wiki.html";
 	
-	var empty = original.substr(0, posDiv[0] + startSaveArea.length) + original.substr(posDiv[1]);
+	var original = window.originalHTML;
+	var storeAreaRange = locateStoreArea(original);
+	var empty = original.substr(0, storeAreaRange[0] + storeAreaStartString.length) + original.substr(storeAreaRange[1]);
 	
 	var emptySave = saveFile(emptyPath, empty);
-	
-	if (emptySave)
-		displayMessage(config.messages.emptySaved, "file://" + emptyPath);
-	else
+			
+	if (emptySave){
+		emptyPath = "file:///" + emptyPath;
+		displayMessage(config.messages.emptySaved, emptyPath, -1);
+	} else {
 		alert(config.messages.emptyFailed);
+	}
 }
 
 // Translate escaped URL to unescaped local path [Preemption]
@@ -7977,9 +7993,9 @@ window.getLocalPath = window.getLocalPath || function(uri) {
 
 // Save a file in filesystem [Preemption]
 // Returns true, if saving was possible unattendedly (without forcing the user to download manually)
-window.saveFile = window.saveFile || function(fileUrl, htmlSource) {
+window.saveFile = window.saveFile || function(fileUrl, htmlSource, forceManualMode) {
 	
-	if (saveFileViaBlobApi(fileUrl, htmlSource)) return true;
+	if (! forceManualMode) if (saveFileViaBlobApi(fileUrl, htmlSource)) return true;
 		
 	// Fallback: Create data URL link for manual download
 		
@@ -8002,16 +8018,15 @@ function saveFileViaBlobApi(fileUrl, htmlSource) {
 		
 		var blob = new Blob([htmlSource], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
 		var uri = window.URL.createObjectURL(blob);
+		
 		var link = document.createElement("a");
-		// link.setAttribute("target","_blank");
+		// link.setAttribute("target", "_blank");
 		link.setAttribute("href", uri);
 		link.setAttribute("download", filename);
-		document.body.appendChild(link);
-		
+		document.body.appendChild(link);		
 		link.click();
-		
 		document.body.removeChild(link);
-		// window.URL.revokeObjectURL(uri); // todo: normally this should be done - edge won't save with this - maybe a timing problem, solution could be async
+		// window.URL.revokeObjectURL(uri); // todo: normally this should be done - edge won't save with this - maybe a timing problem, solution could be using a callback (if possible)
 	} catch(ex) {
 		return false;
 	}	
@@ -8309,28 +8324,22 @@ function createTiddlyElement(parent, tagName, id, className, text, attribs) {
 	* @param  {string}    accessKey - Optional.
 	* @param  {hashtable} attribs   - Optional. These attributes will be added to the <a> tag.
 */
-function renderTiddlyButton(parent, text, tooltip, action, className, id, accessKey, attribs) {
+function renderTiddlyButton(parent, text, tooltip, action, className, id, accessKey, attribs, icon) {
 	var btn = document.createElement("a");
 	btn.setAttribute("href", "javascript:;");
-	if (action) {
-		btn.onclick = action;
-	}
-	if (tooltip)
-		btn.setAttribute("title", tooltip);
-	if (text)
-		btn.appendChild(document.createTextNode(text));
-	btn.className = className || "button";
-	if (id)
-		btn.id = id;
+	if (action) btn.onclick = action;
+	if (tooltip) btn.setAttribute("title", tooltip);
+	if (icon)	btn.appendChild((function() { var i = document.createElement("div"); i.innerHTML = icon; return i;})());
+	if (text)	btn.appendChild(document.createTextNode(text));
+	btn.className = className || (icon ? "button buttonWithIcon" : "button");
+	if (id)	btn.id = id;
 	if (attribs) {
 		for (var i in attribs) {
 			btn.setAttribute(i, attribs[i]);
 		}
 	}
-	if (parent)
-		parent.appendChild(btn);
-	if (accessKey)
-		btn.setAttribute("accessKey", accessKey);
+	if (parent)	parent.appendChild(btn);
+	if (accessKey) btn.setAttribute("accessKey", accessKey);
 	return btn;
 }
 
