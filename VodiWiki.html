@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 1};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 2};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -41,7 +41,7 @@ html, body, #contentWrapper, #displayArea, #tiddlerDisplay {height: 100%; overfl
 .searchField {margin-left: 1em;}
 .searchField, #search .button {display: inline-block; box-sizing: border-box; height: 1.7em;}
 
-.articleContentContainer {padding-top: 0.5em; padding-bottom: 2em;}
+.articleContentContainer {position:relative; padding-top: 0.5em; padding-bottom: 2em;}
 table {border-collapse: collapse;}
 table td {vertical-align: top;}
 .articleContentContainer table, table.twtable {margin: 1pt 0;}
@@ -256,7 +256,7 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 &lt;div class="editor" macro="edit title"&gt;&lt;/div&gt;
 &lt;div class="editor" macro="edit text"&gt;&lt;/div&gt;
 &lt;div class="editor" macro="edit tags"&gt;Tags: &lt;/div&gt;
-&lt;div class="editor" macro="edit parenttiddler"&gt;Parent:&lt;/div&gt;
+&lt;div class="editor" macro="edit parenttitle"&gt;Parent:&lt;/div&gt;
 &lt;div class="editorFooter"&gt;&lt;span macro="message views.editor.tagHint"&gt;&lt;/span&gt;&lt;span macro="tagChooser"&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;!--}}}--&gt;
 </pre>
@@ -305,7 +305,6 @@ code.escaped {white-space:nowrap;}
 #contentWrapper {display:block;}
 #splashScreen {display:none;}
 
-.editor {font-size:1.1em;}
 .editor input, .editor textarea {display:block; width:100%; font:inherit;}
 .editorFooter {padding:0.25em 0; font-size:.9em;}
 
@@ -335,8 +334,10 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="- Home -" created="201904232038" modified="202001251815" modifier="Anonymous" changecount="14">
-<pre>!What is VodiWiki
+<div title="- Home -" created="201904232038" modified="202001260819" modifier="Anonymous" changecount="45">
+<pre>| ''[[Download VodiWiki.zip|http://www.vodi.de/VodiWiki/VodiWiki.zip]]'' (Version &lt;&lt;version&gt;&gt;) |
+
+!What is VodiWiki
 
 * It's a single HTML file containing many documents 
 * Built-in viewer with search function
@@ -383,9 +384,18 @@ When working with sensitive data consider the following advice:
 !License
 
 &lt;&lt;licenseText&gt;&gt;
+
+&lt;html&gt;
+	&lt;div style=&quot;position:absolute;top:0;right:2.5em;&quot;&gt;		
+		&lt;a href=&quot;http://www.vodi.de/VodiWiki/index-de.html&quot;&gt;
+			&lt;svg width=&quot;30&quot; height=&quot;18&quot; viewBox=&quot;0 0 5 3&quot;&gt;&lt;rect width=&quot;5&quot; height=&quot;3&quot; y=&quot;0&quot; x=&quot;0&quot; fill=&quot;#0&quot;/&gt;&lt;rect width=&quot;5&quot; height=&quot;2&quot; y=&quot;1&quot; x=&quot;0&quot; fill=&quot;#D00&quot;/&gt;&lt;rect width=&quot;5&quot; height=&quot;1&quot; y=&quot;2&quot; x=&quot;0&quot; fill=&quot;#FFCE00&quot;/&gt;&lt;/svg&gt;
+			Deutsch
+		&lt;/a&gt;
+	&lt;/div&gt;
+&lt;/html&gt;
 </pre>
 </div>
-<div title="Anatomy Of The Main Window" created="201701242104" modified="202001251729" modifier="Anonymous" changecount="37" parenttiddler="Getting Started">
+<div title="Anatomy Of The Main Window" created="201701242104" modified="202001251729" modifier="Anonymous" changecount="37" parenttitle="Getting Started">
 <pre>|Backstage Menu (hidden)|&gt;|&gt;|
 |Navigation Tabs|← → Navigation Bar| Search|
 |Navigation&lt;br&gt;tree or&lt;br&gt;list views|&lt;br&gt;&lt;br&gt;Current Page&lt;br&gt;&lt;br&gt;&lt;br&gt; |&gt;|
@@ -415,7 +425,7 @@ When working with sensitive data consider the following advice:
 <pre>[[- Home -]]
 </pre>
 </div>
-<div title="Embedding Parts Of Other Pages" created="201906080811" modified="201906081653" modifier="YourName" changecount="53" parenttiddler="​Advanced Use Cases">
+<div title="Embedding Parts Of Other Pages" created="201906080811" modified="201906081653" modifier="YourName" changecount="53" parenttitle="​Advanced Use Cases">
 <pre>This is useful if you want to create some kind of overview page for other pages (e.g. a thesaurus).
 
 !How To Embed
@@ -471,7 +481,7 @@ The following code...
 <div title="Getting Started" created="201904231951" modified="201904231951" modifier="YourName" changecount="1">
 <pre></pre>
 </div>
-<div title="How to Customize Stuff" created="201904232039" modified="202001251730" modifier="Anonymous" changecount="7" parenttiddler="Getting Started">
+<div title="How to Customize Stuff" created="201904232039" modified="202001251730" modifier="Anonymous" changecount="7" parenttitle="Getting Started">
 <pre>!The Startup Page
 
 * By default it's the page with the title &quot;- Home -&quot;
@@ -484,7 +494,7 @@ The following code...
 * This can be changed by editing the internal &quot;[[SiteTitle]]&quot; page
 </pre>
 </div>
-<div title="How to Read Content" created="201904232015" modified="201904232018" modifier="YourName" changecount="3" parenttiddler="Getting Started">
+<div title="How to Read Content" created="201904232015" modified="201904232018" modifier="YourName" changecount="3" parenttitle="Getting Started">
 <pre>Only one page can be read at a time. There's no tabbed browsing.
 
 * Use the tree/list in the left area to directly navigate through the pages
@@ -492,8 +502,14 @@ The following code...
 * Use the search field to search for content
 * Click on links in pages to navigate to other pages</pre>
 </div>
-<div title="How to Write Content" created="201904232018" modified="202001251823" modifier="Anonymous" changecount="17" parenttiddler="Getting Started">
-<pre>!Adding a New Page
+<div title="How to Write Content" created="201904232018" modified="202001251849" modifier="Anonymous" changecount="18" parenttitle="Getting Started">
+<pre>!Creating a New, Empty Wiki
+
+* Unhide the backstage by clicking ⌵ on the upper right
+* In the &quot;File&quot; menu choose &quot;New&quot;
+** An empty file will be pushed into your download location.
+
+!Adding a New Page
 
 * Click on &quot;New Article&quot; to add a page on the root level
 * Click on &quot;New Sub Article&quot; to add a page below the current page
@@ -517,7 +533,7 @@ The following code...
 
 * Place the image file besides the Wiki-File (or create a sub directory, e.g. &quot;Files&quot;)
 * Use a tag like this: {{{[img[Label|Files/Bars.svg]]}}}
-** Example: [img[Label|Files/Bars.svg]]
+** Example: [img[Label|index-Files/Bars.svg]]
 
 !Saving
 
@@ -530,7 +546,7 @@ Never use the browser File/Save functions - this would save the file without you
 ** Due to browser restrictions the wiki cannot overwrite it's original file - therefore the download strategy is the only possible way (yet)
 </pre>
 </div>
-<div title="Index Sorting" created="201906080758" modified="201906080810" modifier="YourName" changecount="4" parenttiddler="​Advanced Use Cases">
+<div title="Index Sorting" created="201906080758" modified="201906080810" modifier="YourName" changecount="4" parenttitle="​Advanced Use Cases">
 <pre>Normally the index tree is sorted alphabetically. You can change the order of items only by using a trick:
 Add an invisible space in front of the page title to push it at the bottom.
 
@@ -538,13 +554,13 @@ Here is a non printing space you can copy &amp; paste:
 
 |Double click into the right table cell to select and copy to clipboard -&gt;|​|</pre>
 </div>
-<div title="Keyboard Shortcuts" created="201303170925" modified="201906080808" modifier="YourName" changecount="7" parenttiddler="​Reference">
+<div title="Keyboard Shortcuts" created="201303170925" modified="201906080808" modifier="YourName" changecount="7" parenttitle="​Reference">
 <pre>|Keys|Function|Available|h
 |Ctrl-E|Search|Always|
 |Ctrl-Enter|Toggle editing|Always|
 |Ctrl-K|Edit link|When editing|</pre>
 </div>
-<div title="Link Variations" created="201701242104" modified="201911231541" modifier="YourName" changecount="42" parenttiddler="​Reference">
+<div title="Link Variations" created="201701242104" modified="201911231541" modifier="YourName" changecount="42" parenttitle="​Reference">
 <pre>|Code|Demo|h
 |{{{[[Web link to Startpage|https://www.startpage.com]]}}}|[[Web link to Startpage|https://www.startpage.com]]|
 |{{{[[Internal link to another wiki page|Syntax Examples]]}}}|[[Internal link to another wiki page|Syntax Examples]]|
@@ -555,8 +571,8 @@ Here is a non printing space you can copy &amp; paste:
 |{{{[[Local link to table cell B1|##TableCell B1]]}}}|[[Local link to table cell B1|##TableCell B1]]|
 |{{{[[Local link to table cell C3|##TableCell C3]]}}}|[[Local link to table cell C3|##TableCell C3]]|
 |{{{[[Local link to a named anchor|##MyAnchorName]]}}}|[[Local link to a named anchor|##MyAnchorName]]|
-|{{{[img[This is the image tip|Files/Bars.svg][##Head 1]]}}}|[img[This is the image tip|Files/Bars.svg][##Head 1]]|
-|{{{[img[This is the image tip|Files/Bars.svg][https://startpage.com]]}}}|[img[This is the image tip|Files/Bars.svg][https://startpage.com]]|
+|{{{[img[This is the image tip|Files/Bars.svg][##Head 1]]}}}|[img[This is the image tip|index-Files/Bars.svg][##Head 1]]|
+|{{{[img[This is the image tip|Files/Bars.svg][https://startpage.com]]}}}|[img[This is the image tip|index-Files/Bars.svg][https://startpage.com]]|
 
 !Head 1
 
@@ -586,7 +602,7 @@ Some dummy text.
 <div title="SiteTitle" created="201305200101" modified="201305200103" modifier="YourName" changecount="3">
 <pre>VodiWiki</pre>
 </div>
-<div title="Syntax Examples" created="201208271404" modified="201912011414" modifier="YourName" changecount="51" parenttiddler="​Reference">
+<div title="Syntax Examples" created="201208271404" modified="201912011414" modifier="YourName" changecount="51" parenttitle="​Reference">
 <pre>!Headings
 
 {{{
@@ -732,9 +748,9 @@ Several lines of blockquoted text.
 &gt;&gt;&gt; Bla
 </pre>
 </div>
-<div title="Syntax Reference" created="201208280946" modified="201906221449" modifier="YourName" changecount="49" parenttiddler="​Reference">
+<div title="Syntax Reference" created="201208280946" modified="202001260754" modifier="Anonymous" changecount="50" parenttitle="​Reference">
 <pre>|Headings|Lists|Lists|Formatting|Code|h
-|{{{!Heading 1}}}&lt;br&gt;{{{!!Heading 2}}}&lt;br&gt;{{{!!!Heading 3}}}|{{{*Unordered 1}}}&lt;br&gt;{{{**Unordered 2}}}&lt;br&gt;{{{***Unordered 3}}}|{{{#Ordered 1}}}&lt;br&gt;{{{##Ordered 2}}}&lt;br&gt;{{{###Ordered 3}}}|{{{''Bold text''}}}&lt;br&gt;{{{//Italic text//}}}&lt;br&gt;{{{--Strikethrough text--}}}&lt;br&gt;{{{@@Highlighted text@@}}}&lt;br&gt;{{{{{notice{Your notice text.}}}}}}&lt;br&gt;{{{@@css:value;css:value:text@@}}}&lt;br&gt;{{{{{class{styled text}}}}}}|&lt;html&gt;&lt;code&gt;{{{Monospaced text}}}&lt;/code&gt;&lt;/html&gt;&lt;br&gt;&quot;&quot;&quot;{{{&quot;&quot;&quot;&lt;br&gt;{{{ Code Block}}}&lt;br&gt;&quot;&quot;&quot;}}}&quot;&quot;&quot;|
+|{{{!Heading 1}}}&lt;br&gt;{{{!!Heading 2}}}&lt;br&gt;{{{!!!Heading 3}}}|{{{*Unordered 1}}}&lt;br&gt;{{{**Unordered 2}}}&lt;br&gt;{{{***Unordered 3}}}|{{{#Ordered 1}}}&lt;br&gt;{{{##Ordered 2}}}&lt;br&gt;{{{###Ordered 3}}}|{{{''Bold text''}}}&lt;br&gt;{{{//Italic text//}}}&lt;br&gt;{{{--Strikethrough text--}}}&lt;br&gt;{{{@@Highlighted text@@}}}&lt;br&gt;{{{{{notice{Your notice text.}}}}}}&lt;br&gt;{{{@@css:value;css:value;text@@}}}&lt;br&gt;{{{{{class{styled text}}}}}}|&lt;html&gt;&lt;code&gt;{{{Monospaced text}}}&lt;/code&gt;&lt;/html&gt;&lt;br&gt;&quot;&quot;&quot;{{{&quot;&quot;&quot;&lt;br&gt;{{{ Code Block}}}&lt;br&gt;&quot;&quot;&quot;}}}&quot;&quot;&quot;|
 
 |Tables|Linking &amp; Embedding|Escaping|h
 |{{{|Table caption|c}}}&lt;br&gt;{{{|Heading 1|Heading 2|h}}}&lt;br&gt;{{{|Table|Footer|f}}}&lt;br&gt;{{{|!Heading 1|!Heading 2|}}}&lt;br&gt;{{{| Centered |cell|}}}&lt;br&gt;{{{|Left-Aligned |cell|}}}&lt;br&gt;{{{| Right-Aligned|cell|}}}&lt;br&gt;{{{|bgcolor(blue):Coloured|cell|}}}&lt;br&gt;{{{|&gt;|Colspan cell|}}}&lt;br&gt;{{{|Rowspan|cells|}}}&lt;br&gt;{{{|~|~|}}}|{{{[[PageTitle]]}}}&lt;br&gt;{{{[[Label|PageTitle]]}}}&lt;br&gt;{{{[[Label|##PageElement]]}}}&lt;br&gt;{{{[[Label|PageTitle##PageElement]]}}}&lt;br&gt;{{{[[Label|https://foo.com]]}}}&lt;br&gt;{{{[img[Label|LocalFileName.png]]}}}&lt;br&gt;{{{[img[Label|LocalFileName.png][PageTitle]]}}}&lt;br&gt;{{{[img[Label|LocalFileName.png][https://foo.com]]}}}|{{{&lt;br&gt;}}} - Line Break&lt;br&gt;{{{&quot;&quot;&quot;Escaped Text&quot;&quot;&quot;}}}&lt;br&gt;{{{/%Invisible Comment%/}}}&lt;br&gt;{{{&lt;html&gt;Raw HTML&lt;/html&gt;}}}|
@@ -748,7 +764,7 @@ Several lines of blockquoted text.
 <div title="SystemSettings" created="201912221052" modified="201912221052" modifier="Anonymous" changecount="3">
 <pre>txtUserName: Anonymous</pre>
 </div>
-<div title="Unicode Collection" created="201907110746" modified="201909151030" modifier="YourName" changecount="123" parenttiddler="​Reference">
+<div title="Unicode Collection" created="201907110746" modified="201909151030" modifier="YourName" changecount="123" parenttitle="​Reference">
 <pre>!Spaces
 
 |NBSP|1 EM|½ EM|0 EM|Marker|
@@ -825,6 +841,21 @@ Several lines of blockquoted text.
 **[[Mathematical Operators|http://www.fileformat.info/info/unicode/block/mathematical_operators/utf8test.htm]]
 **[[Technical|https://www.fileformat.info/info/unicode/block/miscellaneous_technical/utf8test.htm]]
 **[[Symbols|http://www.fileformat.info/info/unicode/block/miscellaneous_symbols/utf8test.htm]], [[Pictographs|http://www.fileformat.info/info/unicode/block/miscellaneous_symbols_and_pictographs/utf8test.htm]], [[Transport|http://www.fileformat.info/info/unicode/block/transport_and_map_symbols/utf8test.htm]], [[Supplemental|https://www.fileformat.info/info/unicode/block/supplemental_symbols_and_pictographs/utf8test.htm]], [[Other|https://www.fileformat.info/info/unicode/category/So/list.htm]]
+</pre>
+</div>
+<div title="Updating the Viewer" created="202001252100" modified="202001252110" modifier="Anonymous" changecount="3" parenttitle="​Advanced Use Cases">
+<pre>! How To
+
+* The viewer and editor can be updated via the backstage area (unhide by clicking ⌵ at the upper right)
+* Choose &quot;About / Upgrade&quot;
+* The updater will save an updated HTML file preserving your content
+
+! Major Updates
+
+* Major updates will only happen, if the content would need to be migrated due to internal changes
+* In this case, you cannot skip major versions, e.g. from 1.x.x to 3.x.x
+* You would need to update twice, from 1.x.x to 2.x.x to 3.xx
+* This is because the content will be migrated between the major versions
 </pre>
 </div>
 <div title="VodiConfigPlugin" created="201208271031" modified="201702011759" modifier="YourName" tags="systemConfig excludeLists excludeSearch" changecount="24">
@@ -1259,7 +1290,7 @@ merge(config.macros.upgrade,{
 	wizardTitle: "VodiWiki",
 	step1Title: "About",
 	step1Html:
-		"VodiWiki is a single page application developed and maintained by Mark Vodicka (<a href='www.vodi.de' target='_blank'>www.vodi.de</a>).<br/>" +
+		"VodiWiki is a single page application developed and maintained by Mark Vodicka (<a href='http://www.vodi.de/VodiWiki/' target='_blank'>www.vodi.de</a>).<br/>" +
 		"It contains parts of Jeremy Ruston's TiddlyWiki, abego Software's YourSearchPlugin.<br/><br/>" +
 		"<h1>License</h1><span macro=\"licenseText\"></span><br/><br/>" +
 		"<h1>Check for Upgrade (This Version: <span macro=\"version\"></span>)</h1>" +
@@ -1390,7 +1421,9 @@ function main() {
 	store = new ArticleStore({config: config});
 		
 	story = new Story("tiddlerDisplay");
-	addEvent(document, "click", Popup.onDocumentClick);
+	
+	document.addEventListener("click", Popup.onDocumentClick, false);
+	
 	saveTest();
 	var s;
 	for (s = 0; s < config.notifyTiddlers.length; s++) {
@@ -1421,7 +1454,7 @@ function main() {
 	refreshDisplay();
 	
 	if (pluginProblem) {
-		story.displayTiddler("PluginManager");
+		story.showArticle("PluginManager");
 		displayMessage(config.messages.customConfigError);
 	}	
 	backstage.init();
@@ -1561,7 +1594,7 @@ config.paramifiers = {};
 config.paramifiers.open = {
 	onstart: function(title) {
 		if (! readOnly || store.tiddlerExists(title) || store.isShadowTiddler(title))
-			story.displayTiddler(title);
+			story.showArticle(title);
 	}
 };
 
@@ -1649,6 +1682,15 @@ config.formatterHelpers = {
 	}
 
 };
+
+function resolveImageSource(unresolved){
+	if (! unresolved || unresolved.indexOf('/') > -1)	return unresolved;
+	//var blobArticle = store.getArticleRawText(unresolved);
+	var blobArticle = store.getTiddler(unresolved);
+	if (! blobArticle) return "./%0-Files/%1".format([getFileName(document.location.toString(), true), unresolved]);
+	var type = blobArticle.fields['content-type'];
+	return "data:%0;base64,%1".format([type, blobArticle.text]);
+}
 
 //--
 //-- Standard formatters
@@ -1985,9 +2027,11 @@ config.formatters = [
 			var e = w.output;
 			if (lookaheadMatch[5]) {
 				var link = lookaheadMatch[5];
-				e = config.formatterHelpers.isExternalLink(link) 
-					? renderExternalLink(w.output, link) 
-					: renderLinkElement(w.output, link, false, null, w.isStatic, w.tiddler);
+				e = (
+					config.formatterHelpers.isExternalLink(link) ?
+					renderExternalLink(w.output, link) :
+					renderLinkElement(w.output, link, false, null, w.isStatic, w.tiddler)
+				);
 				jQuery(e).addClass("imageLink");
 			}
 			var img = createTiddlyElement(e, "img");
@@ -1995,11 +2039,8 @@ config.formatters = [
 				img.align = "left";
 			else if (lookaheadMatch[2])
 				img.align = "right";
-			if (lookaheadMatch[3]) {
-				img.title = lookaheadMatch[3];
-				img.setAttribute("alt", lookaheadMatch[3]);
-			}
-			img.src = lookaheadMatch[4];
+			if (lookaheadMatch[3]) img.title = lookaheadMatch[3];
+			img.src = resolveImageSource(lookaheadMatch[4]);
 			w.nextMatch = this.lookaheadRegExp.lastIndex;
 		}
 	}
@@ -2435,7 +2476,7 @@ config.macros.list.refresh = function(list) {
 	var args = paramString.parseParams("anon", null, null)[0];
 	var type = args.anon ? args.anon[0] : "all";
 	jQuery(list).empty().addClass("list list-" + type);
-	var template = args.template ? store.getTiddlerText(args.template[0]) : false;
+	var template = args.template ? store.getArticleRawText(args.template[0]) : false;
 	if (!template) {
 		template = config.macros.list.template;
 	}
@@ -2525,7 +2566,7 @@ config.macros.articleTree.createSubTree = function(place, id, parentTitle, level
 	var isOpen = true;
 	
 	var subArticles = store.reverseLookup(
-		'parenttiddler', parentTitle, true, null, 
+		'parenttitle', parentTitle, true, null, 
 		function(title, article) { return ! (store.isShadowTiddler(title) || article.isTagged("systemConfig") || article.isTagged("excludeLists"))}
 	);
 	
@@ -2586,11 +2627,11 @@ merge(macro, {
 		var no_prefix_field = prefix === "-" || prefix === "+" ? field.substr(1, field.length) : field;
 		var dateFormat = params[2] || this.dateFormat;
 		var groupTemplate = macro.groupTemplate.format(no_prefix_field, dateFormat);
-		groupTemplate = args.groupTemplate ? store.getTiddlerText(args.groupTemplate[0]) || groupTemplate :
+		groupTemplate = args.groupTemplate ? store.getArticleRawText(args.groupTemplate[0]) || groupTemplate :
 			groupTemplate;
 
 		var itemTemplate = macro.itemTemplate;
-		itemTemplate = args.template ? store.getTiddlerText(args.template[0]) || itemTemplate :
+		itemTemplate = args.template ? store.getArticleRawText(args.template[0]) || itemTemplate :
 			itemTemplate;
 
 		var tiddlers = args.filter ? store.sortTiddlers(store.filterTiddlers(args.filter[0]), field) :
@@ -2667,7 +2708,7 @@ config.macros.tiddler.handler = function(place, macroName, params, wikifier, par
 };
 
 config.macros.tiddler.transclude = function(wrapper, titleAndSection, args) {
-	var text = store.getTiddlerText(titleAndSection);
+	var text = store.getArticleRawText(titleAndSection);
 	if (! text)
 		return;
 	var stack = config.macros.tiddler.tiddlerStack;
@@ -2939,7 +2980,7 @@ config.macros.tabs.switchTab = function(tabSet, tab) {
 		var tabContent = createTiddlyElement(null, "div", null, "tabContents");
 		tabSet.parentNode.insertBefore(tabContent, tabSet.nextSibling);
 		var contentTitle = tabElement.getAttribute("content");
-		wikify(store.getTiddlerText(contentTitle), tabContent, null, store.getTiddler(contentTitle));		
+		wikify(store.getArticleRawText(contentTitle), tabContent, null, store.getTiddler(contentTitle));		
 	}
 };
 
@@ -3096,7 +3137,7 @@ config.macros.toolbar.customCommand = function(place,command,wikifier,tiddler) {
 
 config.commands.saveTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
 	var newTitle = story.saveTiddler(title); // todo - wieso kann sich title ändern?
-	if (newTitle) story.displayTiddler(newTitle);
+	if (newTitle) story.showArticle(newTitle);
 	return false;
 };
 
@@ -3106,7 +3147,7 @@ config.commands.cancelTiddler.handler = function(event, src, title) { // Impleme
 			return false;
 	}
 	story.setDirty(title, false);
-	story.displayTiddler(title);
+	story.showArticle(title);
 	return false;
 };
 
@@ -3175,7 +3216,7 @@ function Tiddler(title) {
 	this.links = [];
 	this.linksUpdated = false;
 	this.tags = [];
-	this.fields = {}; // changecount parenttiddler - coming from EditTemplate, consumed by externalizeTiddler
+	this.fields = {}; // changecount parenttitle - coming from EditTemplate, consumed by externalizeTiddler
 	return this;
 }
 
@@ -3378,53 +3419,56 @@ ArticleStore.prototype.getShadowTiddlerText = function(title) {
 		return "";
 };
 
-// Retrieve tiddler contents
-ArticleStore.prototype.getTiddlerText = function(title, defaultText) {
-	if (! title) return defaultText;
-	var pos = title.indexOf(config.textPrimitives.sectionSeparator);
-	var section = null;
+ArticleStore.prototype.getArticleRawText = function(titleWithPartOrSlice, defaultText) {
+	
+	if (! titleWithPartOrSlice) return defaultText;
+	
+	// If a slice was requested, look for that first. (like "SomePageTitle::SliceName")
+	
+	var pos = titleWithPartOrSlice.indexOf(config.textPrimitives.sliceSeparator);
 	if (pos != -1) {
-		section = title.substr(pos + config.textPrimitives.sectionSeparator.length);
-		title = title.substr(0, pos);
+		var slice = this.getTiddlerSlice(titleWithPartOrSlice.substr(0, pos), titleWithPartOrSlice.substr(pos + config.textPrimitives.sliceSeparator.length));
+		if (slice) return slice;
 	}
-	pos = title.indexOf(config.textPrimitives.sliceSeparator);
+	
+	// Check if a section was requested (like "SomePageTitle##SliceName")
+	
+	var sectionName = null;
+	var pos = titleWithPartOrSlice.indexOf(config.textPrimitives.sectionSeparator);
 	if (pos != -1) {
-		var slice = this.getTiddlerSlice(title.substr(0, pos), title.substr(pos + config.textPrimitives.sliceSeparator.length));
-		if (slice)
-			return slice;
+		sectionName = titleWithPartOrSlice.substr(pos + config.textPrimitives.sectionSeparator.length);
+		titleWithPartOrSlice = titleWithPartOrSlice.substr(0, pos);
 	}
-	var tiddler = this.fetchTiddler(title);
-	var text = tiddler ? tiddler.text : null;
-	if (! tiddler && this.isShadowTiddler(title)) {
-		text = this.getShadowTiddlerText(title);
-	}
+	
+	var article = this.fetchTiddler(titleWithPartOrSlice);
+	var text = article ? article.text : null;
+	if (! article && this.isShadowTiddler(titleWithPartOrSlice)) text = this.getShadowTiddlerText(titleWithPartOrSlice);
 	if (text) {
-		if (!section)
-			return text;
-		var re = new RegExp("(^!{1,6}[ \t]*" + section.escapeRegExp() + "[ \t]*\n)","mg");
+		if (! sectionName) return text; // POI: Return the whole article
+		var re = new RegExp("(^!{1,6}[ \t]*" + sectionName.escapeRegExp() + "[ \t]*\n)","mg");
 		re.lastIndex = 0;
 		var match = re.exec(text);
 		if (match) {
-			var t = text.substr(match.index+match[1].length);
+			var t = text.substr(match.index + match[1].length);
 			var re2 = /^!/mg;
 			re2.lastIndex = 0;
 			match = re2.exec(t); //# search for the next heading
-			if (match)
-				t = t.substr(0,match.index-1);//# don't include final \n
-			return t.trim(); // patched by vodi - trim added
+			if (match) t = t.substr(0,match.index-1);//# don't include final \n
+			return t.trim(); // POI: Return a section
 		}
-		return defaultText;
+		// return defaultText;
 	}
 	if (defaultText != undefined) return defaultText;
 	return null;
 };
 
-ArticleStore.prototype.getRecursiveTiddlerText = function(title, defaultText, depth) {
-	var bracketRegExp = new RegExp("(?:\\[\\[([^\\]]+)\\]\\])", "mg");
-	var text = this.getTiddlerText(title, null);
+// if the returned text would contain an included title like this [[NestedArticleTitle]] it will be resolved (recursively).
+ArticleStore.prototype.getArticleRawTextResolveIncludes = function(titleWithPartOrSlice, defaultText, depth) {
+	var text = this.getArticleRawText(titleWithPartOrSlice, null);
 	if (text == null) return defaultText;
 	var textOut = [];
 	var match, lastPos = 0;
+	var bracketRegExp = new RegExp("(?:\\[\\[([^\\]]+)\\]\\])", "mg");
 	do {
 		match = bracketRegExp.exec(text);
 		if (match) {
@@ -3433,7 +3477,7 @@ ArticleStore.prototype.getRecursiveTiddlerText = function(title, defaultText, de
 				if (depth <= 0)	{
 					textOut.push(match[1]);
 				} else {
-					textOut.push(this.getRecursiveTiddlerText(match[1], "", depth - 1));
+					textOut.push(this.getArticleRawTextResolveIncludes(match[1], "", depth - 1));
 				}
 			}
 			lastPos = match.index + match[0].length;
@@ -3449,7 +3493,7 @@ ArticleStore.prototype.slicesRE = /(?:^([\'\/]{0,2})~?([\.\w]+)\:\1[\t\x20]*([^\
 // @internal
 ArticleStore.prototype.calcAllSlices = function(title) {
 	var slices = {};
-	var text = this.getTiddlerText(title,"");
+	var text = this.getArticleRawText(title,"");
 	this.slicesRE.lastIndex = 0;
 	var m = this.slicesRE.exec(text);
 	while (m) {
@@ -3771,7 +3815,7 @@ ArticleStore.prototype.getMissingLinks = function() {
 		var n;
 		for (n = 0; n < tiddler.links.length; n++) {
 			var link = tiddler.links[n];
-			if (this.getTiddlerText(link, null) == null && !this.isShadowTiddler(link) && !config.macros[link])	results.pushUnique(link);
+			if (this.getArticleRawText(link, null) == null && !this.isShadowTiddler(link) && !config.macros[link])	results.pushUnique(link);
 		}
 	});
 	results.sort();
@@ -3852,7 +3896,7 @@ config.filters = {
 			results.pushUnique(tiddler);
 		} else if (this.isShadowTiddler(title)) {
 			tiddler = new Tiddler();
-			tiddler.set(title, this.getTiddlerText(title));
+			tiddler.set(title, this.getArticleRawText(title));
 			results.pushUnique(tiddler);
 		} else {
 			results.pushUnique(new Tiddler(title));
@@ -3965,7 +4009,7 @@ ArticleStore.prototype.getValue = function(tiddler, fieldName) {
 	if (fieldName.indexOf(config.textPrimitives.sectionSeparator) === 0 || fieldName.indexOf(config.textPrimitives.sliceSeparator) === 0) {
 		var sliceType = fieldName.substr(0, 2);
 		var sliceName = fieldName.substring(2);
-		return store.getTiddlerText("%0%1%2".format(t.title,sliceType,sliceName));
+		return store.getArticleRawText("%0%1%2".format(t.title,sliceType,sliceName));
 	} else {
 		fieldName = fieldName.toLowerCase();
 		var accessor = ArticleStore.standardFieldAccess[fieldName];
@@ -4061,7 +4105,7 @@ Story.prototype.editLink = function() {
 
 Story.prototype.getLinkUnderCursor = function() {
 	// ToDo: getWordUnderCursor
-	var textAreaElement = this.getTiddlerField(store.currentTiddler.title,"text");
+	var textAreaElement = this.getTiddlerField(store.currentTiddler.title, "text");
 	var left = textAreaElement.selectionStart;
 	var right = textAreaElement.selectionEnd;
 	var leftLinkSeparator = left;
@@ -4084,26 +4128,26 @@ Story.prototype.getLinkUnderCursor = function() {
 			left++;
 			linkInfo.expressionStart = left;
 			linkInfo.expressionEnd = right - 1;
-			linkInfo.displayText = textAreaElement.value.substring(left,right);
+			linkInfo.displayText = textAreaElement.value.substring(left, right);
 		} else {
 			linkInfo.expressionStart = leftLinkSeparator -1;
 			linkInfo.expressionEnd = rightLinkSeparator +1;
 			left = leftLinkSeparator + 1;
 			right = rightLinkSeparator;
-			var innerExpression = textAreaElement.value.substring(left,right);
+			var innerExpression = textAreaElement.value.substring(left, right);
 			var splitPos = innerExpression.indexOf('|');
 			if (splitPos < 0) {
-				linkInfo.displayText = textAreaElement.value.substring(left,right);
-				linkInfo.link = textAreaElement.value.substring(left,right);	
+				linkInfo.displayText = textAreaElement.value.substring(left, right);
+				linkInfo.link = textAreaElement.value.substring(left, right);	
 			} else {
-				linkInfo.displayText = innerExpression.substring(0,splitPos);
+				linkInfo.displayText = innerExpression.substring(0, splitPos);
 				linkInfo.link = innerExpression.substring(splitPos + 1);
 			}			
 		}
 	} else {
 		linkInfo.expressionStart = left;
 		linkInfo.expressionEnd = right - 1;
-		linkInfo.displayText = textAreaElement.value.substring(left,right);
+		linkInfo.displayText = textAreaElement.value.substring(left, right);
 	}
 	
 	return linkInfo;
@@ -4177,9 +4221,7 @@ Story.prototype.history = {
 		var mayMoveBackStopper = false;
 		if (this.currentIdx == this.backStopper) mayMoveBackStopper = true;
 		this.currentIdx++;
-		if (this.currentIdx == this.limit) {
-			this.currentIdx = 0;
-		}
+		if (this.currentIdx == this.limit) this.currentIdx = 0;
 		this.titles[this.currentIdx] = title;
 		this.fowardStopper = this.currentIdx;
 		if (mayMoveBackStopper) this.backStopper = this.currentIdx;
@@ -4189,26 +4231,26 @@ Story.prototype.history = {
 		if (index < 0) index = this.limit - 1;
 		if (index == this.backStopper || this.titles[index] == undefined) return;
 		this.currentIdx = index;
-		story.displayTiddler(this.titles[index]);
+		story.showArticle(this.titles[index]);
 	},
 	forward: function() {
 		if (this.currentIdx == this.fowardStopper) return;
 		var index = this.currentIdx + 1;
 		if (index >= this.limit) index = 0;
 		this.currentIdx = index;
-		story.displayTiddler(this.titles[index]);
+		story.showArticle(this.titles[index]);
 	}
 }
 
 Story.prototype.displayDefaultTiddlers = function() { // todo: instead of having a "DefaultTiddlers" tiddler, make an option!
-	this.displayTiddlers(null, store.filterTiddlers(store.getTiddlerText("DefaultTiddlers")));
+	this.displayTiddlers(null, store.filterTiddlers(store.getArticleRawText("DefaultTiddlers")));
 };
 
-Story.prototype.displayTiddlers = function(unused, articles, templateNameOrNumber, unused, unused, customFields) {
-	for (var t = articles.length - 1; t >= 0; t--) this.displayTiddler(articles[t].title, templateNameOrNumber, customFields);
+Story.prototype.displayTiddlers = function(unused, articles, templateNameOrNumber, unused, unused) {
+	for (var t = articles.length - 1; t >= 0; t--) this.showArticle(articles[t].title, templateNameOrNumber);
 };
 
-Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFields) {
+Story.prototype.showArticle = function(title, templateNameOrNumber, customFields) {
 	var parts = title.split(config.textPrimitives.sectionSeparator);
 	title = parts[0]; 
 	var sectionName = parts[1];
@@ -4252,7 +4294,7 @@ Story.prototype.displayTiddler = function(title, templateNameOrNumber, customFie
 	
 	if (desiredView) {
 		returningView = desiredView;
-		this.refreshView(title, templateNameOrNumber, false, customFields);
+		this.populateViewOrChangeTemplate(title, templateNameOrNumber, false, customFields);
 	} else {
 		var place = this.getArticleWrapper();
 		returningView = this.renderNewView(place, title, templateNameOrNumber, customFields);
@@ -4279,7 +4321,7 @@ Story.prototype.renderNewView = function(place, title, templateNameOrNumber, cus
 	articleView.setAttribute("refresh", "tiddler");
 	// if (customFields) articleView.setAttribute("tiddlyFields", customFields);
 	place.appendChild(articleView);
-	this.refreshView(title, templateNameOrNumber, false, customFields);
+	this.populateViewOrChangeTemplate(title, templateNameOrNumber, false, customFields);
 	return articleView;
 };
 
@@ -4288,21 +4330,16 @@ Story.prototype.chooseTemplateForTiddler = function(templateNameOrNumber) {
 	if (! templateNameOrNumber) templateNameOrNumber = DEFAULT_VIEW_TEMPLATE; // true when null or 0
 		
 	if (templateNameOrNumber == DEFAULT_VIEW_TEMPLATE || templateNameOrNumber == DEFAULT_EDIT_TEMPLATE)
-		templateNameOrNumber = config.tiddlerTemplates[templateNameOrNumber]; // transform 0 or 1 to default names
+		templateNameOrNumber = config.tiddlerTemplates[templateNameOrNumber]; // actually transform 1 or 2 to "ViewTemplate" or "EditTemplate"
 	return templateNameOrNumber; // return type is always string
 };
 
-Story.prototype.getTemplateForTiddler = function(templateName) {
-	return store.getRecursiveTiddlerText(templateName, null, 10);
-};
-
 // Renders an article viewer / editor - for existing articles as well as for non-existing articles
-//# Apply a template to an existing tiddler if it is not already displayed using that template
-//# title - title of tiddler to update
-//# templateNameOrNumber - the name of the article containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
+//# title - title of the article the content of which will be displayed
+//# templateNameOrNumber - null, the name of the article containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
 //# force - if true, forces the refresh even if the template hasn't changed
 //# customFields - an optional list of name/value pairs to be assigned as tiddler fields (for edit templates)
-Story.prototype.refreshView = function(title, templateNameOrNumber, force, customFields) {
+Story.prototype.populateViewOrChangeTemplate = function(title, templateNameOrNumber, force, customFields) {
 	var articleView = this.getArticleViewByTitle(title);
 	if (! articleView) return;
 	
@@ -4319,8 +4356,9 @@ Story.prototype.refreshView = function(title, templateNameOrNumber, force, custo
 			var now = new Date();
 			if (store.isShadowTiddler(title)) {
 				var tags = [];
-				article.set(title, store.getTiddlerText(title), config.views.wikified.shadowModifier, now, tags, now);
+				article.set(title, store.getArticleRawText(title), config.views.wikified.shadowModifier, now, tags, now);
 			} else {
+				// HACK: Weil das Template rein deklarativ ist und es keine dyn. TemplateHandler gibt, muss hier ein Brocken Intelligenz an die falsche Stelle geschissen werden.
 				var text = (templateName != "EditTemplate") ? config.views.wikified.defaultText.format([title]) : null;
 				var fields = customFields ? customFields.decodeHashMap() : null;
 				article.set(title, text, config.views.wikified.defaultModifier, now, [], now, fields);
@@ -4333,8 +4371,9 @@ Story.prototype.refreshView = function(title, templateNameOrNumber, force, custo
 		articleView.onmouseout = this.onTiddlerMouseOut;
 		articleView.ondblclick = this.onTiddlerDblClick;
 		articleView[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
-		articleView.innerHTML = this.getTemplateForTiddler(templateName);
-		applyHtmlMacros(articleView, article);
+		articleView.onpaste = onPasted;
+		articleView.innerHTML = store.getArticleRawTextResolveIncludes(templateName, null, 10); // Template articles must be HTML syntax
+		applyHtmlMacros(articleView, article); // This will add dynamic content to specially marked HTML tags
 		if (store.getTaggedTiddlers(title).length > 0)
 			jQuery(articleView).addClass("isTag");
 		else
@@ -4351,8 +4390,38 @@ Story.prototype.refreshView = function(title, templateNameOrNumber, force, custo
 	return articleView;
 };
 
+function onPasted(e){
+	var items = e.clipboardData.items;
+	for (var i = 0; i < items.length; i++) {
+		var item = items[i];
+		
+		if (item.type == "text/html"){
+			item.getAsString(function(s){console.log(s)});
+		}
+		
+		if (item.type == "text/plain"){
+			item.getAsString(function(s){console.log(s)});
+		}
+		
+		if (item.type.indexOf("image") == -1) continue;
+		var blob = item.getAsFile();		
+		var dummyCanvas = document.createElement("canvas");
+		var dummyContext = dummyCanvas.getContext('2d');        
+		var dummyImage = new Image();
+			
+		dummyImage.onload = function(ie){      
+			dummyCanvas.width = this.width;
+			dummyCanvas.height = this.height;            
+			// dummyContext.drawImage(dummyImage, 0, 0);
+			var dataUrl = dummyCanvas.toDataURL(item.type); // the dummy stack is needed for base 64 encoding				
+			console.log(dataUrl);
+		}
+		dummyImage.src = window.URL.createObjectURL(blob); // triggers onload()		
+	}
+}
+
 // renders hidden fields for customFields (alias "extended fields"), because later on it will be synced back to the entity (see mergeInputElementsToEditBuffer)
-Story.prototype.addCustomFields = function(place, customFields) { // todo: get rid of all custom fields stuff and make parenttiddler a native property (alias "ArticleStore.isStandardField")
+Story.prototype.addCustomFields = function(place, customFields) { // todo: get rid of all custom fields stuff and make parenttitle a native property (alias "ArticleStore.isStandardField")
 	var fields = customFields.decodeHashMap();
 	var w = createTiddlyElement(place, "div", null, "customFields");
 	w.style.display = "none";
@@ -4370,7 +4439,7 @@ Story.prototype.refreshAllTiddlers = function(force) {
 	while (e) {
 		var templateNameOrNumber = e.getAttribute("template");
 		if (templateNameOrNumber && e.getAttribute("dirty") != "true") {
-			this.refreshView(e.getArticleTitle(), force ? null : templateNameOrNumber, true);
+			this.populateViewOrChangeTemplate(e.getArticleTitle(), force ? null : templateNameOrNumber, true);
 		}
 		e = e.nextSibling;
 	}
@@ -4441,7 +4510,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 	var e = ev || window.event;
 	clearMessage();
 	var consume = false;
-	var title = this.getArticleTitle(); // "this" was bound to the articleView in which the key was pressed (see Story.prototype.refreshView)
+	var title = this.getArticleTitle(); // "this" was bound to the articleView in which the key was pressed (see Story.prototype.populateViewOrChangeTemplate)
 	var sender = resolveSender(e);
 	switch (e.keyCode) {
 		case 9: { // [Tab]
@@ -4497,7 +4566,7 @@ Story.prototype.onTiddlerKeyPress = function(ev) {
 	* Searches for a data bound input or textarea element.
 	*
 	* @param {string} title 				- The article's title (obsolete, since we can edit only 1 article at a time)
-	* @param {string} dataFieldName - A field name of the article entity (e.g. "title", "text", "tags", "parenttiddler").
+	* @param {string} dataFieldName - A field name of the article entity (e.g. "title", "text", "tags", "parenttitle").
 	*
 	* @return {element} - The input or textarea element that is bound to dataFieldName. Fallback: The first element that is bound to any data field. Null, if there's no bound element at all.
 */
@@ -4577,8 +4646,7 @@ Story.prototype.setDirty = function(title, dirty) {
 
 Story.prototype.isDirty = function(title) {
 	var articleView = this.getArticleViewByTitle(title);
-	if (articleView)
-		return articleView.getAttribute("dirty") == "true";
+	if (articleView) return articleView.getAttribute("dirty") == "true";
 	return null;
 };
 
@@ -4721,7 +4789,7 @@ Story.prototype.switchTheme = function(theme) { // todo: remove theming
 			refreshAll();
 			this.refreshAllTiddlers(true);
 		} else {
-			setStylesheet(store.getRecursiveTiddlerText(config.refresherData.styleSheet,"",10),config.refreshers.styleSheet);
+			setStylesheet(store.getArticleRawTextResolveIncludes(config.refresherData.styleSheet,"",10),config.refreshers.styleSheet);
 		}
 		config.options.txtTheme = theme;
 		saveOption("txtTheme");
@@ -5292,7 +5360,7 @@ config.refreshers = {
 		var title = e.getArticleTitle();
 		var templateNameOrNumber = e.getAttribute("template");
 		if (changeList && (changeList.indexOf && changeList.indexOf(title) != -1) && ! story.isDirty(title))
-			story.refreshView(title, templateNameOrNumber, true);
+			story.populateViewOrChangeTemplate(title, templateNameOrNumber, true);
 		else
 			refreshElements(e, changeList);
 		return true;
@@ -5378,7 +5446,7 @@ function refreshPageTemplate(title) {
 		title = config.refresherData.pageTemplate;
 	if (!store.isAvailable(title))
 		title = config.refresherData.defaultPageTemplate; //# this one is always avaialable
-	wrapper.innerHTML = store.getRecursiveTiddlerText(title, null, 10);
+	wrapper.innerHTML = store.getArticleRawTextResolveIncludes(title, null, 10);
 	applyHtmlMacros(wrapper);
 	refreshElements(wrapper);
 	display = story.getArticleWrapper();
@@ -5405,11 +5473,11 @@ function refreshPageTitle() {
 }
 
 function getPageTitle() {
-	return wikifyPlainText(store.getTiddlerText("SiteTitle",""), null, null); // todo: setting instead of tiddler. default: beautified url!
+	return wikifyPlainText(store.getArticleRawText("SiteTitle",""), null, null); // todo: setting instead of tiddler. default: beautified url!
 }
 
 function refreshStyles(title, doc) {
-	setStylesheet(title == null ? "" : store.getRecursiveTiddlerText(title, "", 10), title, doc || document);
+	setStylesheet(title == null ? "" : store.getArticleRawTextResolveIncludes(title, "", 10), title, doc || document);
 }
 
 function refreshAll() {
@@ -5694,7 +5762,7 @@ config.macros.newArticleButton.handler = function(place, macroName, params) { //
 config.macros.newArticleButton.onClick = function(createRoot) {
 	var parentTitle = store.currentTiddler ? store.currentTiddler.title : null;
 	if (createRoot || ! parentTitle || parentTitle == "Untitled")	parentTitle = "";
-	story.displayTiddler("Untitled", DEFAULT_EDIT_TEMPLATE, parentTitle ? "parenttiddler:[[" + parentTitle + "]]" : null);
+	story.showArticle("Untitled", DEFAULT_EDIT_TEMPLATE, parentTitle ? "parenttitle:[[" + parentTitle + "]]" : null);
 	story.focusTiddler("Untitled", "title");
 };
 
@@ -5825,7 +5893,7 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 	//var fields = articleView.getAttribute("tiddlyFields");
 	var fields = null;
 	
-	story.displayTiddler(title, DEFAULT_EDIT_TEMPLATE, fields);
+	story.showArticle(title, DEFAULT_EDIT_TEMPLATE, fields);
 	
 	var textAreaElement = story.getTiddlerField(title, "text");
 	
@@ -5837,7 +5905,7 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 			found = textAreaElement.value.indexOf(selectedText, found + 1);
 		} while (recurseViewerOccurance && found >= 0)
 	}
-	if (found >= 0) {
+	if (found > -1) {
 		setCaretPosition(textAreaElement, found);
 	} else {
 		setCaretPosition(textAreaElement, (articleView.rescuedCaretPosition ? articleView.rescuedCaretPosition : 0));
@@ -5892,7 +5960,7 @@ function refreshTreePath() {
 	var parentTitle;
 	var parentTitles = [];
 	do {
-		parentTitle = tiddler.fields['parenttiddler'];
+		parentTitle = tiddler.fields['parenttitle'];
 		if (parentTitle) {
 			parentTitles.push(parentTitle);
 			tiddler = store.getTiddler(parentTitle);
@@ -7087,7 +7155,7 @@ var closeResultAndDisplayTiddler = function(e) {
 		if (withHilite && withHilite == "true" && lastQuery) {
 			highlightHack = lastQuery.getMarkRegExp();
 		}
-		story.displayTiddler(title);
+		story.showArticle(title);
 		highlightHack = oldHighlightHack;
 	}
 	return(false);
@@ -7142,7 +7210,7 @@ var pager = new abego.PageWiseRenderer();
 
 var MyItemRenderer = function(parent) {
 	// Load the template how to display the items that represent a found tiddler
-	this.itemHtml = store.getTiddlerText("YourSearchItemTemplate");
+	this.itemHtml = store.getArticleRawText("YourSearchItemTemplate");
 	if (!this.itemHtml) alertAndThrow("YourSearchItemTemplate not found");
 	
 	// Locate the node that shall contain the list of found tiddlers
@@ -7178,7 +7246,7 @@ var refreshResult = function() {
 	if (!resultElement || !searchInputField) return;
 
 	// Load the template for the YourSearchResult
-	var html = store.getTiddlerText("YourSearchResultTemplate");
+	var html = store.getArticleRawText("YourSearchResultTemplate");
 	if (!html) html = "<b>Tiddler YourSearchResultTemplate not found</b>";
 	resultElement.innerHTML = html;
 
@@ -7787,7 +7855,7 @@ window.onkeydown = function(e) {
 				if (e.keyCode == 13) {
 					// document.getElementsByClassName('yourSearchTitle')[0].firstChild.focus();
 					var foundTiddlers = abego.YourSearch.getFoundTiddlers();
-					story.displayTiddler(foundTiddlers[0].title);
+					story.showArticle(foundTiddlers[0].title);
 					abego.YourSearch.closeResult();
 					return false;
 				};
@@ -7830,7 +7898,7 @@ function updateMarkupBlock(s, blockName, tiddlerName) {
 	return s.replaceChunk(
 		"<!--%0-START-->".format([blockName]),
 		"<!--%0-END-->".format([blockName]),
-		"\n" + store.getRecursiveTiddlerText(tiddlerName, "") + "\n"
+		"\n" + store.getArticleRawTextResolveIncludes(tiddlerName, "") + "\n"
 	);
 }
 
@@ -7961,7 +8029,7 @@ function createEmptyWikiAction() {
 	}
 }
 
-// Translate escaped URL to unescaped local path [Preemption]
+// Translate URL to local path [Preemption]
 // e.g. "file:///C:/Foo/Bar/Batz.html" =>
 //              "C:\\Foo\\Bar\\Batz.html"
 window.getLocalPath = window.getLocalPath || function(uri) {	
@@ -7985,6 +8053,22 @@ window.getLocalPath = window.getLocalPath || function(uri) {
 		localPath = "\\\\" + uri.substr(7).replace(new RegExp("/","g"),"\\");
 				
 	return localPath;
+}
+
+function getFileName(url, withoutExtension){
+	
+	var fileName, p;
+	if ((p = url.lastIndexOf("/")) != -1)
+		fileName = url.substr(p + 1);
+	else if ((p = url.lastIndexOf("\\")) != -1)
+		fileName = url.substr(p + 2);
+	else
+		fileName = url;
+	
+	if (withoutExtension){
+		if ((p = fileName.lastIndexOf(".")) != -1) fileName = fileName.substr(0, p);
+	}
+	return fileName;
 }
 
 //--
@@ -8386,7 +8470,7 @@ function onLinkElementClicked(ev) {
 	var senderTitle = articleView ? articleView.getAttribute('tiddler') : '';
 	
 	if (title != senderTitle || ! sectionName) { // link target is not on the current page
-		story.displayTiddler(title);
+		story.showArticle(title);
 	}
 	
 	clearMessage();
@@ -8436,7 +8520,7 @@ function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalCl
 	var classNames = buildClassNames(title, additionalClassNames);
 	var btn;
 	if (isStatic) {
-		btn = renderExternalLink(place, store.getTiddlerText("SiteUrl", null) + "#" + title) 
+		btn = renderExternalLink(place, store.getArticleRawText("SiteUrl", null) + "#" + title) 
 		btn.className += ' ' + additionalClassNames;
 	} else {
 		btn = renderTiddlyButton(place, label, null, onLinkElementClicked, classNames);
@@ -8445,7 +8529,7 @@ function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalCl
 	btn.setAttribute("tiddlyLink", title);
 	if (section) {
 		btn.setAttribute('section', section);
-		if (! store.getTiddlerText(title + config.textPrimitives.sectionSeparator + section))
+		if (! store.getArticleRawText(title + config.textPrimitives.sectionSeparator + section))
 			addClass(btn, 'tiddlyLinkNonExistingSection');
 	}
 	return btn;
@@ -9458,7 +9542,7 @@ RGB.prototype.toString = function() {
 //-- DOM utilities - many derived from www.quirksmode.org
 //--
 
-function addEvent(obj, type, fn) {
+function addEvent(obj, type, fn) { // xxx
 	if (obj.attachEvent) {
 		obj["e"+type+fn] = fn;
 		obj[type+fn] = function() {obj["e"+type+fn](window.event);};
@@ -9774,7 +9858,7 @@ TW21Saver.prototype.externalizeTiddler = function(store, article) {
 		var tags = article.getTagsTuple();
 		if (tags) attributes += ' tags="' + tags.htmlEncode() + '"';
 		
-		var extendedAttributes = ""; // changecount parenttiddler
+		var extendedAttributes = ""; // changecount parenttitle
 		
 		store.forEachField(article,
 			function(article, fieldName, value) {
@@ -9920,7 +10004,7 @@ function wikifyPlain(title,theStore,limit) {
 	if (!theStore)
 		theStore = store;
 	if (theStore.tiddlerExists(title) || theStore.isShadowTiddler(title)) {
-		return wikifyPlainText(theStore.getTiddlerText(title),limit,tiddler);
+		return wikifyPlainText(theStore.getArticleRawText(title),limit,tiddler);
 	} else {
 		return "";
 	}
