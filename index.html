@@ -1,9 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 2};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 3};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -1657,8 +1657,7 @@ config.formatterHelpers = {
 		var lookaheadMatch = this.lookaheadRegExp.exec(w.source);
 		if (lookaheadMatch && lookaheadMatch.index == w.matchStart) {
 			var text = lookaheadMatch[1];
-			if (config.browser.isIE && (config.browser.ieVersion[1] < 10))
-				text = text.replace(/\n/g,"\r");
+			if (config.browser.isIE && (config.browser.ieVersion[1] < 10)) text = text.replace(/\n/g,"\r");
 			createTiddlyElement(w.output,this.element,null,null,text);
 			w.nextMatch = lookaheadMatch.index + lookaheadMatch[0].length;
 		}
@@ -1684,12 +1683,10 @@ config.formatterHelpers = {
 };
 
 function resolveImageSource(unresolved){
-	if (! unresolved || unresolved.indexOf('/') > -1)	return unresolved;
-	//var blobArticle = store.getArticleRawText(unresolved);
-	var blobArticle = store.getTiddler(unresolved);
-	if (! blobArticle) return "./%0-Files/%1".format([getFileName(document.location.toString(), true), unresolved]);
-	var type = blobArticle.fields['content-type'];
-	return "data:%0;base64,%1".format([type, blobArticle.text]);
+	if (! unresolved || unresolved.indexOf('/') > -1)	return unresolved;	
+	var blobArticle = store.getArticle(unresolved);
+	if (! blobArticle) return "./%0-Files/%1".format([getFileName(document.location.toString(), true), unresolved]);	
+	return blobArticle.text;
 }
 
 //--
@@ -2389,7 +2386,7 @@ function invokeMacro(place, macroName, params, wikifier, tiddler) {
 		var iMacroResolver = config.macros[macroName]; // Dynamically find the macro module implementation by name (VB = GetType("config.macros." + macroName))
 		if (iMacroResolver && iMacroResolver.handler) { // We hope that the module implements IMacroResolver
 			var articleView = story.getArticleViewByChild(place);
-			window.tiddler = articleView ? store.getTiddler(articleView.getArticleTitle()) : null;
+			window.tiddler = articleView ? store.getArticle(articleView.getArticleTitle()) : null;
 			window.place = place;
 			var allowEval = true;
 			if (config.evaluateMacroParameters == "system") {
@@ -2476,7 +2473,7 @@ config.macros.list.refresh = function(list) {
 	var args = paramString.parseParams("anon", null, null)[0];
 	var type = args.anon ? args.anon[0] : "all";
 	jQuery(list).empty().addClass("list list-" + type);
-	var template = args.template ? store.getArticleRawText(args.template[0]) : false;
+	var template = args.template ? store.getArticleTextPartOrSlice(args.template[0]) : false;
 	if (!template) {
 		template = config.macros.list.template;
 	}
@@ -2491,7 +2488,7 @@ config.macros.list.refresh = function(list) {
 		list.appendChild(li);
 		var tiddler = results[t];
 		if (typeof(tiddler) == 'string') {
-			tiddler = store.getTiddler(tiddler) || new Tiddler(tiddler); // HACK: type of "tiddler" changes from string to tiddler!
+			tiddler = store.getArticle(tiddler) || new Tiddler(tiddler); // HACK: type of "tiddler" changes from string to article!
 		}
 		wikify(template, li, null, tiddler);
 	}
@@ -2576,7 +2573,7 @@ config.macros.articleTree.createSubTree = function(place, id, parentTitle, level
 	}
 		
 	if (parentTitle != ""){
-		var parentArticle = store.getTiddler(parentTitle);
+		var parentArticle = store.getArticle(parentTitle);
 		if (parentArticle.tags.contains("collapsed")) isOpen = false;
 
 		// render branch head (row with collapser button - will stay visible even when collapsed)
@@ -2627,11 +2624,11 @@ merge(macro, {
 		var no_prefix_field = prefix === "-" || prefix === "+" ? field.substr(1, field.length) : field;
 		var dateFormat = params[2] || this.dateFormat;
 		var groupTemplate = macro.groupTemplate.format(no_prefix_field, dateFormat);
-		groupTemplate = args.groupTemplate ? store.getArticleRawText(args.groupTemplate[0]) || groupTemplate :
+		groupTemplate = args.groupTemplate ? store.getArticleTextPartOrSlice(args.groupTemplate[0]) || groupTemplate :
 			groupTemplate;
 
 		var itemTemplate = macro.itemTemplate;
-		itemTemplate = args.template ? store.getArticleRawText(args.template[0]) || itemTemplate :
+		itemTemplate = args.template ? store.getArticleTextPartOrSlice(args.template[0]) || itemTemplate :
 			itemTemplate;
 
 		var tiddlers = args.filter ? store.sortTiddlers(store.filterTiddlers(args.filter[0]), field) :
@@ -2676,7 +2673,7 @@ config.macros.tiddler.handler = function(place, macroName, params, wikifier, par
 		if (pos != -1) {
 			title = title.substr(0, pos); // get the base tiddler title
 		}
-		var t = store.getTiddler(title);
+		var t = store.getArticle(title);
 		if (! t || t.tags.indexOf("systemAllowEval") == -1) {
 			allowEval = false;
 		}
@@ -2708,7 +2705,7 @@ config.macros.tiddler.handler = function(place, macroName, params, wikifier, par
 };
 
 config.macros.tiddler.transclude = function(wrapper, titleAndSection, args) {
-	var text = store.getArticleRawText(titleAndSection);
+	var text = store.getArticleTextPartOrSlice(titleAndSection);
 	if (! text)
 		return;
 	var stack = config.macros.tiddler.tiddlerStack;
@@ -2730,7 +2727,7 @@ config.macros.tiddler.transclude = function(wrapper, titleAndSection, args) {
 };
 
 config.macros.tiddler.renderText = function(place, text, title) {
-	wikify(text, place, null, store.getTiddler(title));
+	wikify(text, place, null, store.getArticle(title));
 };
 
 config.macros.tiddler.tiddlerStack = [];
@@ -2746,14 +2743,13 @@ config.macros.tags.handler = function(place, macroName, params, wikifier, paramS
 	params = paramString.parseParams("anon", null, true, false, false);
 	var ul = createTiddlyElement(place, "ul");
 	var title = getParam(params, "anon", "");
-	if (title && store.tiddlerExists(title))
-		tiddler = store.getTiddler(title);
+	if (title && store.tiddlerExists(title)) tiddler = store.getArticle(title);
 	var sep = getParam(params, "sep", " ");
 	var lingo = config.views.wikified.tag;
 	var label = null;
 	var t;
 	for (t = 0; t < tiddler.tags.length; t++) {
-		var tag = store.getTiddler(tiddler.tags[t]);
+		var tag = store.getArticle(tiddler.tags[t]);
 		if (!tag || !tag.tags.contains("excludeLists")) {
 			if (!label)
 				label = createTiddlyElement(ul,"li",null,"listTitle",lingo.labelTags.format([tiddler.title]));
@@ -2980,7 +2976,7 @@ config.macros.tabs.switchTab = function(tabSet, tab) {
 		var tabContent = createTiddlyElement(null, "div", null, "tabContents");
 		tabSet.parentNode.insertBefore(tabContent, tabSet.nextSibling);
 		var contentTitle = tabElement.getAttribute("content");
-		wikify(store.getArticleRawText(contentTitle), tabContent, null, store.getTiddler(contentTitle));		
+		wikify(store.getArticleTextPartOrSlice(contentTitle), tabContent, null, store.getArticle(contentTitle));		
 	}
 };
 
@@ -3165,8 +3161,7 @@ config.commands.deleteTiddler.handler = function(event, src, title) { // Impleme
 
 config.commands.permalink.handler = function(event, src, title) { // Implements ICommand.handler()
 	var t = encodeURIComponent(String.encodeTiddlyLink(title));
-	if (window.location.hash != t)
-		window.location.hash = t;
+	if (window.location.hash != t) window.location.hash = t;
 	return false;
 };
 
@@ -3191,7 +3186,7 @@ config.commands.jump.handlePopup = function(popup, title) {
 };
 
 config.commands.fields.handlePopup = function(popup,title) {
-	var tiddler = store.fetchTiddler(title);
+	var tiddler = store.getArticle(title);
 	if (!tiddler)	return;
 	var items = [];
 	store.forEachField(tiddler, function(tiddler,fieldName,value) {items.push({field:fieldName,value:value});},true);
@@ -3347,7 +3342,7 @@ function ArticleStore(params) {
 		tiddlers = {};
 		this.setDirty(false);
 	};
-	this.fetchTiddler = function(title) {
+	this.getArticle = function(title) {
 		var t = tiddlers[title];
 		return t instanceof Tiddler ? t : null;
 	};
@@ -3377,7 +3372,7 @@ ArticleStore.prototype.isDirty = function() {
 };
 
 ArticleStore.prototype.tiddlerExists = function(title) {
-	var t = this.fetchTiddler(title);
+	var t = this.getArticle(title);
 	return t != undefined;
 };
 
@@ -3395,21 +3390,13 @@ ArticleStore.prototype.isAvailable = function(title) {
 };
 
 ArticleStore.prototype.getOrAddNewArticle = function(title) {
-	var article = this.fetchTiddler(title);
+	var article = this.getArticle(title);
 	if (article) return article;
 		
 	article = new Tiddler(title);
 	this.addTiddler(article);
 	this.setDirty(true);
 	return article;
-};
-
-ArticleStore.prototype.getTiddler = function(title) {
-	var t = this.fetchTiddler(title);
-	if (t != undefined)
-		return t;
-	else
-		return null;
 };
 
 ArticleStore.prototype.getShadowTiddlerText = function(title) {
@@ -3419,7 +3406,7 @@ ArticleStore.prototype.getShadowTiddlerText = function(title) {
 		return "";
 };
 
-ArticleStore.prototype.getArticleRawText = function(titleWithPartOrSlice, defaultText) {
+ArticleStore.prototype.getArticleTextPartOrSlice = function(titleWithPartOrSlice, defaultText) {
 	
 	if (! titleWithPartOrSlice) return defaultText;
 	
@@ -3435,14 +3422,17 @@ ArticleStore.prototype.getArticleRawText = function(titleWithPartOrSlice, defaul
 	
 	var sectionName = null;
 	var pos = titleWithPartOrSlice.indexOf(config.textPrimitives.sectionSeparator);
+	var title;
 	if (pos != -1) {
 		sectionName = titleWithPartOrSlice.substr(pos + config.textPrimitives.sectionSeparator.length);
-		titleWithPartOrSlice = titleWithPartOrSlice.substr(0, pos);
+		title = titleWithPartOrSlice.substr(0, pos);
+	} else {
+		title = titleWithPartOrSlice;
 	}
 	
-	var article = this.fetchTiddler(titleWithPartOrSlice);
+	var article = this.getArticle(title);
 	var text = article ? article.text : null;
-	if (! article && this.isShadowTiddler(titleWithPartOrSlice)) text = this.getShadowTiddlerText(titleWithPartOrSlice);
+	if (! article && this.isShadowTiddler(title)) text = this.getShadowTiddlerText(title);
 	if (text) {
 		if (! sectionName) return text; // POI: Return the whole article
 		var re = new RegExp("(^!{1,6}[ \t]*" + sectionName.escapeRegExp() + "[ \t]*\n)","mg");
@@ -3464,7 +3454,7 @@ ArticleStore.prototype.getArticleRawText = function(titleWithPartOrSlice, defaul
 
 // if the returned text would contain an included title like this [[NestedArticleTitle]] it will be resolved (recursively).
 ArticleStore.prototype.getArticleRawTextResolveIncludes = function(titleWithPartOrSlice, defaultText, depth) {
-	var text = this.getArticleRawText(titleWithPartOrSlice, null);
+	var text = this.getArticleTextPartOrSlice(titleWithPartOrSlice, null);
 	if (text == null) return defaultText;
 	var textOut = [];
 	var match, lastPos = 0;
@@ -3493,7 +3483,7 @@ ArticleStore.prototype.slicesRE = /(?:^([\'\/]{0,2})~?([\.\w]+)\:\1[\t\x20]*([^\
 // @internal
 ArticleStore.prototype.calcAllSlices = function(title) {
 	var slices = {};
-	var text = this.getArticleRawText(title,"");
+	var text = this.getArticleTextPartOrSlice(title,"");
 	this.slicesRE.lastIndex = 0;
 	var m = this.slicesRE.exec(text);
 	while (m) {
@@ -3571,7 +3561,7 @@ ArticleStore.prototype.addNotification = function(title, fn) {
 };
 
 ArticleStore.prototype.removeTiddler = function(title) {
-	var tiddler = this.fetchTiddler(title);
+	var tiddler = this.getArticle(title);
 	if (tiddler) {
 		this.deleteTiddler(title);
 		this.notify(title, true);
@@ -3580,7 +3570,7 @@ ArticleStore.prototype.removeTiddler = function(title) {
 };
 
 ArticleStore.prototype.setTiddlerTag = function(title, status, tag) {
-	var tiddler = this.fetchTiddler(title);
+	var tiddler = this.getArticle(title);
 	if (tiddler) {
 		var t = tiddler.tags.indexOf(tag);
 		if (t != -1) tiddler.tags.splice(t,1);
@@ -3593,7 +3583,7 @@ ArticleStore.prototype.setTiddlerTag = function(title, status, tag) {
 };
 
 ArticleStore.prototype.addTiddlerFields = function(title, fields) {
-	var tiddler = this.fetchTiddler(title);
+	var tiddler = this.getArticle(title);
 	if (! tiddler)	return;
 	merge(tiddler.fields,fields);
 	tiddler.changed();
@@ -3610,7 +3600,7 @@ ArticleStore.prototype.saveTiddler = function(title, newTitle, newBody, modifier
 		title = tiddler.title;
 		newTitle = title;
 	} else {
-		tiddler = this.fetchTiddler(title);
+		tiddler = this.getArticle(title);
 		if (tiddler) {
 			created = created || tiddler.created; // Preserve created date
 			creator = creator || tiddler.creator;
@@ -3634,7 +3624,7 @@ ArticleStore.prototype.saveTiddler = function(title, newTitle, newBody, modifier
 };
 
 ArticleStore.prototype.incChangeCount = function(title) {
-	var tiddler = this.fetchTiddler(title);
+	var tiddler = this.getArticle(title);
 	if (tiddler)
 		tiddler.incChangeCount();
 };
@@ -3673,21 +3663,24 @@ ArticleStore.prototype.importAllArticlesFromHtmlSource = function(htmlSource) {
 	var storeAreaRange = locateStoreArea(htmlSource);
 	if (! storeAreaRange)	return null;
 	var content = "<" + "html><" + "body>" + htmlSource.substring(storeAreaRange[0], storeAreaRange[1] + storeAreaEndString.length) + "<" + "/body><" + "/html>";
-	// Create an iframe as tool for converting the htmlSource to a DOM
-	var iframe = document.createElement("iframe");
-	iframe.style.display = "none";
-	document.body.appendChild(iframe);
-	var doc = iframe.contentDocument;
-	doc.open();
-	doc.writeln(content);
-	doc.close();
-	// Load the content into the store instance
-	var storeDiv = doc.getElementById("storeArea");
-	this.loadFromDiv(storeDiv);
-	// Get rid of the iframe
-	iframe.parentNode.removeChild(iframe);
+	processHtmlSourceAsDocument(content, function(doc){
+		var storeDiv = doc.getElementById("storeArea");
+		this.loadFromDiv(storeDiv);	
+	});
 	return this;
 };
+
+function processHtmlSourceAsDocument(htmlSource, cb){
+	var iframe = document.createElement("iframe"); // Create an iframe as tool for converting the htmlSource to a DOM
+	iframe.style.display = "none";
+	document.body.appendChild(iframe); // sonst ist aus "Sicherheitsgründen" contentDocument null
+	var doc = iframe.contentDocument;
+	doc.open();
+	doc.writeln(htmlSource);
+	doc.close();
+	cb(doc);	
+	iframe.parentNode.removeChild(iframe); // Get rid of the iframe
+}
 
 ArticleStore.prototype.updateTiddlers = function() {
 	this.tiddlersUpdated = true;
@@ -3725,7 +3718,7 @@ ArticleStore.prototype.getTags = function(excludeTag) {
 				}
 			}
 			if (n && excludeTag) {
-				var t = this.fetchTiddler(tag); // todo tags ar NOT articles!
+				var t = this.getArticle(tag); // todo tags ar NOT articles!
 				if (t && t.isTagged(excludeTag))
 					n = false;
 			}
@@ -3815,7 +3808,7 @@ ArticleStore.prototype.getMissingLinks = function() {
 		var n;
 		for (n = 0; n < tiddler.links.length; n++) {
 			var link = tiddler.links[n];
-			if (this.getArticleRawText(link, null) == null && !this.isShadowTiddler(link) && !config.macros[link])	results.pushUnique(link);
+			if (this.getArticleTextPartOrSlice(link, null) == null && !this.isShadowTiddler(link) && !config.macros[link])	results.pushUnique(link);
 		}
 	});
 	results.sort();
@@ -3856,7 +3849,7 @@ ArticleStore.prototype.getTouched = function() {
 
 // Resolves a Tiddler reference or tiddler title into a Tiddler object, or null if it doesn't exist
 ArticleStore.prototype.resolveTiddler = function(tiddler) {
-	var t = (typeof tiddler == "string") ? this.getTiddler(tiddler) : tiddler;
+	var t = (typeof tiddler == "string") ? this.getArticle(tiddler) : tiddler;
 	return t instanceof Tiddler ? t : null;
 };
 
@@ -3891,12 +3884,12 @@ ArticleStore.prototype.sortTiddlers = function(tiddlers,field) {
 config.filters = {
 	tiddler: function(results, match) {
 		var title = match[1] || match[4];
-		var tiddler = this.fetchTiddler(title);
+		var tiddler = this.getArticle(title);
 		if (tiddler) {
 			results.pushUnique(tiddler);
 		} else if (this.isShadowTiddler(title)) {
 			tiddler = new Tiddler();
-			tiddler.set(title, this.getArticleRawText(title));
+			tiddler.set(title, this.getArticleTextPartOrSlice(title));
 			results.pushUnique(tiddler);
 		} else {
 			results.pushUnique(new Tiddler(title));
@@ -4009,7 +4002,7 @@ ArticleStore.prototype.getValue = function(tiddler, fieldName) {
 	if (fieldName.indexOf(config.textPrimitives.sectionSeparator) === 0 || fieldName.indexOf(config.textPrimitives.sliceSeparator) === 0) {
 		var sliceType = fieldName.substr(0, 2);
 		var sliceName = fieldName.substring(2);
-		return store.getArticleRawText("%0%1%2".format(t.title,sliceType,sliceName));
+		return store.getArticleTextPartOrSlice("%0%1%2".format(t.title,sliceType,sliceName));
 	} else {
 		fieldName = fieldName.toLowerCase();
 		var accessor = ArticleStore.standardFieldAccess[fieldName];
@@ -4243,13 +4236,14 @@ Story.prototype.history = {
 }
 
 Story.prototype.displayDefaultTiddlers = function() { // todo: instead of having a "DefaultTiddlers" tiddler, make an option!
-	this.displayTiddlers(null, store.filterTiddlers(store.getArticleRawText("DefaultTiddlers")));
+	this.displayTiddlers(null, store.filterTiddlers(store.getArticleTextPartOrSlice("DefaultTiddlers")));
 };
 
 Story.prototype.displayTiddlers = function(unused, articles, templateNameOrNumber, unused, unused) {
 	for (var t = articles.length - 1; t >= 0; t--) this.showArticle(articles[t].title, templateNameOrNumber);
 };
 
+// title - Title of an existing or new article
 Story.prototype.showArticle = function(title, templateNameOrNumber, customFields) {
 	var parts = title.split(config.textPrimitives.sectionSeparator);
 	title = parts[0]; 
@@ -4301,7 +4295,7 @@ Story.prototype.showArticle = function(title, templateNameOrNumber, customFields
 	}
 	story.scrollToSection(title, sectionName);
 	
-	store.currentTiddler = store.getTiddler(title);	// HACK: store shouldn't know anything about "current" - it has to be kept in the UI layer!
+	store.currentTiddler = store.getArticle(title); // HACK: store shouldn't know anything about "current" - it has to be kept in the UI layer!
 	if (store.currentTiddler) returningView.scrollTop = store.currentTiddler.rescuedScrollTop;
 	story.history.add(title);
 	refreshTreePath();
@@ -4335,7 +4329,7 @@ Story.prototype.chooseTemplateForTiddler = function(templateNameOrNumber) {
 };
 
 // Renders an article viewer / editor - for existing articles as well as for non-existing articles
-//# title - title of the article the content of which will be displayed
+//# title - Title of an existing or new article.
 //# templateNameOrNumber - null, the name of the article containing the template or one of the constants DEFAULT_VIEW_TEMPLATE and DEFAULT_EDIT_TEMPLATE
 //# force - if true, forces the refresh even if the template hasn't changed
 //# customFields - an optional list of name/value pairs to be assigned as tiddler fields (for edit templates)
@@ -4349,14 +4343,14 @@ Story.prototype.populateViewOrChangeTemplate = function(title, templateNameOrNum
 	
 	var currTemplate = articleView.getAttribute("template");
 	if ((templateName != currTemplate) || force) {
-		var article = store.getTiddler(title);
+		var article = store.getArticle(title);
 		
 		if (! article) {
 			article = new Tiddler();
 			var now = new Date();
 			if (store.isShadowTiddler(title)) {
 				var tags = [];
-				article.set(title, store.getArticleRawText(title), config.views.wikified.shadowModifier, now, tags, now);
+				article.set(title, store.getArticleTextPartOrSlice(title), config.views.wikified.shadowModifier, now, tags, now);
 			} else {
 				// HACK: Weil das Template rein deklarativ ist und es keine dyn. TemplateHandler gibt, muss hier ein Brocken Intelligenz an die falsche Stelle geschissen werden.
 				var text = (templateName != "EditTemplate") ? config.views.wikified.defaultText.format([title]) : null;
@@ -4371,9 +4365,11 @@ Story.prototype.populateViewOrChangeTemplate = function(title, templateNameOrNum
 		articleView.onmouseout = this.onTiddlerMouseOut;
 		articleView.ondblclick = this.onTiddlerDblClick;
 		articleView[window.event ? "onkeydown" : "onkeypress"] = this.onTiddlerKeyPress;
-		articleView.onpaste = onPasted;
+		
+		// Load the template and resolve dynamic stuff:
 		articleView.innerHTML = store.getArticleRawTextResolveIncludes(templateName, null, 10); // Template articles must be HTML syntax
 		applyHtmlMacros(articleView, article); // This will add dynamic content to specially marked HTML tags
+		
 		if (store.getTaggedTiddlers(title).length > 0)
 			jQuery(articleView).addClass("isTag");
 		else
@@ -4390,33 +4386,86 @@ Story.prototype.populateViewOrChangeTemplate = function(title, templateNameOrNum
 	return articleView;
 };
 
-function onPasted(e){
+//aaa
+
+function recurseDom(nodes, cb) {
+	for (var i = 0, len = nodes.length; i < len; i++) {
+		var node = nodes[i], ret = cb(node)
+		if (ret) return ret
+		if (node.childNodes.length) {
+			var ret = recurseDom(node.childNodes, cb)
+			if (ret) return ret
+		}
+	}
+}
+
+function onImageNodePasted(node, target){	
+	requesAsync("blob", node.src, function(response, contentType){ 
+		var title = blobToNewArticle(response, function(title, article){ insertAtCursor(target, "[img[" + title + "]]"); });
+	});
+}
+
+function blobToNewArticle(blob, cb){
+	blobToDataUrlAsync(blob, function(dataUrl){
+		article = new Tiddler();
+		var now = new Date();
+		var title = now.convertToYYYYMMDDHHMMSSMMM();
+		article.set(title, dataUrl, config.views.wikified.defaultModifier, now, ["resource"], now);
+		store.addTiddler(article);
+		if (cb) cb(title, article);
+	});
+}
+
+function blobToDataUrlAsync(blob, cb){
+	var reader = new FileReader();
+	reader.onloadend = function() { cb(reader.result); }
+	reader.readAsDataURL(blob);
+}
+
+function requesAsync(responseType, url, cb){
+	var request = new XMLHttpRequest;
+	request.responseType = responseType;
+	request.open('GET', url, true);
+	request.onload = function(e){ cb(this.response, this.getResponseHeader("content-type")); };
+	request.send();	
+}
+
+var pasteHandlers = { // TagName: Delegate
+	IMG: onImageNodePasted
+};
+
+function onPasted(e){ // this = textarea, e = ClipBoardEvent
 	var items = e.clipboardData.items;
+	var target = e.target;
+	var wasHandled;
 	for (var i = 0; i < items.length; i++) {
 		var item = items[i];
 		
-		if (item.type == "text/html"){
-			item.getAsString(function(s){console.log(s)});
+		switch (true) {
+			case (item.type == "text/html"):{
+				item.getAsString(
+					function(s){						
+						processHtmlSourceAsDocument(s, function(doc){
+							recurseDom(doc.childNodes, function(node) { if (pasteHandlers[node.nodeName]) pasteHandlers[node.nodeName](node, target); });
+						});
+					}
+				)
+				wasHandled = true;
+				break;
+			}
+			case (item.type == "text/plain"):{
+				item.getAsString(function(s){ console.log("text/plain:"+s); });
+				wasHandled = true;
+				break;
+			}
+			case (item.type.indexOf("image") > -1): {
+				var blob = item.getAsFile();
+				var title = blobToNewArticle(blob, function(title, article){ insertAtCursor(target, "[img[" + title + "]]"); });
+				wasHandled = true;
+				break;
+			}			
 		}
-		
-		if (item.type == "text/plain"){
-			item.getAsString(function(s){console.log(s)});
-		}
-		
-		if (item.type.indexOf("image") == -1) continue;
-		var blob = item.getAsFile();		
-		var dummyCanvas = document.createElement("canvas");
-		var dummyContext = dummyCanvas.getContext('2d');        
-		var dummyImage = new Image();
-			
-		dummyImage.onload = function(ie){      
-			dummyCanvas.width = this.width;
-			dummyCanvas.height = this.height;            
-			// dummyContext.drawImage(dummyImage, 0, 0);
-			var dataUrl = dummyCanvas.toDataURL(item.type); // the dummy stack is needed for base 64 encoding				
-			console.log(dataUrl);
-		}
-		dummyImage.src = window.URL.createObjectURL(blob); // triggers onload()		
+		if (wasHandled) break;
 	}
 }
 
@@ -4580,7 +4629,7 @@ Story.prototype.getTiddlerField = function(title, dataFieldName) {
 	for (var i = 0; i < children.length; i++) {
 		var c = children[i];
 		if (c.tagName.toLowerCase() == "input" || c.tagName.toLowerCase() == "textarea") {
-			if (! foundElement) foundElement = c; // rescue first hit
+			if (! foundElement) foundElement = c; // rescue first hit as fallback. xxx why?
 			if (c.getAttribute("edit") == dataFieldName) {
 				foundElement = c;
 				break;
@@ -4630,7 +4679,7 @@ Story.prototype.closeView = function(title) {
 		return;
 	}
 	
-	var article = store.getTiddler(title);
+	var article = store.getArticle(title);
 	if (article) article.rescuedScrollTop = articleView.scrollTop;
 	
 	clearMessage();
@@ -4680,7 +4729,7 @@ Story.prototype.hasChanges = function(title) {
 	if (articleView) {
 		var editBuffer = {};
 		this.mergeInputElementsToEditBuffer(articleView, editBuffer);
-		if (store.fetchTiddler(title)) {
+		if (store.getArticle(title)) {
 			for (var fieldName in editBuffer) {
 				if (store.getValue(title, fieldName) != editBuffer[fieldName]) //# tiddler changed
 					return true;
@@ -4730,7 +4779,7 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 	var newDate = new Date();
 	var extendedFields = {};
 	if (store.tiddlerExists(title)) {
-		var article = store.fetchTiddler(title);
+		var article = store.getArticle(title);
 		extendedFields = article.fields; // article.fields is actually only extended fields. Other fields are real properties.
 		creator = article.creator;
 	}
@@ -5314,7 +5363,7 @@ function displayMessage(text, href, duration) {
 	}
 	if (! textDiv) textDiv = document.getElementById("messageText");
 	
-	while (textDiv.firstChild) { textDiv.removeChild(textDiv.firstChild); }
+	while (textDiv.firstChild) {textDiv.removeChild(textDiv.firstChild);}
 	
 	if (href) {
 		var link = createTiddlyElement(textDiv, "a", null, null, text);
@@ -5473,7 +5522,7 @@ function refreshPageTitle() {
 }
 
 function getPageTitle() {
-	return wikifyPlainText(store.getArticleRawText("SiteTitle",""), null, null); // todo: setting instead of tiddler. default: beautified url!
+	return wikifyPlainText(store.getArticleTextPartOrSlice("SiteTitle",""), null, null); // todo: setting instead of tiddler. default: beautified url!
 }
 
 function refreshStyles(title, doc) {
@@ -5576,7 +5625,7 @@ function saveSystemSetting(name, doSaveFile) {
 	}
 	text = text.sort().join('\n');
 	var storeWasDirty = store.isDirty();
-	var tiddler = store.getTiddler(title);
+	var tiddler = store.getArticle(title);
 	if (tiddler) {
 		tiddler.text = text;
 		tiddler = store.saveTiddler(tiddler);
@@ -5798,6 +5847,7 @@ config.macros.sectionTOC = { // todo: this only works when the user positions th
 	}
 }
 
+// Zähle, der wievielte Treffer das Wort needle im DOM ist, wenn man bis zum Anker (=selektierter Node) navigiert.
 function recurseViewer(node, anchor, needle) {
 	for (var i = 0; i < node.childNodes.length; i++) {
 		var child = node.childNodes[i];
@@ -5887,7 +5937,7 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 		recurseViewer(articleContentContainer, window.getSelection().anchorNode, selectedText);
 	}
 
-	var article = store.getTiddler(title);
+	var article = store.getArticle(title);
 	if (article) article.rescuedScrollTop = articleView.scrollTop;
 	
 	//var fields = articleView.getAttribute("tiddlyFields");
@@ -5895,7 +5945,8 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 	
 	story.showArticle(title, DEFAULT_EDIT_TEMPLATE, fields);
 	
-	var textAreaElement = story.getTiddlerField(title, "text");
+	var textAreaElement = story.getTiddlerField(title, "text");	
+	textAreaElement.onpaste = onPasted;
 	
 	// Selected text: Reconstruct the selection by locating the n-th occurance of the formerly selected text
 	if (recurseViewerOccurance) {		
@@ -5912,6 +5963,21 @@ config.commands.editTiddler.handler = function(event, src, title) { // Implement
 	}
 	
 	return false;
+}
+
+function insertAtCursor(input, textToInsert) {
+  // get current text of the input
+  const value = input.value;
+
+  // save selection start and end position
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+
+  // update the value with our text inserted
+  input.value = value.slice(0, start) + textToInsert + value.slice(end);
+
+  // update cursor to be at the end of insertion
+  input.selectionStart = input.selectionEnd = start + textToInsert.length;
 }
 
 config.commands.cancelTiddler.handlerBase = config.commands.cancelTiddler.handler;
@@ -5963,7 +6029,7 @@ function refreshTreePath() {
 		parentTitle = tiddler.fields['parenttitle'];
 		if (parentTitle) {
 			parentTitles.push(parentTitle);
-			tiddler = store.getTiddler(parentTitle);
+			tiddler = store.getArticle(parentTitle);
 		}		
 	} while (parentTitle && tiddler);
 	
@@ -7210,7 +7276,7 @@ var pager = new abego.PageWiseRenderer();
 
 var MyItemRenderer = function(parent) {
 	// Load the template how to display the items that represent a found tiddler
-	this.itemHtml = store.getArticleRawText("YourSearchItemTemplate");
+	this.itemHtml = store.getArticleTextPartOrSlice("YourSearchItemTemplate");
 	if (!this.itemHtml) alertAndThrow("YourSearchItemTemplate not found");
 	
 	// Locate the node that shall contain the list of found tiddlers
@@ -7246,7 +7312,7 @@ var refreshResult = function() {
 	if (!resultElement || !searchInputField) return;
 
 	// Load the template for the YourSearchResult
-	var html = store.getArticleRawText("YourSearchResultTemplate");
+	var html = store.getArticleTextPartOrSlice("YourSearchResultTemplate");
 	if (!html) html = "<b>Tiddler YourSearchResultTemplate not found</b>";
 	resultElement.innerHTML = html;
 
@@ -8083,7 +8149,7 @@ window.saveFile = window.saveFile || function(fileUrl, htmlSource, forceManualMo
 		
 	// Fallback: Create data URL link for manual download
 		
-	var dataUrl = "data:text/html;charset=UTF-8;base64," + encodeBase64(unescape(encodeURIComponent(htmlSource)));	
+	var dataUrl = "data:text/html;charset=UTF-8;base64," + encodeBase64(unescape(encodeURIComponent(htmlSource)));
 	// JavaScript strings are UTF-16.
 	// encodeURIComponent() will re-encode the UTF-16 string to UTF-8, but unfortunalely escape all URL-poison-chars/spaces
 	// after calling unescape() you get pure UTF-8
@@ -8118,7 +8184,7 @@ function saveFileViaBlobApi(fileUrl, htmlSource) {
 }
 
 function encodeBase64(data) {
-	if (!data) return "";
+	if (! data) return "";
 	var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	var out = "";
 	var chr1, chr2, chr3 = "";
@@ -8216,7 +8282,7 @@ FileImporter.retrieveArticleAsync = function(title, importWorkItem) { // todo: n
 };
 
 FileImporter.retrieveArticle_WikiSourceRetrieved = function(importWorkItem, userParams) {
-	var t = importWorkItem.incomingArticleStore.fetchTiddler(importWorkItem.title);
+	var t = importWorkItem.incomingArticleStore.getArticle(importWorkItem.title);
 	if (t) {
 		importWorkItem.tiddler = t;
 		importWorkItem.status = true;
@@ -8444,7 +8510,7 @@ function renderExternalLink(place, url, label) {
 function buildClassNames(title, additionalClassNames) {
 	var classes = additionalClassNames ? additionalClassNames.split(" ") : [];
 	classes.pushUnique("tiddlyLink");
-	var tiddler = store.fetchTiddler(title);
+	var tiddler = store.getArticle(title);
 	if (tiddler) {
 		classes.pushUnique("tiddlyLinkExisting");
 		classes.remove("tiddlyLinkNonExisting");
@@ -8520,7 +8586,7 @@ function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalCl
 	var classNames = buildClassNames(title, additionalClassNames);
 	var btn;
 	if (isStatic) {
-		btn = renderExternalLink(place, store.getArticleRawText("SiteUrl", null) + "#" + title) 
+		btn = renderExternalLink(place, store.getArticleTextPartOrSlice("SiteUrl", null) + "#" + title) 
 		btn.className += ' ' + additionalClassNames;
 	} else {
 		btn = renderTiddlyButton(place, label, null, onLinkElementClicked, classNames);
@@ -8529,7 +8595,7 @@ function renderLinkElement(place, titleAndSection, useTitleAsLabel, additionalCl
 	btn.setAttribute("tiddlyLink", title);
 	if (section) {
 		btn.setAttribute('section', section);
-		if (! store.getArticleRawText(title + config.textPrimitives.sectionSeparator + section))
+		if (! store.getArticleTextPartOrSlice(title + config.textPrimitives.sectionSeparator + section))
 			addClass(btn, 'tiddlyLinkNonExistingSection');
 	}
 	return btn;
@@ -9692,7 +9758,7 @@ function setCaretPosition(e, pos) {
 		e.selectionEnd = pos;
 		e.focus();
 	} else if (document.selection) {
-		// IE support
+		// IE support xxx
 		e.focus ();
 		var sel = document.selection.createRange();
 		sel.moveStart('character', -e.value.length);
@@ -10004,7 +10070,7 @@ function wikifyPlain(title,theStore,limit) {
 	if (!theStore)
 		theStore = store;
 	if (theStore.tiddlerExists(title) || theStore.isShadowTiddler(title)) {
-		return wikifyPlainText(theStore.getArticleRawText(title),limit,tiddler);
+		return wikifyPlainText(theStore.getArticleTextPartOrSlice(title),limit,tiddler);
 	} else {
 		return "";
 	}
