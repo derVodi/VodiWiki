@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 3};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 4};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -196,12 +196,6 @@ h5, .popup li.disabled, #backstageTabBar {color: gray;}
 .popup, .wizard, .listBreak {border-color: lightgray;}
 pre {border: 1px solid lightblue;}
 .tabContents {color: deepskyblue;}
-
-.tabSelected:hover, .tabContents a:hover {background-color:#636363 !important;}
-.tab:hover {background-color:#BFBFBF;}
-.tiddlyLink.current {background-color: #777722; box-shadow: 0px 0px 2px 2px #777722;}
-.tiddlyLink.current:hover {background-color: #848426 !important; box-shadow: 0px 0px 2px 2px #848426;}
-
 h1 {color: #003600;}
 h2, h3, h4, h5 {color: #366092;}
 .button {border-color: transparent;}
@@ -221,8 +215,12 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 .dualColorTable tbody td:first-child, .listView tbody td:first-child {background-color: #DEEBF6;} /* Blue 80% */
 .error, .errorButton {background: #f88;} /* Red */
 .wizardFooter .button {background-color: lightgrey;}
+.tab:hover {background-color:#BFBFBF;}
 .tab {background-color: darkgray;}
+.tabSelected:hover, .tabContents a:hover {background-color:#636363 !important;}
 .tabSelected, .tabContents {background-color: #535353 !important;} /* Black 35% */
+.tiddlyLink.current {background-color: #333333 !important;} /* Black 35% */
+.tiddlyLink.current {box-shadow: 0px 0px 0px 1px #333333;}
 #backstageTabBar {background-color: black;}
 
 /* Shadows */
@@ -421,10 +419,6 @@ When working with sensitive data consider the following advice:
 * Search the content of all articles
 </pre>
 </div>
-<div title="DefaultTiddlers" created="201208271046" modified="201904232039" modifier="YourName" tags="excludeLists" changecount="1">
-<pre>[[- Home -]]
-</pre>
-</div>
 <div title="Embedding Parts Of Other Pages" created="201906080811" modified="201906081653" modifier="YourName" changecount="53" parenttitle="​Advanced Use Cases">
 <pre>This is useful if you want to create some kind of overview page for other pages (e.g. a thesaurus).
 
@@ -482,16 +476,10 @@ The following code...
 <pre></pre>
 </div>
 <div title="How to Customize Stuff" created="201904232039" modified="202001251730" modifier="Anonymous" changecount="7" parenttitle="Getting Started">
-<pre>!The Startup Page
-
-* By default it's the page with the title &quot;- Home -&quot;
-* This can be changed by editing the internal [[DefaultTiddlers]] page
-* Edit the page and replace the link by anything of your choice, e.g. {{{[[My Start Page]]}}}
-
-!The Window Title
+<pre>!The Window Title
 
 * By default this is &quot;VodiWiki&quot;
-* This can be changed by editing the internal &quot;[[SiteTitle]]&quot; page
+* This can be changed in the backstage area
 </pre>
 </div>
 <div title="How to Read Content" created="201904232015" modified="201904232018" modifier="YourName" changecount="3" parenttitle="Getting Started">
@@ -598,9 +586,6 @@ Demo code, directly followed by it's output:
 
 Some dummy text.
 </pre>
-</div>
-<div title="SiteTitle" created="201305200101" modified="201305200103" modifier="YourName" changecount="3">
-<pre>VodiWiki</pre>
 </div>
 <div title="Syntax Examples" created="201208271404" modified="201912011414" modifier="YourName" changecount="51" parenttitle="​Reference">
 <pre>!Headings
@@ -762,7 +747,9 @@ Several lines of blockquoted text.
 </pre>
 </div>
 <div title="SystemSettings" created="201912221052" modified="201912221052" modifier="Anonymous" changecount="3">
-<pre>txtUserName: Anonymous</pre>
+<pre>txtUserName: Anonymous
+txtWikiTitle: VodiWiki
+</pre>
 </div>
 <div title="Unicode Collection" created="201907110746" modified="201909151030" modifier="YourName" changecount="123" parenttitle="​Reference">
 <pre>!Spaces
@@ -858,7 +845,7 @@ Several lines of blockquoted text.
 * This is because the content will be migrated between the major versions
 </pre>
 </div>
-<div title="VodiConfigPlugin" created="201208271031" modified="201702011759" modifier="YourName" tags="systemConfig excludeLists excludeSearch" changecount="24">
+<div title="`VodiConfigPlugin" created="201208271031" modified="201702011759" modifier="YourName" changecount="24">
 <pre>/***
 |''Name:''|VodiConfigPlugin|
 |''Version:''|2016.01.08|
@@ -914,7 +901,9 @@ config.options = {
 	txtBackupFolder: "",
 	txtMaxEditRows: "30",
 	txtFileSystemCharSet: "UTF-8",
-	txtTheme: ""
+	txtTheme: "",
+	txtUserName: "Anonymous",
+	txtWikiTitle: "VodiWiki"
 };
 config.optionsDesc = {};
 
@@ -958,6 +947,7 @@ config.macros = {
 		all: {},
 		missing: {},
 		orphans: {},
+		resources: {},
 		shadowed: {},
 		touched: {},
 		filter: {}
@@ -1029,14 +1019,14 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 //--
 
 config.shadowTiddlers = {	
-	ArticleTreePanel: '{{articleTreePanel{<<articleTree>>{{articleTreeButtons{<<newArticleButton "🕀 New Article" true>><<newArticleButton "🕁 New Sub Article" false>>}}}}}}',
+	ArticleTreePanel: '{{articleTreePanel{<<articleTree>>{{articleTreeButtons{<<newArticleButton "New Article" true>><<newArticleButton " Sub Article" false>>}}}}}}',
 	NavigationPanel: '<<tabs navigationTabSetWrapper "╘" "Structured tree" ArticleTreePanel "A-Z" "Sorted list" SortedListPanel "🕓" "Timeline" TimelinePanel>>',
 	PluginManager: '<<plugins>>',
 	SortedListPanel: '<<list all>>',
 	SystemSettings: '',
-	TabTags: '<<allTags excludeLists>>',
+	TabTags: '<<allTags>>',
 	TabMoreMissing: 'Pages with no menu entry: <<list orphans>> Broken Links <<list missing>>',
-	TabMoreShadowed: '<<list shadowed>>',
+	TabResources: '<<list resources>>',
 	TimelinePanel: '<<timeline>>',	
 };
 
@@ -1055,8 +1045,6 @@ config.browser = {
 
 // Strings in "double quotes" should be translated; strings in 'single quotes' should be left alone
 
-merge(config.options, {txtUserName: ""});
-
 merge(config.tasks, {
 	save: {text: "File", tooltip: "New, Save, ...", content: '<<fileTasks>>'},
 	importTask: {text: "Import", tooltip: "Import content and plugins from other wiki files and servers", content: '<<importTiddlers>>'},
@@ -1067,19 +1055,21 @@ merge(config.tasks, {
 
 // Options that can be set in the options panel and/or cookies
 merge(config.optionsDesc, {
-	txtUserName: "Username for signing your edits",
+	chkAutoSave: "Automatically save changes",
 	chkRegExpSearch: "Enable regular expressions for searches",
 	chkCaseSensitiveSearch: "Case-sensitive searching",
 	chkIncrementalSearch: "Incremental key-by-key searching",	
-	chkAutoSave: "Automatically save changes",
 	chkOpenInNewWindow: "Open external links in a new window",
 	chkToggleLinks: "Clicking on links to open tiddlers causes them to close",
 	chkHttpReadOnly: "Hide editing features when viewed over HTTP",
 	chkConfirmDelete: "Require confirmation before deleting tiddlers",
 	txtBackupFolder: "Name of folder to use for backups",
+	txtFileSystemCharSet: "Default character set for saving changes (Firefox/Mozilla only)",
 	txtMaxEditRows: "Maximum number of rows in edit boxes",
 	txtTheme: "Name of the theme to use",
-	txtFileSystemCharSet: "Default character set for saving changes (Firefox/Mozilla only)"});
+	txtUserName: "Username for signing your edits",
+	txtWikiTitle: "The title of the wiki (used as window title)."
+});
 
 merge(config.messages,{
 	customConfigError: "Problems were encountered loading plugins. See PluginManager for details",
@@ -1202,7 +1192,7 @@ merge(config.macros.plugins, {
 	skippedText: "(This plugin has not been executed because it was added since startup)",
 	noPluginText: "There are no plugins installed",
 	confirmDeleteText: "Are you sure you want to delete these plugins:\n\n%0",
-	removeLabel: "Remove systemConfig Tag",
+	removeLabel: "Remove systemConfig Tag", // xxx
 	removePrompt: "Remove systemConfig tag",
 	deleteLabel: "Delete",
 	deletePrompt: "Delete these tiddlers forever",
@@ -1373,10 +1363,9 @@ merge(config.commands.fields,{
 	}
 });
 
-merge(config.shadowTiddlers,{	
-	SiteTitle: "VodiWiki",
+merge(config.shadowTiddlers,{
 	SiteUrl: "",
-	SideBarTabs: '<<tabs sideBarTabSet "Missing" "Missing links & pages" TabMoreMissing "Tags" "All tags" TabTags "Internal" "Internal Articles" TabMoreShadowed>>'
+	SideBarTabs: '<<tabs sideBarTabSet "Missing" "Missing links & pages" TabMoreMissing "Tags" "All tags" TabTags "Resources" "Images And Stuff" TabResources>>'
 });
 
 //--
@@ -1438,7 +1427,7 @@ function main() {
 	
 	readOnly = window.isLocal() ? false : config.options.chkHttpReadOnly;
 	
-	var pluginProblem = loadPlugins("systemConfig");
+	var pluginProblem = loadPlugins();
 
 	formatter = new Formatter(config.formatters);
 	
@@ -1473,15 +1462,14 @@ function unload() {
 function restart() {
 	invokeParamifier(params, "onstart");
 	if (story.isEmpty()) {
-		story.displayDefaultTiddlers();
+		story.showArticle(firstLeaf);
 	}
 	window.scrollTo(0, 0);
 }
 
 function saveTest() {
 	var s = document.getElementById("saveTest");
-	if (s.hasChildNodes())
-		alert(config.messages.savedSnapshotError);
+	if (s.hasChildNodes()) alert(config.messages.savedSnapshotError);
 	s.appendChild(document.createTextNode("savetest"));
 }
 
@@ -1491,12 +1479,11 @@ function loadBuiltInArticlesFromHtmlIntoJsDictionary() {
 	shadows.forEachArticle(function(title, tiddler) {config.shadowTiddlers[title] = tiddler.text;});
 }
 
-function loadPlugins(tag) {
+function loadPlugins() {
 	
 	if (safeMode)	return false;
 	
-	var tiddlers = store.getTaggedTiddlers(tag);
-	tiddlers.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : 1);});
+	var tiddlers = store.getPlugins();	
 	var toLoad = [];
 	var nLoaded = 0;
 	var map = {};
@@ -1593,8 +1580,7 @@ config.paramifiers = {};
 
 config.paramifiers.open = {
 	onstart: function(title) {
-		if (! readOnly || store.tiddlerExists(title) || store.isShadowTiddler(title))
-			story.showArticle(title);
+		if (! readOnly || store.tiddlerExists(title) || isShadowTiddler(title))	story.showArticle(title);
 	}
 };
 
@@ -1667,7 +1653,7 @@ config.formatterHelpers = {
 
 		link = link.split(config.textPrimitives.sectionSeparator)[0]; // handle internal section links (e.g. "foo##bar" => "foo" or "##bar" => "")
 		
-		if (!link.length || store.tiddlerExists(link) || store.isShadowTiddler(link)) {
+		if (!link.length || store.tiddlerExists(link) || isShadowTiddler(link)) {
 			return false;
 		}
 		var urlRegExp = new RegExp(config.textPrimitives.urlPattern, "mg");
@@ -2189,8 +2175,7 @@ function getParser(tiddler, format) {
 			}
 		} else {
 			for (i in config.parsers) {
-				if (tiddler.isTagged(config.parsers[i].formatTag))
-					return config.parsers[i];
+				if (tiddler.isTagged(config.parsers[i].formatTag)) return config.parsers[i];
 			}
 		}
 	}
@@ -2499,7 +2484,7 @@ config.macros.list.refresh = function(list) {
 };
 
 config.macros.list.all.handler = function(params) { // Implements IMacroResolver.handler()
-	return store.reverseLookup("tags", "excludeLists", false, "title");
+	return store.getArticlesQuickly("title");
 };
 
 config.macros.list.missing.handler = function(params) { // Implements IMacroResolver.handler()
@@ -2508,6 +2493,10 @@ config.macros.list.missing.handler = function(params) { // Implements IMacroReso
 
 config.macros.list.orphans.handler = function(params) { // Implements IMacroResolver.handler()
 	return store.getOrphans();
+};
+
+config.macros.list.resources.handler = function(params) { // Implements IMacroResolver.handler()
+	return store.getResourceTitles();
 };
 
 config.macros.list.shadowed.handler = function(params) { // Implements IMacroResolver.handler()
@@ -2529,10 +2518,9 @@ config.macros.list.filter.handler = function(params) { // Implements IMacroResol
 };
 
 config.macros.allTags.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
-	var tags = store.getTags(params[0]);
+	var tags = store.getTags();
 	var ul = createTiddlyElement(place, "ul");
-	if (tags.length == 0)
-		createTiddlyElement(ul, "li", null, "listTitle", this.noTags);
+	if (tags.length == 0) createTiddlyElement(ul, "li", null, "listTitle", this.noTags);
 	var t;
 	for (t = 0; t < tags.length; t++) {
 		var title = tags[t][0];
@@ -2542,9 +2530,7 @@ config.macros.allTags.handler = function(place, macroName, params) { // Implemen
 		btn.setAttribute("tag", title);
 		btn.setAttribute("refresh", "link");
 		btn.setAttribute("tiddlyLink", title);
-		if (params[1]) {
-			btn.setAttribute("sortby", params[1]);
-		}
+		if (params[0]) btn.setAttribute("sortby", params[0]);
 	}
 };
 
@@ -2559,15 +2545,15 @@ config.macros.articleTree.handler = function(place, macroName, params, wikifier,
 	config.macros.articleTree.createSubTree(place, id, "", 0);
 }
 
+var firstLeaf;
+
 config.macros.articleTree.createSubTree = function(place, id, parentTitle, level) {
 	var isOpen = true;
 	
-	var subArticles = store.reverseLookup(
-		'parenttitle', parentTitle, true, null, 
-		function(title, article) { return ! (store.isShadowTiddler(title) || article.isTagged("systemConfig") || article.isTagged("excludeLists"))}
-	);
+	var subArticles = store.getArticlesByField('parenttitle', true, parentTitle);
 	
 	if (! subArticles.length) {
+		if (! firstLeaf) firstLeaf = parentTitle;
 		createTiddlyText(renderLinkElement(place, parentTitle, false, "leaf"), parentTitle); // leaf
 		return;
 	}
@@ -2608,6 +2594,16 @@ config.macros.articleTree.getId = function(element) {
 
 var macro = config.macros.timeline; // HACK
 
+// <<timeline field maxlength dateformat template:title groupTemplate:title filter:filter>>
+//
+// field         - determines the field used as the basis for the list, usually "modified" or "created"
+// maxlength     - an integer that limits the maximum number of tiddlers in the list
+// dateformat    - a date format string
+// template      - a reference to a tiddler or tiddler section used as the template for list entries
+// groupTemplate - a reference to a tiddler or tiddler section used as the template for grouping entries in the list with {{{%0}}} being the name of 
+//                 the field that is displayed and {{{%1}}} being a rendered date based on the date format, see parameter "dateformat" above
+// filter        - a filter used to filter the tiddlers relevant for the list
+
 merge(macro, {
 	handler: function(place, macroName, params, wikifier, paramString, tiddler) {
 		var container = jQuery("<div />").attr("params", paramString).attr("macroName", macroName).appendTo(place)[0];
@@ -2619,26 +2615,28 @@ merge(macro, {
 		var args = paramString.parseParams("anon", null, null)[0];
 		var params = args.anon || [];
 
-		var field = params[0] || "modified";
-		var prefix = field.charAt(0);
-		var no_prefix_field = prefix === "-" || prefix === "+" ? field.substr(1, field.length) : field;
+		var sortBy = params[0] || "modified";
+		var prefix = sortBy.charAt(0);
+		var no_prefix_field = prefix === "-" || prefix === "+" ? sortBy.substr(1, sortBy.length) : sortBy;
 		var dateFormat = params[2] || this.dateFormat;
+
 		var groupTemplate = macro.groupTemplate.format(no_prefix_field, dateFormat);
-		groupTemplate = args.groupTemplate ? store.getArticleTextPartOrSlice(args.groupTemplate[0]) || groupTemplate :
+		groupTemplate = args.groupTemplate ? 
+			store.getArticleTextPartOrSlice(args.groupTemplate[0]) || groupTemplate :
 			groupTemplate;
 
 		var itemTemplate = macro.itemTemplate;
 		itemTemplate = args.template ? store.getArticleTextPartOrSlice(args.template[0]) || itemTemplate :
 			itemTemplate;
 
-		var tiddlers = args.filter ? store.sortTiddlers(store.filterTiddlers(args.filter[0]), field) :
-			store.reverseLookup("tags", "excludeLists", false, field);
+		var articles = store.getArticlesQuickly(sortBy);
+
 		var lastGroup = "", ul;
-		var last = params[1] ? tiddlers.length-Math.min(tiddlers.length, parseInt(params[1], 10)) : 0;
-		var t;
-		for (t=tiddlers.length-1; t>=last; t--) {
-			var tiddler = tiddlers[t];
-			var theGroup = wikifyPlainText(groupTemplate,0,tiddler);
+		var last = params[1] ? articles.length-Math.min(articles.length, parseInt(params[1], 10)) : 0;
+		var i;
+		for (i = articles.length - 1; i >= last; i--) { // backwards => most recent on top
+			var article = articles[i];
+			var theGroup = wikifyPlainText(groupTemplate, 0, article);
 			if (typeof(ul) == "undefined" || theGroup != lastGroup) {
 				ul = document.createElement("ul");
 				jQuery(ul).addClass("timeline");
@@ -2647,7 +2645,7 @@ merge(macro, {
 				lastGroup = theGroup;
 			}
 			var item = createTiddlyElement(ul, "li", null, "listLink");
-			wikify(itemTemplate,item,null,tiddler);
+			wikify(itemTemplate, item, null, article);
 		}
 	},
 	groupTemplate: "<<view %0 date '%1'>>", 
@@ -2748,18 +2746,12 @@ config.macros.tags.handler = function(place, macroName, params, wikifier, paramS
 	var lingo = config.views.wikified.tag;
 	var label = null;
 	var t;
-	for (t = 0; t < tiddler.tags.length; t++) {
-		var tag = store.getArticle(tiddler.tags[t]);
-		if (!tag || !tag.tags.contains("excludeLists")) {
-			if (!label)
-				label = createTiddlyElement(ul,"li",null,"listTitle",lingo.labelTags.format([tiddler.title]));
-			createTagButton(createTiddlyElement(ul, "li"), tiddler.tags[t], tiddler.title);
-			if (t < tiddler.tags.length - 1)
-				createTiddlyText(ul, sep);
-		}
+	for (t = 0; t < tiddler.tags.length; t++) {		
+		if (! label) label = createTiddlyElement(ul, "li", null, "listTitle", lingo.labelTags.format([tiddler.title]));
+		createTagButton(createTiddlyElement(ul, "li"), tiddler.tags[t], tiddler.title);
+		if (t < tiddler.tags.length - 1) createTiddlyText(ul, sep);
 	}
-	if (!label)
-		createTiddlyElement(ul, "li", null, "listTitle", lingo.labelNoTags.format([tiddler.title]));
+	if (! label) createTiddlyElement(ul, "li", null, "listTitle", lingo.labelNoTags.format([tiddler.title]));
 };
 
 config.macros.saveChanges.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
@@ -3005,7 +2997,7 @@ config.macros.toolbar.renderCommandButton = function(place, commandName, tiddler
 config.macros.toolbar.isCommandEnabled = function(command, tiddler) {
 	var title = tiddler.title;
 	var ro = tiddler.isReadOnly();
-	var shadow = store.isShadowTiddler(title) && !store.tiddlerExists(title);
+	var shadow = (title) && !store.tiddlerExists(title);
 	return (!ro || (ro && !command.hideReadOnly)) && !(shadow && command.hideShadow);
 };
 
@@ -3170,13 +3162,12 @@ config.commands.references.handlePopup = function(popup, title) {
 	var c = false;
 	var r;
 	for (r = 0; r < references.length; r++) {
-		if (references[r].title != title && ! references[r].isTagged("excludeLists")) {
-			renderLinkElement(createTiddlyElement(popup,"li"), references[r].title, true);
+		if (references[r].title != title) {
+			renderLinkElement(createTiddlyElement(popup, "li"), references[r].title, true);
 			c = true;
 		}
 	}
-	if (!c)
-		createTiddlyElement(popup, "li", null, "disabled", this.popupNone);
+	if (!c) createTiddlyElement(popup, "li", null, "disabled", this.popupNone);
 };
 
 config.commands.jump.handlePopup = function(popup, title) {
@@ -3211,7 +3202,7 @@ function Tiddler(title) {
 	this.links = [];
 	this.linksUpdated = false;
 	this.tags = [];
-	this.fields = {}; // changecount parenttitle - coming from EditTemplate, consumed by externalizeTiddler
+	this.fields = {}; // changecount parenttitle - coming from EditTemplate, consumed by transformArticleToDiv
 	return this;
 }
 
@@ -3355,10 +3346,10 @@ function ArticleStore(params) {
 		tiddlers[tiddler.title] = tiddler;
 	};
 	this.forEachArticle = function(callback) {
-		var t;
-		for (t in tiddlers) {
-			var tiddler = tiddlers[t];
-			if (tiddler instanceof Tiddler)	callback.call(this, t, tiddler);
+		var title;
+		for (title in tiddlers) {
+			var article = tiddlers[title];
+			if (article instanceof Tiddler)	callback.call(this, title, article);
 		}
 	};
 }
@@ -3376,7 +3367,7 @@ ArticleStore.prototype.tiddlerExists = function(title) {
 	return t != undefined;
 };
 
-ArticleStore.prototype.isShadowTiddler = function(title) {
+function isShadowTiddler(title) {
 	return config.shadowTiddlers[title] === undefined ? false : true;
 };
 
@@ -3386,7 +3377,7 @@ ArticleStore.prototype.isAvailable = function(title) {
 	var s = title ? title.indexOf(config.textPrimitives.sectionSeparator) : -1;
 	if (s != -1)
 		title = title.substr(0, s);
-	return this.tiddlerExists(title) || this.isShadowTiddler(title);
+	return this.tiddlerExists(title) || isShadowTiddler(title);
 };
 
 ArticleStore.prototype.getOrAddNewArticle = function(title) {
@@ -3432,7 +3423,7 @@ ArticleStore.prototype.getArticleTextPartOrSlice = function(titleWithPartOrSlice
 	
 	var article = this.getArticle(title);
 	var text = article ? article.text : null;
-	if (! article && this.isShadowTiddler(title)) text = this.getShadowTiddlerText(title);
+	if (! article && isShadowTiddler(title)) text = this.getShadowTiddlerText(title);
 	if (text) {
 		if (! sectionName) return text; // POI: Return the whole article
 		var re = new RegExp("(^!{1,6}[ \t]*" + sectionName.escapeRegExp() + "[ \t]*\n)","mg");
@@ -3641,7 +3632,7 @@ ArticleStore.prototype.getSaver = function() {
 
 // Return all tiddlers formatted as an HTML string
 ArticleStore.prototype.allTiddlersAsHtml = function() {
-	return this.getSaver().externalize(store);
+	return this.getSaver().transformAllArticlesToDivs(store);
 };
 
 // Load articles of a Wiki from an HTML DIV element containing articles (e.g. "storeArea" or "builtInArticles")
@@ -3660,12 +3651,13 @@ ArticleStore.prototype.loadFromDiv = function(elementOrId, noUpdate) {
 // Load contents of a Wiki from a string
 // Returns null if there's an error
 ArticleStore.prototype.importAllArticlesFromHtmlSource = function(htmlSource) {
+	var me = this;
 	var storeAreaRange = locateStoreArea(htmlSource);
 	if (! storeAreaRange)	return null;
 	var content = "<" + "html><" + "body>" + htmlSource.substring(storeAreaRange[0], storeAreaRange[1] + storeAreaEndString.length) + "<" + "/body><" + "/html>";
 	processHtmlSourceAsDocument(content, function(doc){
 		var storeDiv = doc.getElementById("storeArea");
-		this.loadFromDiv(storeDiv);	
+		me.loadFromDiv(storeDiv);	
 	});
 	return this;
 };
@@ -3689,41 +3681,22 @@ ArticleStore.prototype.updateTiddlers = function() {
 	});
 };
 
-// Return an array of tiddlers matching a search regular expression
-ArticleStore.prototype.search = function(searchRegExp, sortField, excludeTag, match) {
-	var candidates = this.reverseLookup("tags", excludeTag, !! match);
-	var results = [];
-	for (var t = 0; t < candidates.length; t++) {
-		if ((candidates[t].title.search(searchRegExp) != -1) || (candidates[t].text.search(searchRegExp) != -1))
-			results.push(candidates[t]);
-	}
-	if (! sortField) sortField = "title";
-	results.sort(function(a, b) {return a[sortField] < b[sortField] ? -1 : (a[sortField] == b[sortField] ? 0 : +1);});
-	return results;
-};
-
 // Returns a list of all tags in use
 //   excludeTag - if present, excludes tags that are themselves tagged with excludeTag
 // Returns an array of arrays where [tag][0] is the name of the tag and [tag][1] is the number of occurances
-ArticleStore.prototype.getTags = function(excludeTag) {
+ArticleStore.prototype.getTags = function() {
 	var results = [];
-	this.forEachArticle(function(title, tiddler) {
-		for (var g = 0; g < tiddler.tags.length; g++) {
-			var tag = tiddler.tags[g];
-			var n = true;
+	this.forEachArticle(function(title, article) {
+		for (var g = 0; g < article.tags.length; g++) {
+			var tag = article.tags[g];
+			var add = true;
 			for (var c = 0; c < results.length; c++) {
 				if (results[c][0] == tag) {
-					n = false;
+					add = false;
 					results[c][1]++;
 				}
-			}
-			if (n && excludeTag) {
-				var t = this.getArticle(tag); // todo tags ar NOT articles!
-				if (t && t.isTagged(excludeTag))
-					n = false;
-			}
-			if (n)
-				results.push([tag, 1]);
+			}			
+			if (add) results.push([tag, 1]);
 		}
 	});
 	results.sort(function(a,b) {return a[0].toLowerCase() < b[0].toLowerCase() ? -1 : (a[0].toLowerCase() == b[0].toLowerCase() ? 0 : +1);});
@@ -3731,71 +3704,72 @@ ArticleStore.prototype.getTags = function(excludeTag) {
 };
 
 // Return an array of the tiddlers that are tagged with a given tag
-ArticleStore.prototype.getTaggedTiddlers = function(tag, sortField) {
-	return this.reverseLookup("tags", tag, true, sortField);
-};
-
-ArticleStore.prototype.getValueTiddlers = function(field, value, sortField) {
-	return this.reverseLookup(field, value, true, sortField);
+ArticleStore.prototype.getArticlesByTag = function(tag) {
+	return this.getArticlesByField("tags", true, tag);
 };
 
 // Return an array of the tiddlers that link to a given tiddler
 ArticleStore.prototype.getReferringTiddlers = function(title, unusedParameter, sortField) {
-	if (!this.tiddlersUpdated)
-		this.updateTiddlers();
-	return this.reverseLookup("links", title, true, sortField);
+	if (! this.tiddlersUpdated) this.updateTiddlers();
+	return this.getArticlesByField("links", true, title, sortField);
 };
+
+function canShow(title, includeHidden) {
+	if (includeHidden) return true;
+	if (title[0] == "`" || title[0] == "$" || isShadowTiddler(title)) return false;	
+	return true;
+}
 
 // Return an array of the articles that do (or must not) have a specified value in the specified field
 // If the field type is a collection, a match is found if lookupValue is present at least once in the collection.
 // matchMode == true to select matching articles, false to select all others
-ArticleStore.prototype.reverseLookup = function(lookupField, lookupValue, matchMode, sortField, optionalPredicate) {
+// sortBy - Field name. May have a "+" or "-" prefix. Default: "title"
+// optionalPredicate decides whether the article should be included in the result set
+ArticleStore.prototype.getArticlesByField = function(lookupField, matchMode, lookupValue, sortBy, includeHidden) {
 	var results = [];
 	this.forEachArticle(function(title, article) {
-		var f = ! matchMode;
-		var values;
-		if (["links", "tags"].contains(lookupField)) {
-			values = article[lookupField];
-		} else {
-			var accessor = ArticleStore.standardFieldAccess[lookupField];
-			if (accessor) {
-				values = [accessor.get(article)];
+		if (canShow(title, includeHidden)) {
+			var include = ! matchMode;
+			var values;
+			if (["links", "tags"].contains(lookupField)) { // yoda
+				values = article[lookupField];
 			} else {
-				values = article.fields[lookupField] ? [article.fields[lookupField]] : [""]; // Remeber: JS interprets an empty string as "false", so the right part will be executed!
+				var accessor = ArticleStore.standardFieldAccess[lookupField];
+				if (accessor) {
+					values = [accessor.get(article)];
+				} else {
+					values = article.fields[lookupField] ? [article.fields[lookupField]] : [""]; // Remeber: JS interprets an empty string as "false", so the right part will be executed!
+				}
 			}
-		}
-		for (var i = 0; i < values.length; i++) {
-			if (values[i] == lookupValue){
-				f = matchMode;
-				break;
+			for (var i = 0; i < values.length; i++) {
+				if (values[i] == lookupValue){
+					include = matchMode;
+					break;
+				}
 			}
+			if (include) results.push(article);
 		}
-		if (f && optionalPredicate){
-			f = optionalPredicate.call(this, title, article);
-		}
-		if (f) results.push(article);
 	});
-	if (! sortField)
-		sortField = "title";
-	return this.sortTiddlers(results, sortField);
+	if (! sortBy) sortBy = "title";
+	return this.sortTiddlers(results, sortBy);
 };
 
 /**
 		* Gets a (sorted) collection of articles without those carrying the excludeTag.
 		*
-		* @param {string} fieldName  - Sort the result set by this field
-		* @param {string} excludeTag - Filter out articles by this tag
+		* @param {string} sortBy     - Field name. Must be a hard coded field. May NOT have a "+" or "-" prefix. Default: Unsorted.
+		* @param {string} excludeTag - Filter out articles by this tag.
 		*
 		* @return {array} - Array of articles.
 	*/
-ArticleStore.prototype.getTiddlers = function(fieldName, excludeTag) {
+ArticleStore.prototype.getArticlesQuickly = function(sortBy, includeHidden) {
 	var results = [];
-	this.forEachArticle(function(title, tiddler) {
-		if (excludeTag == undefined || ! tiddler.isTagged(excludeTag))
-			results.push(tiddler);
+	this.forEachArticle(function(title, article) {
+		if (canShow(title, includeHidden)) {
+			results.push(article);
+		}
 	});
-	if (fieldName)
-		results.sort(function(a,b) {return a[fieldName] < b[fieldName] ? -1 : (a[fieldName] == b[fieldName] ? 0 : +1);});
+	if (sortBy) results.sort(function(a,b) {return a[sortBy] < b[sortBy] ? -1 : (a[sortBy] == b[sortBy] ? 0 : +1);});
 	return results;
 };
 
@@ -3808,7 +3782,7 @@ ArticleStore.prototype.getMissingLinks = function() {
 		var n;
 		for (n = 0; n < tiddler.links.length; n++) {
 			var link = tiddler.links[n];
-			if (this.getArticleTextPartOrSlice(link, null) == null && !this.isShadowTiddler(link) && !config.macros[link])	results.pushUnique(link);
+			if (this.getArticleTextPartOrSlice(link, null) == null && ! isShadowTiddler(link) && !config.macros[link]) results.pushUnique(link);
 		}
 	});
 	results.sort();
@@ -3819,18 +3793,35 @@ ArticleStore.prototype.getMissingLinks = function() {
 ArticleStore.prototype.getOrphans = function() {
 	var results = [];
 	this.forEachArticle(function (title, tiddler) {
-		if (this.getReferringTiddlers(title).length == 0 && ! tiddler.isTagged("excludeLists")) results.push(title);
+		if (this.getReferringTiddlers(title).length == 0 && canShow(title)) results.push(title);
 	});
 	results.sort();
 	return results;
 };
 
+ArticleStore.prototype.getPlugins = function() {
+	var results = [];
+	this.forEachArticle(function (title, article) {
+		if (title[0] == "`") results.push(article);
+	});
+	results.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : 1);});
+	return results;
+}
+
+ArticleStore.prototype.getResourceTitles = function() {
+	var results = [];
+	this.forEachArticle(function (title, article) {
+		if (title[0] == "$") results.push(title);
+	});
+	results.sort();
+	return results;
+}
+
 // Return an array of names of all the shadow tiddlers
 ArticleStore.prototype.getShadowed = function() {
 	var t,results = [];
 	for (t in config.shadowTiddlers) {
-		if (this.isShadowTiddler(t))
-			results.push(t);
+		if (isShadowTiddler(t))	results.push(t); // xxx if statement is always true
 	}
 	results.sort();
 	return results;
@@ -3848,33 +3839,34 @@ ArticleStore.prototype.getTouched = function() {
 };
 
 // Resolves a Tiddler reference or tiddler title into a Tiddler object, or null if it doesn't exist
-ArticleStore.prototype.resolveTiddler = function(tiddler) {
-	var t = (typeof tiddler == "string") ? this.getArticle(tiddler) : tiddler;
+ArticleStore.prototype.resolveTiddler = function(articleOrTitle) {
+	var t = (typeof articleOrTitle == "string") ? this.getArticle(articleOrTitle) : articleOrTitle;
 	return t instanceof Tiddler ? t : null;
 };
 
-// Sort a list of tiddlers
-ArticleStore.prototype.sortTiddlers = function(tiddlers,field) {
+// Sort an array of articles. 
+// sortBy - Field name. May have a "+" or "-" prefix
+ArticleStore.prototype.sortTiddlers = function(articles, sortBy) {
 	var asc = +1;
-	switch(field.substr(0,1)) {
+	switch(sortBy.substr(0,1)) {
 	case "-":
 		asc = -1;
-		field = field.substr(1);
+		sortBy = sortBy.substr(1);
 		break;
 	case "+":
-		field = field.substr(1);
+		sortBy = sortBy.substr(1);
 		break;
 	}
-	if (ArticleStore.standardFieldAccess[field]) {
-		if (field=="title") {
-			tiddlers.sort(function(a,b) {return a[field].toLowerCase() < b[field].toLowerCase() ? -asc : (a[field].toLowerCase() == b[field].toLowerCase() ? 0 : asc);});
+	if (ArticleStore.standardFieldAccess[sortBy]) {
+		if (sortBy == "title") {
+			articles.sort(function(a,b) {return a[sortBy].toLowerCase() < b[sortBy].toLowerCase() ? -asc : (a[sortBy].toLowerCase() == b[sortBy].toLowerCase() ? 0 : asc);});
 		} else {
-			tiddlers.sort(function(a,b) {return a[field] < b[field] ? -asc : (a[field] == b[field] ? 0 : asc);});
+			articles.sort(function(a,b) {return a[sortBy] < b[ sortBy] ? -asc : (a[sortBy] == b[sortBy] ? 0 : asc);});
 		}
 	} else {
-		tiddlers.sort(function(a,b) {return a.fields[field] < b.fields[field] ? -asc : (a.fields[field] == b.fields[field] ? 0 : +asc);});
+		articles.sort(function(a,b) {return a.fields[sortBy] < b.fields[sortBy] ? -asc : (a.fields[sortBy] == b.fields[sortBy] ? 0 : +asc);});
 	}
-	return tiddlers;
+	return articles;
 };
 
 //--
@@ -3887,7 +3879,7 @@ config.filters = {
 		var tiddler = this.getArticle(title);
 		if (tiddler) {
 			results.pushUnique(tiddler);
-		} else if (this.isShadowTiddler(title)) {
+		} else if (isShadowTiddler(title)) {
 			tiddler = new Tiddler();
 			tiddler.set(title, this.getArticleTextPartOrSlice(title));
 			results.pushUnique(tiddler);
@@ -3897,7 +3889,7 @@ config.filters = {
 		return results;
 	},
 	tag: function(results, match) {
-		var matched = this.getTaggedTiddlers(match[3]);
+		var matched = this.getArticlesByTag(match[3]);
 		for (var m=0; m < matched.length; m++) {
 			results.pushUnique(matched[m]);
 		}
@@ -3910,7 +3902,8 @@ config.filters = {
 		return results.slice(0, parseInt(match[3], 10));
 	},
 	field: function(results, match) {
-		var m,matched = this.getValueTiddlers(match[2], match[3]);
+		var matched = this.getArticlesByField(match[2], true, match[3]);
+		var m;
 		for (m = 0; m < matched.length; m++) {
 			results.pushUnique(matched[m]);
 		}
@@ -4018,8 +4011,8 @@ ArticleStore.prototype.getValue = function(tiddler, fieldName) {
 // and that value is returned.
 // The order of the fields is not defined.
 // @param callback a function(tiddler,fieldName,value).
-ArticleStore.prototype.forEachField = function(tiddler, callback, onlyExtendedFields, sortExtendedFields) {
-	var t = this.resolveTiddler(tiddler);
+ArticleStore.prototype.forEachField = function(articleOrTitle, callback, onlyExtendedFields, sortExtendedFields) { // HACK: Das sollte am Article kleben und nicht am Store
+	var t = this.resolveTiddler(articleOrTitle);
 	if (! t) return undefined;
 	var result;
 		
@@ -4235,10 +4228,6 @@ Story.prototype.history = {
 	}
 }
 
-Story.prototype.displayDefaultTiddlers = function() { // todo: instead of having a "DefaultTiddlers" tiddler, make an option!
-	this.displayTiddlers(null, store.filterTiddlers(store.getArticleTextPartOrSlice("DefaultTiddlers")));
-};
-
 Story.prototype.displayTiddlers = function(unused, articles, templateNameOrNumber, unused, unused) {
 	for (var t = articles.length - 1; t >= 0; t--) this.showArticle(articles[t].title, templateNameOrNumber);
 };
@@ -4348,7 +4337,7 @@ Story.prototype.populateViewOrChangeTemplate = function(title, templateNameOrNum
 		if (! article) {
 			article = new Tiddler();
 			var now = new Date();
-			if (store.isShadowTiddler(title)) {
+			if (isShadowTiddler(title)) {
 				var tags = [];
 				article.set(title, store.getArticleTextPartOrSlice(title), config.views.wikified.shadowModifier, now, tags, now);
 			} else {
@@ -4369,24 +4358,18 @@ Story.prototype.populateViewOrChangeTemplate = function(title, templateNameOrNum
 		// Load the template and resolve dynamic stuff:
 		articleView.innerHTML = store.getArticleRawTextResolveIncludes(templateName, null, 10); // Template articles must be HTML syntax
 		applyHtmlMacros(articleView, article); // This will add dynamic content to specially marked HTML tags
-		
-		if (store.getTaggedTiddlers(title).length > 0)
-			jQuery(articleView).addClass("isTag");
-		else
-			jQuery(articleView).removeClass("isTag");
+
 		if (store.tiddlerExists(title)) {
 			jQuery(articleView).removeClass("shadow");
 			jQuery(articleView).removeClass("missing");
 		} else {
-			jQuery(articleView).addClass(store.isShadowTiddler(title) ? "shadow" : "missing");
+			jQuery(articleView).addClass(isShadowTiddler(title) ? "shadow" : "missing");
 		}
 		if (customFields)
 			this.addCustomFields(articleView, customFields);
 	}
 	return articleView;
 };
-
-//aaa
 
 function recurseDom(nodes, cb) {
 	for (var i = 0, len = nodes.length; i < len; i++) {
@@ -4409,7 +4392,7 @@ function blobToNewArticle(blob, cb){
 	blobToDataUrlAsync(blob, function(dataUrl){
 		article = new Tiddler();
 		var now = new Date();
-		var title = now.convertToYYYYMMDDHHMMSSMMM();
+		var title = "$" + now.convertToYYYYMMDDHHMMSSMMM(); // "$" is the prefix for resource containing articles
 		article.set(title, dataUrl, config.views.wikified.defaultModifier, now, ["resource"], now);
 		store.addTiddler(article);
 		if (cb) cb(title, article);
@@ -4735,7 +4718,7 @@ Story.prototype.hasChanges = function(title) {
 					return true;
 			}
 		} else {
-			if (store.isShadowTiddler(title) && store.getShadowTiddlerText(title) == editBuffer.text) { //# not checking for title or tags
+			if (isShadowTiddler(title) && store.getShadowTiddlerText(title) == editBuffer.text) { //# not checking for title or tags
 				return false;
 			} else { //# changed shadow or new tiddler
 				return true;
@@ -5059,18 +5042,16 @@ config.macros.importTiddlers.onAfterRetrievingArticleList = function(importWorkI
 	var rowsToBeRendered = [];
 	if (importWorkItem.ArticlesToBeImported) {
 		for (var i = 0; i < importWorkItem.ArticlesToBeImported.length; i++) {
-			var tiddler = importWorkItem.ArticlesToBeImported[i];
-			if (! tiddler.tags.contains("excludeSearch")) {
-				rowsToBeRendered.push({
-					title: tiddler.title,
-					modified: tiddler.modified,
-					modifier: tiddler.modifier,
-					text: tiddler.text ? wikifyPlainText(tiddler.text, 100) : "",
-					tags: tiddler.tags,
-					size: tiddler.text ? tiddler.text.length : 0,
-					tiddler: tiddler
-				});
-			}
+			var article = importWorkItem.ArticlesToBeImported[i];
+			rowsToBeRendered.push({
+				title: article.title,
+				modified: article.modified,
+				modifier: article.modifier,
+				text: article.text ? wikifyPlainText(article.text, 100) : "",
+				tags: article.tags,
+				size: article.text ? article.text.length : 0,
+				tiddler: article
+			});			
 		}
 	}
 	rowsToBeRendered.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : +1);});
@@ -5286,7 +5267,7 @@ config.macros.plugins.refresh = function(listWrapper, params) {
 	
 	// Search for unloaded plugins and add them to the pluginInfos list
 	
-	var configTiddlers = store.getTaggedTiddlers("systemConfig");	
+	var configTiddlers = store.getArticlesByTag("systemConfig");	
 	for (t = 0; t < configTiddlers.length; t++) {
 		tiddler = configTiddlers[t];
 		if (pluginInfos.findByField("title", tiddler.title) == null) {
@@ -5392,8 +5373,7 @@ config.notifyTiddlers = [
 	{name: "StyleSheetLayout", notify: refreshStyles},	
 	{name: "StyleSheet", notify: refreshStyles},
 	{name: "StyleSheetPrint", notify: refreshStyles},
-	{name: "PageTemplate", notify: refreshPageTemplate},
-	{name: "SiteTitle", notify: refreshPageTitle},
+	{name: "PageTemplate", notify: refreshPageTemplate},	
 	{name: null, notify: refreshDisplay}
 ];
 
@@ -5517,12 +5497,8 @@ function refreshDisplay(hint) { // hint dürfte immer undefined sein!
 	}
 }
 
-function refreshPageTitle() {
-	document.title = getPageTitle();
-}
-
-function getPageTitle() {
-	return wikifyPlainText(store.getArticleTextPartOrSlice("SiteTitle",""), null, null); // todo: setting instead of tiddler. default: beautified url!
+function getPageTitle() { // document.title = getPageTitle();
+	return wikifyPlainText(config.options.txtWikiTitle, null, null);	
 }
 
 function refreshStyles(title, doc) {
@@ -5582,6 +5558,7 @@ function onSystemSettingsChange() {
 	if (! startingUp) {
 		loadSystemSettings();
 	}
+	document.title = getPageTitle();
 }
 
 function saveOption(name) {
@@ -5630,7 +5607,7 @@ function saveSystemSetting(name, doSaveFile) {
 		tiddler.text = text;
 		tiddler = store.saveTiddler(tiddler);
 	} else {
-		tiddler = store.saveTiddler(title, title, text, 'System', new Date(), ['excludeLists'], null);
+		tiddler = store.saveTiddler(title, title, text, 'System', new Date(), null, null);
 	}
 	if (doSaveFile) {
 		commitSystemSettings(storeWasDirty);
@@ -5875,9 +5852,7 @@ function highlightArticleTree() {
 	var articleTreePanel = document.getElementsByClassName('articleTreePanel')[0];
 	var nodeElement = document.querySelector('[tiddlylink="' + store.currentTiddler.title + '"]');
 	
-	if (! articleTreePanel || ! nodeElement) {
-		return;
-	}
+	if (! articleTreePanel || ! nodeElement) return;
 	
 	nodeElement.classList.add('current');	 
 
@@ -7127,8 +7102,8 @@ var standardRankFunction = function(tiddler, query) {
 //
 var findMatches = function(store, searchText, caseSensitive, useRegExp, sortField, excludeTag) {
 	lastQuery = null;
-	
-	var candidates = store.reverseLookup("tags", excludeTag, false);
+		
+	var candidates = store.getArticlesQuickly();
 	try {
 		var defaultFields = [];
 		if (config.options.chkSearchInTitle) defaultFields.push("title");
@@ -8257,7 +8232,9 @@ FileImporter.retrieveArticleList_WikiSourceRetrieved = function(importWorkItem, 
 			importWorkItem.ArticlesToBeImported = importWorkItem.incomingArticleStore.filterTiddlers(importWorkItem.filter);
 		} else {
 			importWorkItem.ArticlesToBeImported = [];
-			importWorkItem.incomingArticleStore.forEachArticle(function(title,tiddler) {importWorkItem.ArticlesToBeImported.push(tiddler);});
+			importWorkItem.incomingArticleStore.forEachArticle(function(title,article) {
+				if (title[0] != "`" && ! article.isTagged("systemConfig")) importWorkItem.ArticlesToBeImported.push(article); // Exclude internal stuff and legacy TiddlyWiki plugins
+			});
 		}
 		importWorkItem.status = true;
 	}
@@ -8518,7 +8495,7 @@ function buildClassNames(title, additionalClassNames) {
 	} else {
 		classes.remove("tiddlyLinkExisting");
 		classes.pushUnique("tiddlyLinkNonExisting");
-		if (store.isShadowTiddler(title)) {
+		if (isShadowTiddler(title)) {
 			classes.pushUnique("shadow");
 		} else {
 			classes.remove("shadow");
@@ -8630,10 +8607,10 @@ function onClickTag(ev) { // (do not mix up with onTagClick)
 	var tag = this.getAttribute("tag");
 	var title = this.getArticleTitle();
 	if (popup && tag) {
-		var foundArticles = tag.indexOf("[") == -1 ? store.getTaggedTiddlers(tag) : store.filterTiddlers(tag);
-		var sortby = this.getAttribute("sortby");
-		if (sortby && sortby.length) {
-			store.sortTiddlers(foundArticles, sortby);
+		var foundArticles = tag.indexOf("[") == -1 ? store.getArticlesByTag(tag) : store.filterTiddlers(tag);
+		var sortBy = this.getAttribute("sortby");
+		if (sortBy && sortBy.length) {
+			store.sortTiddlers(foundArticles, sortBy);
 		}
 		var titles = [];
 		var r;
@@ -9838,7 +9815,7 @@ function LoaderBase() {}
 LoaderBase.prototype.loadTiddler = function(sourceElement, destinationStore, articles) {
 	var title = this.getTitle(sourceElement);
 	if (! title) return;
-	if (safeMode && destinationStore.isShadowTiddler(title)) return;
+	if (safeMode && isShadowTiddler(title)) return;
 		
 	var article = destinationStore.getOrAddNewArticle(title);
 	this.populateArticleFromElement(article, title, sourceElement);
@@ -9859,13 +9836,13 @@ LoaderBase.prototype.loadArticles = function(sourceElements, destinationStore) {
 
 function SaverBase() {}
 
-SaverBase.prototype.externalize = function(store) {
-	var results = [];
-	var articles = store.getTiddlers("title");
-	for (var t = 0; t < articles.length; t++) {
-		results.push(this.externalizeTiddler(store, articles[t]));
+SaverBase.prototype.transformAllArticlesToDivs = function(store) {
+	var divBlocks = [];
+	var articles = store.getArticlesQuickly("title", true); // sorted by "title", include hidden
+	for (var i = 0; i < articles.length; i++) {
+		divBlocks.push(this.transformArticleToDiv(store, articles[i]));
 	}
-	return results.join("\n");
+	return divBlocks.join("\n");
 };
 
 //--
@@ -9914,7 +9891,7 @@ function TW21Saver() {}
 
 TW21Saver.prototype = new SaverBase();
 
-TW21Saver.prototype.externalizeTiddler = function(store, article) {
+TW21Saver.prototype.transformArticleToDiv = function(store, article) {
 	try {
 		var attributes =
 			' created="' + article.created.convertToYYYYMMDDHHMM() + '"' +
@@ -10069,7 +10046,7 @@ function hasClass(e,className) {
 function wikifyPlain(title,theStore,limit) {
 	if (!theStore)
 		theStore = store;
-	if (theStore.tiddlerExists(title) || theStore.isShadowTiddler(title)) {
+	if (theStore.tiddlerExists(title) || isShadowTiddler(title)) {
 		return wikifyPlainText(theStore.getArticleTextPartOrSlice(title),limit,tiddler);
 	} else {
 		return "";
