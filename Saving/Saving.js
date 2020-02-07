@@ -22,3 +22,9 @@ function saveFileViaBlobApi(fileUrl, htmlSource) {
 	}	
 	return true;
 }
+
+function saveTest() {
+	var s = document.getElementById("saveTest");
+	if (s.hasChildNodes()) alert(config.messages.savedSnapshotError);
+	s.appendChild(document.createTextNode("savetest"));
+}

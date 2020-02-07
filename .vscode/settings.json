@@ -17,15 +17,6 @@
 		"HACK"
 	],
 	"files.exclude": {
-		"**/.git": false,
-		"**/.svn": false,
-		"**/.hg": false,
-		"**/CVS": false,
-		"**/.DS_Store": false,
-		"**/.vscode": false,
-		".gitignore": false
-	},
-	"explorerExclude.backup": {
 		"**/.git": true,
 		"**/.svn": true,
 		"**/.hg": true,
@@ -34,6 +25,7 @@
 		"**/.vscode": true,
 		".gitignore": true
 	},
+	"explorerExclude.backup": null,
 	"dimmer.enabled": true,
 	"terminal.integrated.fontSize": 12,
 	"todo-tree.general.revealBehaviour": "start of line",
