@@ -1,3 +1,29 @@
+function injectAllArticles(htmlSource) {
+	
+	storeAreaRange = locateStoreArea(htmlSource);
+	if (! storeAreaRange) throw "storeAreaRange not found!";
+	
+	var revisedHtmlSource = htmlSource.substr(0, storeAreaRange[0] + storeAreaStartString.length) + "\n" +
+													store.allTiddlersAsHtml() + "\n" +
+													htmlSource.substr(storeAreaRange[1]);
+								
+	var newSiteTitle = getPageTitle().htmlEncode();
+	revisedHtmlSource = revisedHtmlSource.replaceChunk("<title"+">", "</title"+">", " " + newSiteTitle + " ");
+	return revisedHtmlSource;
+}
+
+function locateStoreArea(original) {
+	// Locate the storeArea divs
+	if (! original) return null;
+	var posOpeningDiv = original.search(storeAreaStartRE);
+	var limitClosingDiv = original.indexOf("<" + "!--POST-STOREAREA--" + ">");
+	if (limitClosingDiv == -1) limitClosingDiv = original.indexOf("<" + "!--POST-BODY-START--" + ">");
+	var start = limitClosingDiv == -1 ? original.length : limitClosingDiv;
+	var posClosingDiv = original.lastIndexOf(storeAreaEndString, start);
+	if (posClosingDiv == -1) posClosingDiv = original.lastIndexOf(storeAreaEndStringUpperCase, start);
+	return (posOpeningDiv != -1 && posClosingDiv != -1) ? [posOpeningDiv, posClosingDiv] : null;
+}
+
 function encodeBase64(data) {
 	if (! data) return "";
 	var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";

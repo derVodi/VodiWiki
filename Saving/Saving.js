@@ -1,3 +1,19 @@
+// Returns true, if saving was possible unattendedly (without forcing the user to download manually)
+window.saveFile = window.saveFile || function(fileUrl, htmlSource, forceManualMode) {
+	
+	if (! forceManualMode) if (saveFileViaBlobApi(fileUrl, htmlSource)) return true;
+		
+	// Fallback: Create data URL link for manual download
+		
+	var dataUrl = "data:text/html;charset=UTF-8;base64," + encodeBase64(unescape(encodeURIComponent(htmlSource)));
+	// JavaScript strings are UTF-16.
+	// encodeURIComponent() will re-encode the UTF-16 string to UTF-8, but unfortunalely escape all URL-poison-chars/spaces
+	// after calling unescape() you get pure UTF-8
+	
+	displayMessage(config.messages.mainDownloadManual, dataUrl, -1);		
+	return false;
+}
+
 function saveFileViaBlobApi(fileUrl, htmlSource) {	
 	if (document.createElement("a").download == undefined) return null;
 	try {

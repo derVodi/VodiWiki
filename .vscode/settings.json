@@ -4,8 +4,14 @@
 		"reloadButton":"♻️", // reload button refreshes changes from settings to status bar
 		"commands": [
 			{
+				"name": "Firefox",
+				"command": "\"C:\\Program Files\\Mozilla Firefox\\firefox.exe\" index.html",
+				// "singleInstance": true
+			},
+			{
 				"name": "Build MyLinker",
-				"command": "\"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe\" /nologo /out:Building\\MyLinker.exe Building\\MyLinker.cs"
+				"command": "\"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe\" /nologo /out:Building\\MyLinker.exe Building\\MyLinker.cs",
+				// "singleInstance": true
 			}
 		]
 	},
@@ -25,16 +31,5 @@
 		"**/.vscode": true,
 		".gitignore": true
 	},
-	"explorerExclude.backup": null,
-	"dimmer.enabled": true,
-	"terminal.integrated.fontSize": 12,
-	"todo-tree.general.revealBehaviour": "start of line",
-	"todo-tree.general.statusBarClickBehaviour": "cycle",
-	"todo-tree.general.statusBar": "tags",
-	"todo-tree.tree.showInExplorer": false,
-	"todo-tree.tree.sortTagsOnlyViewAlphabetically": true,
-	"todo-tree.regex.regexCaseSensitive": false,
-	"editor.highlightActiveIndentGuide": false,
-	"editor.insertSpaces": false,
-	"editor.renderIndentGuides": false
+	"explorerExclude.backup": null
 }

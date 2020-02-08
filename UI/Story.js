@@ -238,7 +238,7 @@ Story.prototype.showArticle = function(title, templateNameOrNumber, customFields
 	store.currentTiddler = store.getArticle(title); // HACK: store shouldn't know anything about "current" - it has to be kept in the UI layer!
 	if (store.currentTiddler) returningView.scrollTop = store.currentTiddler.rescuedScrollTop;
 	story.history.add(title);
-	refreshTreePath();
+	renderBreadcrumbs();
 	highlightArticleTree();
 	
 	return returningView;
