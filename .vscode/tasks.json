@@ -10,7 +10,7 @@
 			},
 			"label": "Link VodiWiki.html",
 			"type": "shell",
-			"command": "Building\\MyLinker.exe index.html Out\\VodiWiki.html"
+			"command": "Building\\MyLinker.exe index.html Out\\VodiWiki.html Out\\index.html"
 		},
 		{
 			"label": "Deploy",

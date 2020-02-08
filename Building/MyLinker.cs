@@ -3,70 +3,74 @@ using System.IO;
 
 public class MyLinker {
 
-	private static string _CurrentNamespace;
-	private static bool _SkippingBlock;
+	private static bool _WithinJsBlock;
+	private static bool _SkippingContent;
 
-	// arg[0] - source.html
-	// arg[1] - target.html
+	// arg[0] - source.html  - Wiki containing    content,       no JS (for developing)
+	// arg[1] - target1.html - Wiki containing no content, embedded JS (empty wiki for download and update)
+	// arg[2] - target2.html - Wiki containing    content, embedded JS (wiki for homepage)
 	public static void Main(string[] args) {
 
-		// Console.WriteLine(args[0]);
-		// Console.WriteLine(args[1]);
-
-		using (StreamWriter writer = new StreamWriter(args[1])) {
-			writer.NewLine = "\n";
-			CopyLineByLine(args[0], writer, ProcessLine);		
+		using (StreamWriter emptyWikiWriter = new StreamWriter(args[1])) {
+			using (StreamWriter fullWikiWriter = new StreamWriter(args[2])) {
+				emptyWikiWriter.NewLine = "\n";
+				CopyLineByLine(args[0], emptyWikiWriter, fullWikiWriter, ProcessLine);
+			}
 		}
 	}
 
-	public static bool ProcessLine(string line, StreamWriter writer){
+	public static string ProcessLine(string line, StreamWriter emptyWikiWriter, StreamWriter fullWikiWriter){
 		
 		if (line.IndexOf("<!--POST-STOREAREA-->") > -1){
-			writer.WriteLine("</div>");
-			_SkippingBlock = false;
-			return true;
+			emptyWikiWriter.WriteLine("</div>");
+			_SkippingContent = false;
+			return line;
 		}
 
-		if (_SkippingBlock) return false;
-		
-		if (line.IndexOf("<!-- Begin Namespace") > -1) {
-			string n = line.Substring(21, line.IndexOf(" ", 21) - 21);
-			if (_CurrentNamespace != null) Console.WriteLine("ERROR opened namespace was not closed");
-			_CurrentNamespace = n;
-			writer.WriteLine(String.Format("<script id=\"js{0}\">", n));
-			return false;
+		if (_SkippingContent) {
+			fullWikiWriter.WriteLine(line);
+			return null;
 		}
 
-		if (line.IndexOf("<!-- End Namespace") > -1){
-			if (_CurrentNamespace == null) Console.WriteLine("ERROR closing namespace was never opened");
-			_CurrentNamespace = null;
-			writer.WriteLine("</script>");
-			return false;
+		if (line.IndexOf("<!--JS-START-->") > -1) {
+			if (_WithinJsBlock) Console.WriteLine("ERROR JS-START cannot be nested!");
+			_WithinJsBlock = true;			
+			return ("<script id=\"jsSection\">");
+		}
+
+		if (line.IndexOf("<!--JS-END-->") > -1){
+			if (! _WithinJsBlock) Console.WriteLine("ERROR closing JS-START was never opened!");
+			_WithinJsBlock = false;			
+			return "</script>";
 		}
 
 		if (line.IndexOf("<script src=") > -1){ // embed external .js references
 			string jsPath = line.Substring(13, line.IndexOf("\"", 13) - 13);
 			CopyLineByLine(
 				jsPath,
-				writer, 
-				delegate (string l, StreamWriter w) {
-					return (! string.IsNullOrWhiteSpace(l)); // omit blank lines
+				emptyWikiWriter,
+				fullWikiWriter,
+				delegate (string l, StreamWriter ew,  StreamWriter fw) {
+					return (string.IsNullOrWhiteSpace(l) ? null : l); // omit blank lines
 				}
 			);			
-			return false;
+			return null;
 		}
 
-		if (line.IndexOf("<div id=\"storeArea\">") > -1) _SkippingBlock = true;
+		if (line.IndexOf("<div id=\"storeArea\">") > -1) _SkippingContent = true;
 
-		return true;
+		return line;
 	}
 
-	public static void CopyLineByLine(string sourceFileName, StreamWriter writer, Func<string, StreamWriter, bool> onLineRead){
+	public static void CopyLineByLine(string sourceFileName, StreamWriter emptyWikiWriter, StreamWriter fullWikiWriter, Func<string, StreamWriter, StreamWriter, string> onLineRead){
 		using (StreamReader reader = new StreamReader(sourceFileName)) {
 			string line;
 			while ((line = reader.ReadLine()) != null) {
-				bool passThrough = onLineRead.Invoke(line, writer);
-				if (passThrough) writer.WriteLine(line);
+				string processedLine = onLineRead.Invoke(line, emptyWikiWriter, fullWikiWriter);
+				if (processedLine != null){
+					emptyWikiWriter.WriteLine(processedLine);
+					fullWikiWriter.WriteLine(processedLine);
+				} 
 			}
 		}
 	}

@@ -132,15 +132,14 @@ Story.prototype.getArticleViewByAttribute = function(attributeName, value){
 
 Story.prototype.forEachArticleView = function(callbackFunction) {
 	var place = this.getArticleWrapper();
-	if (! place)
-		return;
+	if (! place) return;
 	var e = place.firstChild;
 	var cancel = false;
 	while (e) {
 		var n = e.nextSibling;
 		var title = e.getArticleTitle();
 		if (title) {
-			cancel= callbackFunction.call(this, title, e);
+			cancel = callbackFunction.call(this, title, e);
 		}
 		if (cancel) return;
 		e = n;
@@ -226,16 +225,23 @@ Story.prototype.showArticle = function(title, templateNameOrNumber, customFields
 	
 	// open or refresh the desired article
 	
+	var place = this.getArticleWrapper();
+
+	if (! title) {
+		createTiddlyElement(place, "div", "articleFallbackTitle", "articleView", "👀 Click on \"New Article\" on the left.", {tiddler: "FallbackTitle"});
+		// HACK: Internal knowledge used to create a fake article view
+		return null;
+	}
+
 	if (desiredView) {
 		returningView = desiredView;
 		this.populateViewOrChangeTemplate(title, templateNameOrNumber, false, customFields);
-	} else {
-		var place = this.getArticleWrapper();
+	} else {		
 		returningView = this.renderNewView(place, title, templateNameOrNumber, customFields);
 	}
 	story.scrollToSection(title, sectionName);
 	
-	store.currentTiddler = store.getArticle(title); // HACK: store shouldn't know anything about "current" - it has to be kept in the UI layer!
+	store.currentTiddler = store.getArticle(title); // HACK: CURRENT state doesn't belong in store - it has to be kept in the UI layer!
 	if (store.currentTiddler) returningView.scrollTop = store.currentTiddler.rescuedScrollTop;
 	story.history.add(title);
 	renderBreadcrumbs();

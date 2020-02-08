@@ -1,3 +1,24 @@
+Element.prototype.getArticleTitle = function(){
+	return this.getAttribute("tiddler");
+}
+
+Element.prototype.setArticleTitle = function(title){
+	this.setAttribute("tiddler", title);
+}
+
+function createTiddlyDropDown(place, onchange, options, defaultValue) {
+	var sel = createTiddlyElement(place, "select");
+	sel.onchange = onchange;
+	var t;
+	for (t = 0; t < options.length; t++) {
+		var e = createTiddlyElement(sel, "option", null, null, options[t].caption);
+		e.value = options[t].name;
+		if (options[t].name == defaultValue)
+			e.selected = true;
+	}
+	return sel;
+}
+
 // Fix document.documentElement.outerHTML returning a crappy mutation of the original HTML source
 function recreateOriginal() {
 	
@@ -66,6 +87,37 @@ function addEvent(obj, type, fn) {
 	} else {
 		obj.addEventListener(type,fn,false);
 	}
+}
+
+/**
+	* Renders a button.
+	*
+	* @param  {element}   parent    - Optional. The newly created link will be appended as new child to the parent element.
+	* @param  {string}    text      - Optional. The text will become the inner html of the <a>...</a>.
+	* @param  {string}    tooltip   - Optional.
+	* @param  {function}  action    - Optional. This delegate will be called when the link is invoked.
+	* @param  {string}    className - Optional. CSS class name(s). If omitted, "button" will be used as default.
+	* @param  {string}    id        - Optional.
+	* @param  {string}    accessKey - Optional.
+	* @param  {hashtable} attribs   - Optional. These attributes will be added to the <a> tag.
+*/
+function renderTiddlyButton(parent, text, tooltip, action, className, id, accessKey, attribs, icon) {
+	var btn = document.createElement("a");
+	btn.setAttribute("href", "javascript:;");
+	if (action) btn.onclick = action;
+	if (tooltip) btn.setAttribute("title", tooltip);
+	if (icon)	btn.appendChild((function() { var i = document.createElement("div"); i.innerHTML = icon; return i;})());
+	if (text)	btn.appendChild(document.createTextNode(text));
+	btn.className = className || (icon ? "button buttonWithIcon" : "button");
+	if (id)	btn.id = id;
+	if (attribs) {
+		for (var i in attribs) {
+			btn.setAttribute(i, attribs[i]);
+		}
+	}
+	if (parent)	parent.appendChild(btn);
+	if (accessKey) btn.setAttribute("accessKey", accessKey);
+	return btn;
 }
 
 function removeEvent(obj,type,fn) {
@@ -169,6 +221,35 @@ function blurElement(e) {
 		e.focus();
 		e.blur();
 	}
+}
+
+function createTiddlyText(parent, text) {
+	return parent.appendChild(document.createTextNode(text));
+}
+
+function createTiddlyCheckbox(parent, caption, checked, onChange) {
+	var cb = document.createElement("input");
+	cb.setAttribute("type", "checkbox");
+	cb.onclick = onChange;
+	parent.appendChild(cb);
+	cb.checked = checked;
+	cb.className = "chkOptionInput";
+	if (caption) wikify(caption, parent);
+	return cb;
+}
+
+function createTiddlyElement(parent, tagName, id, className, text, attributeValuesByKey) {
+	var e = document.createElement(tagName);
+	if (className != null) e.className = className;
+	if (id != null)	e.setAttribute("id", id);
+	if (text != null)	e.appendChild(document.createTextNode(text));
+	if (attributeValuesByKey) {
+		for (var n in attributeValuesByKey) {
+			e.setAttribute(n, attributeValuesByKey[n]);
+		}
+	}
+	if (parent != null)	parent.appendChild(e);
+	return e;
 }
 
 // Create a non-breaking space
