@@ -12,8 +12,9 @@ public class MyLinker {
 	public static void Main(string[] args) {
 
 		using (StreamWriter emptyWikiWriter = new StreamWriter(args[1])) {
+			emptyWikiWriter.NewLine = "\n";
 			using (StreamWriter fullWikiWriter = new StreamWriter(args[2])) {
-				emptyWikiWriter.NewLine = "\n";
+				fullWikiWriter.NewLine = "\n";
 				CopyLineByLine(args[0], emptyWikiWriter, fullWikiWriter, ProcessLine);
 			}
 		}

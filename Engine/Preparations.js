@@ -1,3 +1,20 @@
+var params = null; // Command line parameters
+var store = null; // Article entities in-memory storage
+var story = null; // Main story
+var formatter = null; // Default formatters for the wikifier
+var readOnly = false; // Whether we're in readonly mode
+var highlightHack = null; // Embarrassing hack department...
+var hadConfirmExit = false; // Don't warn more than once
+var safeMode = false; // Disable all plugins and cookies
+var installedPlugins = []; // Information filled in when plugins are executed
+var startingUp = false; // Whether we're in the process of starting up
+var pluginInfo, tiddler; // Used to pass information to plugins in loadPlugins()
+
+// Whether this file is being viewed locally
+window.isLocal = function() {
+	return (document.location.protocol == "file:");
+}
+
 var config = {
 	numRssItems: 20 // Number of items in the RSS feed	
 };
@@ -141,7 +158,7 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 	config.textPrimitives.urlPattern + ")","mg");
 
 //--
-//-- Built-in articles - these are programmatic, in contrast to those which were collected from the "builtInArticles" div. See loadBuiltInArticlesFromHtmlIntoJsDictionary()
+//-- Internal articles - these are programmatic, in contrast to those which were collected from the "builtInArticles" div. See populateInternalArticlesFromStaticHtml()
 //--
 
 config.shadowTiddlers = {	

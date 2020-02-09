@@ -143,7 +143,7 @@ config.macros.importTiddlers.onArticleRetrieved = function(context) {
 	
 	var tiddler = context.tiddler;
 	store.suspendNotifications();
-	store.saveTiddler(tiddler.title, tiddler.title, tiddler.text, tiddler.modifier, tiddler.modified, tiddler.tags, tiddler.fields, true, tiddler.created);
+	store.addOrUpdate(tiddler.title, tiddler.title, tiddler.text, tiddler.modifier, tiddler.modified, tiddler.tags, tiddler.fields, true, tiddler.created);
 	store.resumeNotifications();
 	
 	// Notify

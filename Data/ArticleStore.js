@@ -74,6 +74,7 @@ ArticleStore.prototype.isDirty = function() {
 	return this.dirty;
 };
 
+// Finds only normal articles
 ArticleStore.prototype.tiddlerExists = function(title) {
 	var t = this.getArticle(title);
 	return t != undefined;
@@ -83,12 +84,11 @@ function isShadowTiddler(title) {
 	return config.shadowTiddlers[title] === undefined ? false : true;
 };
 
+// Finds normal and internal articles
 ArticleStore.prototype.isAvailable = function(title) {
-	if (!title)
-		return false;
+	if (! title) return false;
 	var s = title ? title.indexOf(config.textPrimitives.sectionSeparator) : -1;
-	if (s != -1)
-		title = title.substr(0, s);
+	if (s != -1) title = title.substr(0, s);
 	return this.tiddlerExists(title) || isShadowTiddler(title);
 };
 
@@ -109,6 +109,7 @@ ArticleStore.prototype.getShadowTiddlerText = function(title) {
 		return "";
 };
 
+// Returns stuff from an article (or internal article)
 ArticleStore.prototype.getArticleTextPartOrSlice = function(titleWithPartOrSlice, defaultText) {
 	
 	if (! titleWithPartOrSlice) return defaultText;
@@ -135,7 +136,7 @@ ArticleStore.prototype.getArticleTextPartOrSlice = function(titleWithPartOrSlice
 	
 	var article = this.getArticle(title);
 	var text = article ? article.text : null;
-	if (! article && isShadowTiddler(title)) text = this.getShadowTiddlerText(title);
+	if (! article && isShadowTiddler(title)) text = this.getShadowTiddlerText(title); // Fallback to internal article
 	if (text) {
 		if (! sectionName) return text; // POI: Return the whole article
 		var re = new RegExp("(^!{1,6}[ \t]*" + sectionName.escapeRegExp() + "[ \t]*\n)","mg");
@@ -156,6 +157,7 @@ ArticleStore.prototype.getArticleTextPartOrSlice = function(titleWithPartOrSlice
 };
 
 // if the returned text would contain an included title like this [[NestedArticleTitle]] it will be resolved (recursively).
+// Internal articles supported.
 ArticleStore.prototype.getArticleRawTextResolveIncludes = function(titleWithPartOrSlice, defaultText, depth) {
 	var text = this.getArticleTextPartOrSlice(titleWithPartOrSlice, null);
 	if (text == null) return defaultText;
@@ -296,34 +298,33 @@ ArticleStore.prototype.addTiddlerFields = function(title, fields) {
 };
 
 // Put an article into the store
-ArticleStore.prototype.saveTiddler = function(title, newTitle, newBody, modifier, modified, tags, fields, clearChangeCount, created, creator) {
-	var tiddler;
+ArticleStore.prototype.addOrUpdate = function(title, newTitle, newBody, modifier, modified, tags, fields, clearChangeCount, created, creator) {
+	var article;
 	if (title instanceof Tiddler) {
-		tiddler = title;
-		title = tiddler.title;
+		article = title;
+		title = article.title; // HACK: Implicite type change from Article to String
 		newTitle = title;
 	} else {
-		tiddler = this.getArticle(title);
-		if (tiddler) {
-			created = created || tiddler.created; // Preserve created date
-			creator = creator || tiddler.creator;
+		article = this.getArticle(title);
+		if (article) {
+			created = created || article.created; // Preserve created date
+			creator = creator || article.creator;
 			this.deleteTiddler(title);
 		} else {
 			created = created || modified;
-			tiddler = new Tiddler();
+			article = new Tiddler();
 		}		
-		tiddler.set(newTitle, newBody, modifier, modified, tags, created, fields, creator);
+		article.set(newTitle, newBody, modifier, modified, tags, created, fields, creator);
 	}
-	this.addTiddler(tiddler);
+	this.addTiddler(article);
 	if (clearChangeCount)
-		tiddler.clearChangeCount();
+		article.clearChangeCount();
 	else
-		tiddler.incChangeCount();
-	if (title != newTitle)
-		this.notify(title, true);
+		article.incChangeCount();
+	if (title != newTitle) this.notify(title, true);
 	this.notify(newTitle, true);
 	this.setDirty(true);
-	return tiddler;
+	return article;
 };
 
 ArticleStore.prototype.incChangeCount = function(title) {
@@ -348,16 +349,10 @@ ArticleStore.prototype.allTiddlersAsHtml = function() {
 };
 
 // Load articles of a Wiki from an HTML DIV element containing articles (e.g. "storeArea" or "builtInArticles")
-ArticleStore.prototype.loadFromDiv = function(elementOrId, noUpdate) {
-	
-	var containerElement = (typeof elementOrId == "string") ? document.getElementById(elementOrId) : elementOrId;
-	if (! containerElement) return;
-	
-	var articles = this.getLoader().loadArticles(containerElement.childNodes, this);
-	
+ArticleStore.prototype.loadFromDiv = function(divElement, noUpdate) {
+	var articles = this.getLoader().loadArticles(divElement.childNodes, this);
 	this.setDirty(false);
-	
-	if (! noUpdate)	for (var i = 0; i < articles.length; i++){articles[i].changed();}
+	if (! noUpdate)	for (var i = 0; i < articles.length; i++){ articles[i].changed(); }
 };
 
 // Load contents of a Wiki from a string

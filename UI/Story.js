@@ -207,7 +207,7 @@ Story.prototype.showArticle = function(title, templateNameOrNumber, customFields
 				returningView = element;
 				return true; // break loop;
 			} else {
-				story.saveTiddler(t);
+				story.acceptChanges(t);
 			}
 		}
 		if (t == title) {
@@ -606,13 +606,13 @@ Story.prototype.hasChanges = function(title) {
 };
 
 /**
-		* function story.saveTiddler() - 
+		* function story.acceptChanges() - 
 		*
 		* @param {string} title - The title as seen by the user (e.g. 'My great foo_article')
 		*
 		* @return {string} - The title usable as internal id (e.g. 'articleMy_great_foo__article')
 	*/
-Story.prototype.saveTiddler = function(title, minorUpdate) {
+Story.prototype.acceptChanges = function(title) {
 	
 	var articleView = this.getArticleViewByTitle(title);	
 	if (! articleView) return null;
@@ -646,7 +646,7 @@ Story.prototype.saveTiddler = function(title, minorUpdate) {
 	for (var fieldName in editBuffer) {
 		if (! ArticleStore.isStandardField(fieldName)) extendedFields[fieldName] = editBuffer[fieldName];
 	}
-	store.saveTiddler(title, newTitle, editBuffer.text, config.options.txtUserName, newDate, editBuffer.tags, extendedFields, null, null, creator);
+	store.addOrUpdate(title, newTitle, editBuffer.text, config.options.txtUserName, newDate, editBuffer.tags, extendedFields, null, null, creator);
 	autoSaveChanges();
 	return newTitle;
 };

@@ -35,13 +35,13 @@ FileImporter.retrieveArticleListAsync = function(importWorkItem) {
 	ajaxReq(ajaxParameters);	
 };
 
-FileImporter.retrieveArticleList_WikiSourceRetrieved = function(importWorkItem, userParams) {
+FileImporter.retrieveArticleList_WikiSourceRetrieved = function(importWorkItem) {
 	if (importWorkItem.status) {
 		if (importWorkItem.filter) { // todo: never true
 			importWorkItem.ArticlesToBeImported = importWorkItem.incomingArticleStore.filterTiddlers(importWorkItem.filter);
 		} else {
 			importWorkItem.ArticlesToBeImported = [];
-			importWorkItem.incomingArticleStore.forEachArticle(function(title,article) {
+			importWorkItem.incomingArticleStore.forEachArticle(function(title, article) {
 				if (title[0] != "`" && ! article.isTagged("systemConfig")) importWorkItem.ArticlesToBeImported.push(article); // Exclude internal stuff and legacy TiddlyWiki plugins
 			});
 		}

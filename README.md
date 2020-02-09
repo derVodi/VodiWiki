@@ -2,7 +2,7 @@
 
 ## Abstract
 
-VodiWiki is self contained wiki in a monolithic HTML file. This means the reader, the editor and the content is all in the very same file which can easily be put an an USB stick or published on a web site.
+VodiWiki is a self contained wiki in a monolithic HTML file. This means the reader, the editor and the content is all in the very same file which can easily be put an an USB stick or published on a web site.
 
 You can read more here: http://vodi.de/VodiWiki/
 

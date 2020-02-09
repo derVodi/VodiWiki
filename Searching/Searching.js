@@ -1261,8 +1261,9 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 		// Close the search result page when the user presses "ESC"
 		if (e.keyCode == 27) closeResult();
 	};
-	addEvent(document,"click",onDocumentClick);
-	addEvent(document,"keyup",onDocumentKeyup);
+
+	addEvent(document, "click", onDocumentClick); // This should be moved to a lazy init method, otherwise we've got order dependencies.
+	addEvent(document, "keyup", onDocumentKeyup);
 	
 	// Our Search Macro Hijack Function ==========================================
 	
@@ -1393,15 +1394,15 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 	
 	// When any tiddler are changed reset the result.
 	// 
-	var oldTiddlyWikiSaveTiddler = ArticleStore.prototype.saveTiddler;
-	ArticleStore.prototype.saveTiddler = function(title, newTitle, newBody, modifier, modified, tags, fields) {
-		oldTiddlyWikiSaveTiddler.apply(this, arguments);
+	var hijackedAddOrUpdate = ArticleStore.prototype.addOrUpdate;
+	ArticleStore.prototype.addOrUpdate = function(title, newTitle, newBody, modifier, modified, tags, fields) {
+		hijackedAddOrUpdate.apply(this, arguments);
 		invalidateResult();
 	};
 	
-	var oldTiddlyWikiRemoveTiddler = ArticleStore.prototype.removeTiddler;
+	var hijackedRemoveTiddler = ArticleStore.prototype.removeTiddler;
 	ArticleStore.prototype.removeTiddler = function(title) {
-		oldTiddlyWikiRemoveTiddler.apply(this, arguments);
+		hijackedRemoveTiddler.apply(this, arguments);
 		invalidateResult();
 	};
 	

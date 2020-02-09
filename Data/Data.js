@@ -1,3 +1,25 @@
+// Fix document.documentElement.outerHTML returning a crappy mutation of the original HTML source
+function recreateOriginal() {
+		
+	var content = "<!DOCTYPE html>\n"; //  DOCTYPE is completely missing and has to be rebuilt from scratch
+	
+	content += document.documentElement.outerHTML; // Append browser's output of "original" HTML (broken)
+
+	// Fix stuff
+
+	content = content.replace(/<div id="saveTest">savetest<\/div>/, '<div id="saveTest"></div>'); // clear 'savetest' marker
+	// todo hier mehr krempel leeren, dann kann in main() auf den riesen snapshot der Ursprungsseite verzichtet werden
+	// alles was dynamisch erzeugt wurde
+	// z.B. der ganze Backstage-Kram (suche nach "var backstage =")
+	
+	content = content.replace(/><head>/, '>\n<head>'); //newline before head tag
+	content = content.replace(/\n\n<\/body><\/html>$/, '</body>\n</html>\n'); // newlines before/after end of body/html tags
+	content = content.replace(/(<(meta) [^\>]*[^\/])>/g, '$1 />'); // meta tag terminators
+	content = content.replace(/<noscript>[^\<]*<\/noscript>/,	function(m) {return m.replace(/&lt;/g,'<').replace(/&gt;/g,'>');}); // decode LT/GT entities in noscript (obsolete?)
+	
+	return content;
+}
+
 function injectAllArticles(htmlSource) {
 	
 	storeAreaRange = locateStoreArea(htmlSource);
@@ -51,8 +73,12 @@ function convertUnicodeToHtmlEntities(s) {
 	return s.replace(re, function($0) {return "&#" + $0.charCodeAt(0).toString() + ";";});
 }
 
-function loadBuiltInArticlesFromHtmlIntoJsDictionary() {
-	var shadows = new ArticleStore();
-	shadows.loadFromDiv("builtInArticles", true);
-	shadows.forEachArticle(function(title, tiddler) {config.shadowTiddlers[title] = tiddler.text;});
+function populateInternalArticlesFromStaticHtml() {
+	var dummyStore = new ArticleStore();
+	dummyStore.loadFromDiv(document.getElementById("builtInArticles"), true);
+	dummyStore.forEachArticle(
+		function(title, article) {
+			config.shadowTiddlers[title] = article.text;
+		}
+	);
 }
