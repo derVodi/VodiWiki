@@ -74,8 +74,8 @@ merge(config.messages.tiddlerPopup,{});
 merge(config.views.wikified.tag,{
 	labelNoTags: "no tags",
 	labelTags: "tags: ",
-	tooltip: "Show tiddlers tagged with '%0'",	
-	popupNone: "No other tiddlers tagged with '%0'"
+	tooltip: "Show articles tagged with '%0'",	
+	popupNone: "No other articles tagged with '%0'"
 });
 
 merge(config.views.wikified,{
@@ -111,8 +111,8 @@ merge(config.macros.timeline, {
 });
 
 merge(config.macros.allTags, {
-	tooltip: "Show tiddlers tagged with '%0'",
-	noTags: "There are no tagged tiddlers"
+	tooltip: "Show articles tagged with '%0'",
+	noTags: "There are no tagged articles"
 });
 
 merge(config.macros.saveChanges, {
@@ -277,7 +277,7 @@ merge(config.commands.fields,{
 	}
 });
 
-merge(config.shadowTiddlers,{
+merge(config.internalArticles,{
 	SiteUrl: "",
 	SideBarTabs: '<<tabs sideBarTabSet "Missing" "Missing links & pages" TabMoreMissing "Tags" "All tags" TabTags "Resources" "Images And Stuff" TabResources>>'
 });

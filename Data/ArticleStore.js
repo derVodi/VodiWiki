@@ -15,7 +15,7 @@ ArticleStore.checkFieldName = function(name) {
 };
 
 function ArticleStore(params) {
-	var tiddlers = {}; // Hashmap by name of tiddlers
+	var tiddlers = {}; // Hashmap by name of articles (internal articles not included here!)
 	if (params && params.config) {
 		this.config = config;
 	}
@@ -39,6 +39,7 @@ function ArticleStore(params) {
 		delete this.slices[tiddler.title];
 		tiddlers[tiddler.title] = tiddler;
 	};
+	// Internal articles not supported
 	this.forEachArticle = function(callback) {
 		var title;
 		for (title in tiddlers) {
@@ -80,8 +81,8 @@ ArticleStore.prototype.tiddlerExists = function(title) {
 	return t != undefined;
 };
 
-function isShadowTiddler(title) {
-	return config.shadowTiddlers[title] === undefined ? false : true;
+function isShadowTiddler(title) { // todo look for "kind" property instead of this
+	return config.internalArticles[title] === undefined ? false : true;
 };
 
 // Finds normal and internal articles
@@ -103,8 +104,8 @@ ArticleStore.prototype.getOrAddNewArticle = function(title) {
 };
 
 ArticleStore.prototype.getShadowTiddlerText = function(title) {
-	if (typeof config.shadowTiddlers[title] == "string")
-		return config.shadowTiddlers[title];
+	if (typeof config.internalArticles[title] == "string")
+		return config.internalArticles[title];
 	else
 		return "";
 };
@@ -343,12 +344,12 @@ ArticleStore.prototype.getSaver = function() {
 	return this.saver;
 };
 
-// Return all tiddlers formatted as an HTML string
+// Return all articles formatted as an HTML string
 ArticleStore.prototype.allTiddlersAsHtml = function() {
 	return this.getSaver().transformAllArticlesToDivs(store);
 };
 
-// Load articles of a Wiki from an HTML DIV element containing articles (e.g. "storeArea" or "builtInArticles")
+// Load articles of a Wiki from an HTML DIV element containing articles (e.g. "storeArea" or "internalArticles")
 ArticleStore.prototype.loadFromDiv = function(divElement, noUpdate) {
 	var articles = this.getLoader().loadArticles(divElement.childNodes, this);
 	this.setDirty(false);
@@ -410,32 +411,28 @@ ArticleStore.prototype.getTags = function() {
 	return results;
 };
 
-// Return an array of the tiddlers that are tagged with a given tag
+// Return an array of the articles that are tagged with a given tag
 ArticleStore.prototype.getArticlesByTag = function(tag) {
 	return this.getArticlesByField("tags", true, tag);
 };
 
-// Return an array of the tiddlers that link to a given tiddler
+// Return an array of the articles that link to a given tiddler
 ArticleStore.prototype.getReferringTiddlers = function(title, unusedParameter, sortField) {
 	if (! this.tiddlersUpdated) this.updateTiddlers();
 	return this.getArticlesByField("links", true, title, sortField);
 };
-
-function canShow(title, includeHidden) {
-	if (includeHidden) return true;
-	if (title[0] == "`" || title[0] == "$" || isShadowTiddler(title)) return false;	
-	return true;
-}
 
 // Return an array of the articles that do (or must not) have a specified value in the specified field
 // If the field type is a collection, a match is found if lookupValue is present at least once in the collection.
 // matchMode == true to select matching articles, false to select all others
 // sortBy - Field name. May have a "+" or "-" prefix. Default: "title"
 // optionalPredicate decides whether the article should be included in the result set
-ArticleStore.prototype.getArticlesByField = function(lookupField, matchMode, lookupValue, sortBy, includeHidden) {
+//
+// Internal articles not supported.
+ArticleStore.prototype.getArticlesByField = function(lookupField, matchMode, lookupValue, sortBy, includeInternal) {
 	var results = [];
 	this.forEachArticle(function(title, article) {
-		if (canShow(title, includeHidden)) {
+		if (includeInternal || ! article.isInternal()) {
 			var include = ! matchMode;
 			var values;
 			if (["links", "tags"].contains(lookupField)) { // yoda
@@ -469,10 +466,10 @@ ArticleStore.prototype.getArticlesByField = function(lookupField, matchMode, loo
 		*
 		* @return {array} - Array of articles.
 	*/
-ArticleStore.prototype.getArticlesQuickly = function(sortBy, includeHidden) {
+ArticleStore.prototype.getArticlesQuickly = function(sortBy, includeInternal) {
 	var results = [];
 	this.forEachArticle(function(title, article) {
-		if (canShow(title, includeHidden)) {
+		if (includeInternal || ! article.isInternal()) {
 			results.push(article);
 		}
 	});
@@ -485,7 +482,7 @@ ArticleStore.prototype.getMissingLinks = function() {
 	if (! this.tiddlersUpdated) this.updateTiddlers();
 	var results = [];
 	this.forEachArticle(function (title, tiddler) {
-		if (tiddler.isTagged("excludeMissing") || tiddler.isTagged("systemConfig")) return;
+		if (tiddler.isTagged("excludeMissing") || tiddler.isTagged("systemConfig")) return; // aaa
 		var n;
 		for (n = 0; n < tiddler.links.length; n++) {
 			var link = tiddler.links[n];
@@ -499,8 +496,8 @@ ArticleStore.prototype.getMissingLinks = function() {
 // Return an array of names of tiddlers that are defined but not referred to
 ArticleStore.prototype.getOrphans = function() {
 	var results = [];
-	this.forEachArticle(function (title, tiddler) {
-		if (this.getReferringTiddlers(title).length == 0 && canShow(title)) results.push(title);
+	this.forEachArticle(function (title, article) {
+		if (this.getReferringTiddlers(title).length == 0 && ! article.isInternal()) results.push(title);
 	});
 	results.sort();
 	return results;
@@ -509,7 +506,7 @@ ArticleStore.prototype.getOrphans = function() {
 ArticleStore.prototype.getPlugins = function() {
 	var results = [];
 	this.forEachArticle(function (title, article) {
-		if (title[0] == "`") results.push(article);
+		if (article.kind == "!") results.push(article);
 	});
 	results.sort(function(a,b) {return a.title < b.title ? -1 : (a.title == b.title ? 0 : 1);});
 	return results;
@@ -518,7 +515,7 @@ ArticleStore.prototype.getPlugins = function() {
 ArticleStore.prototype.getResourceTitles = function() {
 	var results = [];
 	this.forEachArticle(function (title, article) {
-		if (title[0] == "$") results.push(title);
+		if (article.kind == "$") results.push(title);
 	});
 	results.sort();
 	return results;
@@ -527,7 +524,7 @@ ArticleStore.prototype.getResourceTitles = function() {
 // Return an array of names of all the shadow tiddlers
 ArticleStore.prototype.getShadowed = function() {
 	var t,results = [];
-	for (t in config.shadowTiddlers) {
+	for (t in config.internalArticles) {
 		if (isShadowTiddler(t))	results.push(t); // xxx if statement is always true
 	}
 	results.sort();

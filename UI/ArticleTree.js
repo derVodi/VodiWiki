@@ -1,5 +1,5 @@
 config.macros.articleTree = {
-	expand : "▹",
+	expand : "▷",
 	collapse : "◿",
 	collapsedTag : "collapsed"	
 }

@@ -1,3 +1,21 @@
+function blobToNewArticle(blob, cb){
+	blobToDataUrlAsync(blob, function(dataUrl){
+		article = new Tiddler();
+		var now = new Date();
+		var title = now.convertToYYYYMMDDHHMMSSMMM();
+		article.set(title, dataUrl, config.views.wikified.defaultModifier, now, null, now);
+		article.kind = "$";
+		store.addTiddler(article);
+		if (cb) cb(title, article);
+	});
+}
+
+function blobToDataUrlAsync(blob, cb){
+	var reader = new FileReader();
+	reader.onloadend = function() { cb(reader.result); }
+	reader.readAsDataURL(blob);
+}
+
 // Fix document.documentElement.outerHTML returning a crappy mutation of the original HTML source
 function recreateOriginal() {
 		
@@ -75,10 +93,10 @@ function convertUnicodeToHtmlEntities(s) {
 
 function populateInternalArticlesFromStaticHtml() {
 	var dummyStore = new ArticleStore();
-	dummyStore.loadFromDiv(document.getElementById("builtInArticles"), true);
+	dummyStore.loadFromDiv(document.getElementById("internalArticles"), true);
 	dummyStore.forEachArticle(
 		function(title, article) {
-			config.shadowTiddlers[title] = article.text;
+			config.internalArticles[title] = article.text;
 		}
 	);
 }

@@ -451,22 +451,22 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 		};
 	};
 	
-	// Returns true iff the query includes the given tiddler
+	// Returns true iff the query includes the given article
 	//
 	// @param tiddler [may be null/undefined]
 	//
-	abego.TiddlerQuery.prototype.test = function(tiddler) {
-		if (!tiddler) return false;
+	abego.TiddlerQuery.prototype.test = function(article) {
+		if (!article) return false;
 		if (this.regExp) {
-			return this.tester.test(tiddler);
+			return this.tester.test(article);
 		}
-		return this.expr.exec(tiddler);
+		return this.expr.exec(article);
 	};
 	
-	// Returns an array with those tiddlers from the tiddlers array that match the query.
+	// Returns an array with those articles from the articles array that match the query.
 	//
-	abego.TiddlerQuery.prototype.filter = function(tiddlers) {
-		return abego.select(tiddlers,this.test,this);
+	abego.TiddlerQuery.prototype.filter = function(articles) {
+		return abego.select(articles,this.test,this);
 	};
 	
 	abego.TiddlerQuery.prototype.getMarkRegExp = function() {
@@ -1010,7 +1010,7 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 			if (config.options.chkSearchInTags) defaultFields.push("tags");
 			lastQuery = new abego.TiddlerQuery(searchText, caseSensitive, useRegExp, defaultFields, config.options.chkSearchExtendedFields);
 		} catch (e) {
-			// when an invalid query is given no tiddlers are matched
+			// when an invalid query is given no articles are matched
 			return [];
 		}
 	
@@ -1596,7 +1596,7 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 	// Shadow Tiddlers
 	//----------------------------------------------------------------------------
 	
-	config.shadowTiddlers["YourSearch Help"] =
+	config.internalArticles["YourSearch Help"] =
 	"!Field Search\nWith the Field Search you can restrict your search to certain fields of a tiddler, e.g"+
 	" only search the tags or only the titles. The general form is //fieldname//'':''//textToSearch// (e."+
 	"g. {{{title:intro}}}). In addition one-character shortcuts are also supported for the standard field"+
@@ -1653,7 +1653,7 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 	"eady \"use\" these shortcuts.//";
 	
 	// todo remove shadow tiddler and integrate into global options
-	config.shadowTiddlers["YourSearch Options"] =
+	config.internalArticles["YourSearch Options"] =
 	"|>|!YourSearch Options|\n|!|<<option chkPreviewText"+
 	">> Show Text Preview|\n|!|<<option chkSearchAsYouType>> 'Search As You Type' Mode (No RETURN required"+
 	" to start search)|\n|!|Default Search Filter:<<option chkSearchInTitle>>Title ('!')     <<option chk"+
@@ -1664,7 +1664,7 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 	"on search result page: <<option txtItemsPerPage>>|\n|!|Number of items on search result page with pre"+
 	"view text: <<option txtItemsPerPageWithPreview>>|\n";
 	
-	config.shadowTiddlers["YourSearchResultTemplate"] =
+	config.internalArticles["YourSearchResultTemplate"] =
 	"<!--\n" +
 	"{{{\n" +
 	"-->\n" +
@@ -1724,7 +1724,7 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 	"-->\n"
 	;
 	
-	config.shadowTiddlers["YourSearchItemTemplate"] = 
+	config.internalArticles["YourSearchItemTemplate"] = 
 		"<!--\n" +
 		"{{{\n" +
 		"-->\n" +

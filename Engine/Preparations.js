@@ -158,10 +158,10 @@ config.textPrimitives.tiddlerForcedLinkRegExp = new RegExp("(?:" + config.textPr
 	config.textPrimitives.urlPattern + ")","mg");
 
 //--
-//-- Internal articles - these are programmatic, in contrast to those which were collected from the "builtInArticles" div. See populateInternalArticlesFromStaticHtml()
+//-- Internal articles - these are programmatic, in contrast to those which were collected from the "internalArticles" div. See populateInternalArticlesFromStaticHtml()
 //--
 
-config.shadowTiddlers = {	
+config.internalArticles = {	
 	ArticleTreePanel: '{{articleTreePanel{<<articleTree>>{{articleTreeButtons{<<newArticleButton "New Article" true>><<newArticleButton " Sub Article" false>>}}}}}}',
 	NavigationPanel: '<<tabs navigationTabSetWrapper "╘" "Structured tree" ArticleTreePanel "A-Z" "Sorted list" SortedListPanel "🕓" "Timeline" TimelinePanel>>',
 	PluginManager: '<<plugins>>',

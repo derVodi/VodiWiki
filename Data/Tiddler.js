@@ -4,6 +4,7 @@
 
 function Tiddler(title) {
 	this.title = title;
+	this.kind = null;
 	this.text = "";
 	this.creator = null;
 	this.modifier = null;
@@ -17,8 +18,7 @@ function Tiddler(title) {
 }
 
 Tiddler.prototype.getLinks = function() {
-	if (this.linksUpdated==false)
-		this.changed();
+	if (this.linksUpdated == false)	this.changed();
 	return this.links;
 };
 
@@ -28,6 +28,10 @@ Tiddler.prototype.incChangeCount = function() {
 	c = c ? parseInt(c, 10) : 0;
 	this.fields['changecount'] = String(c + 1);
 };
+
+Tiddler.prototype.isInternal = function() {
+	return (this.kind || isShadowTiddler(this.title)); // HACK: isShadowTiddler should die after all internal articles are marked via a "kind" property
+}
 
 // Clear the changeCount of a tiddler
 Tiddler.prototype.clearChangeCount = function() {
