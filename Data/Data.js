@@ -1,3 +1,8 @@
+var storeAreaStartString = '<div id="' + 'storeArea">'; // Split up into two so that indexOf() of this source doesn't find it
+var storeAreaStartRE = /<((div)|(DIV)) ((id)|(ID))=["']?storeArea['"]?>/; // Used for IE6
+var storeAreaEndString = '</d' + 'iv>';
+var storeAreaEndStringUpperCase = '</D' + 'IV>';
+
 function blobToNewArticle(blob, cb){
 	blobToDataUrlAsync(blob, function(dataUrl){
 		article = new Tiddler();

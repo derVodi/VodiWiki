@@ -114,10 +114,10 @@ config.macros = {
 
 // Commands supported by the toolbar macro
 config.commands = {
-	editTiddler: {},
-	saveTiddler: {hideReadOnly: true},
-	cancelTiddler: {},
-	deleteTiddler: {hideReadOnly: true},
+	startEditing: {},
+	finishEditing: {hideReadOnly: true},
+	cancelEditing: {},
+	deleteArticle: {hideReadOnly: true},
 	permalink: {},
 	references: {type: "popup"},
 	jump: {type: "popup"},

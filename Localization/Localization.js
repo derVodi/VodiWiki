@@ -221,19 +221,19 @@ merge(config.macros.upgrade,{
 	step3Html: "You have cancelled the upgrade process"
 });
 
-merge(config.commands.editTiddler,{
+merge(config.commands.startEditing,{
 	text: "✎ Edit",
 	tooltip: "Edit This Article\n[Ctrl - Enter]",
 	readOnlyText: "view",
 	readOnlyTooltip: "View the source of this article"
 });
 
-merge(config.commands.saveTiddler,{
+merge(config.commands.finishEditing,{
 	text: "✔ Done",
 	tooltip: "Save changes to this article\n[Ctrl - Enter]"
 });
 
-merge(config.commands.cancelTiddler,{
+merge(config.commands.cancelEditing,{
 	text: "⨯ Cancel",
 	tooltip: "Undo Changes to This Article",
 	warning: "Are you sure you want to abandon your changes to '%0'?",
@@ -241,7 +241,7 @@ merge(config.commands.cancelTiddler,{
 	readOnlyTooltip: "View this article normally"
 });
 
-merge(config.commands.deleteTiddler,{
+merge(config.commands.deleteArticle,{
 	text: "🗙 Delete",
 	tooltip: "Delete This Article",
 	warning: "Are you sure you want to delete '%0'?"

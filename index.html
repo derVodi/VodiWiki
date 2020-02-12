@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 9};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 10};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -249,7 +249,7 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 <div id="internalArticles">
 <div title="EditTemplate">
 <pre>&lt;!--{{{--&gt;
-&lt;div class="toolbar" macro="toolbar +saveTiddler -cancelTiddler"&gt;&lt;/div&gt;
+&lt;div class="toolbar" macro="toolbar +finishEditing -cancelEditing"&gt;&lt;/div&gt;
 &lt;div class="title" macro="view title"&gt;&lt;/div&gt;
 &lt;div class="editor" macro="edit title"&gt;&lt;/div&gt;
 &lt;div class="editor" macro="edit text"&gt;&lt;/div&gt;
@@ -322,7 +322,7 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <div title="ViewTemplate">
 <pre>&lt;!--{{{--&gt;
-&lt;div class='toolbar'&gt;&lt;span macro='toolbar editTiddler deleteTiddler &gt; references &lt;'&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div class='toolbar'&gt;&lt;span macro='toolbar startEditing deleteArticle &gt; references &lt;'&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;div class='title' macro='view title'&gt;&lt;/div&gt;
 &lt;div class='articleContentContainer' macro='view text wikified'&gt;&lt;/div&gt;
 &lt;!--}}}--&gt;
@@ -1768,7 +1768,7 @@ function highlightify(source,output,highlightRegExp,tiddler) {
 /**
 	* @typedef {Object} IMacroResolver
 	*
-	* A Module that will be called (IOC by invokeMacro()) when a macro (like "<<toolbar +saveTiddler -cancelTiddler deleteTiddler>>") is resolved.
+	* A Module that will be called (IOC by invokeMacro()) when a macro (like "<<toolbar +finishEditing -cancelEditing deleteArticle>>") is resolved.
 	* The name of the actual implementation must match the macro name.
 	*
 	* @property {function} handler - The actual resolving function, that should render stuff into "place"	
@@ -3042,88 +3042,6 @@ function calcOffsetTo(inner, outer) {
 	return curtop;
 }
 
-config.commands.editTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
-
-	var articleView;
-
-	if (title){
-		articleView = story.getArticleViewByTitle(title);
-	} else {
-		articleView = story.getCurrentArticleView();
-		title = articleView ? articleView.getArticleTitle() : null;
-	}
-
-	if (! articleView || story.isDirty(title)) return;
-
-	clearMessage();
-		
-	// Selected text: Count the number of occurances of the selected text until we reach the actually selected element
-	recurseViewerOccurance = 0;
-	var found = -1;
-	var selectedText = window.getSelection().toString();
-	if (selectedText.length) {
-		var articleContentContainer = null;
-		for (var i = 0; i < articleView.childNodes.length; i++) {
-			if (articleView.childNodes[i].className == "articleContentContainer") { // HACK: Code dependency to CSS class name!
-				articleContentContainer = articleView.childNodes[i];
-				break;
-			}
-		}		
-		recurseViewer(articleContentContainer, window.getSelection().anchorNode, selectedText);
-	}
-
-	var article = store.getArticle(title);
-	if (article) article.rescuedScrollTop = articleView.scrollTop;
-	
-	//var fields = articleView.getAttribute("tiddlyFields");
-	var fields = null;
-	
-	story.showArticle(title, DEFAULT_EDIT_TEMPLATE, fields);
-	
-	var textAreaElement = story.getTiddlerField(title, "text");	
-	textAreaElement.onpaste = onPasted;
-	
-	// Selected text: Reconstruct the selection by locating the n-th occurance of the formerly selected text
-	if (recurseViewerOccurance) {		
-		found = -1;
-		do {
-			recurseViewerOccurance--;
-			found = textAreaElement.value.indexOf(selectedText, found + 1);
-		} while (recurseViewerOccurance && found >= 0)
-	}
-	if (found > -1) {
-		setCaretPosition(textAreaElement, found);
-	} else {
-		setCaretPosition(textAreaElement, (articleView.rescuedCaretPosition ? articleView.rescuedCaretPosition : 0));
-	}
-	
-	return false;
-}
-
-function insertAtCursor(input, textToInsert) {
-  // get current text of the input
-  const value = input.value;
-
-  // save selection start and end position
-  const start = input.selectionStart;
-  const end = input.selectionEnd;
-
-  // update the value with our text inserted
-  input.value = value.slice(0, start) + textToInsert + value.slice(end);
-
-  // update cursor to be at the end of insertion
-  input.selectionStart = input.selectionEnd = start + textToInsert.length;
-}
-
-config.commands.cancelTiddler.handlerBase = config.commands.cancelTiddler.handler;
-
-config.commands.cancelTiddler.handler = function(event, src, title) { // Implements ICommand.handler()
-	var pos = story.getTiddlerField(title,"text").selectionStart;
-	var baseResult = config.commands.cancelTiddler.handlerBase(event, src, title);
-	story.getArticleViewByTitle(title).rescuedCaretPosition = pos;
-	return baseResult;
-};
-
 config.commands.navigateBack = {
 	text: 'Back',
 	tooltip: 'View the previous page.',
@@ -3146,11 +3064,6 @@ config.commands.navigateForward = {
 //-- Saving
 //--
 
-var storeAreaStartString = '<div id="' + 'storeArea">'; // Split up into two so that indexOf() of this source doesn't find it
-var storeAreaStartRE = /<((div)|(DIV)) ((id)|(ID))=["']?storeArea['"]?>/; // Used for IE6
-var storeAreaEndString = '</d' + 'iv>';
-var storeAreaEndStringUpperCase = '</D' + 'IV>';
-
 // If there are unsaved changes, force the user to confirm before exitting
 function confirmExit() {
 	hadConfirmExit = true;
@@ -3163,14 +3076,6 @@ function checkUnsavedChanges() {
 	if (store && store.isDirty && store.isDirty() && window.hadConfirmExit === false) {
 		if (confirm(config.messages.unsavedChangesWarning))	saveChangesAction();
 	}
-}
-
-function updateMarkupBlock(s, blockName, tiddlerName) {
-	return s.replaceChunk(
-		"<!--%0-START-->".format([blockName]),
-		"<!--%0-END-->".format([blockName]),
-		"\n" + store.getArticleRawTextResolveIncludes(tiddlerName, "") + "\n"
-	);
 }
 
 function autoSaveChanges() {

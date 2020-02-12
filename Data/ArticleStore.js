@@ -31,7 +31,7 @@ function ArticleStore(params) {
 		var t = tiddlers[title];
 		return t instanceof Tiddler ? t : null;
 	};
-	this.deleteTiddler = function(title) {
+	this.deleteArticle = function(title) {
 		delete this.slices[title];
 		delete tiddlers[title];
 	};
@@ -269,7 +269,7 @@ ArticleStore.prototype.addNotification = function(title, fn) {
 ArticleStore.prototype.removeTiddler = function(title) {
 	var tiddler = this.getArticle(title);
 	if (tiddler) {
-		this.deleteTiddler(title);
+		this.deleteArticle(title);
 		this.notify(title, true);
 		this.setDirty(true);
 	}
@@ -310,7 +310,7 @@ ArticleStore.prototype.addOrUpdate = function(title, newTitle, newBody, modifier
 		if (article) {
 			created = created || article.created; // Preserve created date
 			creator = creator || article.creator;
-			this.deleteTiddler(title);
+			this.deleteArticle(title);
 		} else {
 			created = created || modified;
 			article = new Tiddler();

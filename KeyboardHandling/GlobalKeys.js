@@ -19,7 +19,7 @@ window.onkeydown = function(e) {
 		return false;
 	}
 	if (e.ctrlKey && e.keyCode == 13) { // [Ctrl]-[Enter]
-		config.commands.editTiddler.handler(e);  // Expects ICommand.handler()
+		config.commands.startEditing.handler(e);  // Expects ICommand.handler()
     return false;
   };
 };
