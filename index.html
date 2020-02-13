@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 10};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 11};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -65,6 +65,10 @@ table td {vertical-align: top;}
 #storeArea div {padding:0.5em; margin:1em 0em 0em 0em; border-color:#fff #666 #444 #ddd; border-style:solid; border-width:2px; overflow:auto;}
 #internalArticles {display:none;}
 #javascriptWarning {width:100%; text-align:center; font-weight:bold; background-color:#dd1100; color:#fff; padding:1em 0em;}
+
+.fieldsetFix {border:0; padding:0; margin:1px 0px;}
+.editor input, .editor textarea {display:block; width:100%; font:inherit;}
+.editorFooter {padding:0.25em 0; font-size:.9em;}
 
 /* Text */
 
@@ -227,6 +231,13 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 
 .popup, .wizard, #yourSearchResult {box-shadow: 3px 3px 5px lightgray;}
 
+/* Printing */
+
+@media print {
+	#navigationArea, #sidebar, #messageArea, #navAndSearch, .toolbar, #backstageButton, #backstageArea {display: none !important;}
+	noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print preview displays the noscript content */
+}
+
 </style>
 <!--POST-HEAD-START-->
 
@@ -289,35 +300,6 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 	&lt;/div&gt;
 &lt;/div&gt;
 &lt;!--}}}--&gt;
-</pre>
-</div>
-<div title="StyleSheetLayout">
-<pre>/*{{{*/
-
-#contentWrapper .chkOptionInput {border:0;}
-
-.indent {margin-left:3em;}
-.outdent {margin-left:3em; text-indent:-3em;}
-code.escaped {white-space:nowrap;}
-
-#contentWrapper {display:block;}
-#splashScreen {display:none;}
-
-.editor input, .editor textarea {display:block; width:100%; font:inherit;}
-.editorFooter {padding:0.25em 0; font-size:.9em;}
-
-.fieldsetFix {border:0; padding:0; margin:1px 0px;}
-
-/*}}}*/
-</pre>
-</div>
-<div title="StyleSheetPrint">
-<pre>/*{{{*/
-@media print {
-#navigationPanel, #sidebar, #messageArea, .toolbar, #backstageButton, #backstageArea {display: none !important;}
-noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print preview displays the noscript content */
-}
-/*}}}*/
 </pre>
 </div>
 <div title="ViewTemplate">
@@ -886,6 +868,7 @@ Otherwise you loose control over the appearance of the glyph and the browsers wi
 <script src="Libraries/JQuery.js"></script>
 <script src="Engine/Preparations.js"></script>
 <script src="CopyAndPaste/CopyAndPaste.js"></script>
+<script src="Customizability/Customizability.js"></script>
 <script src="Data/Tiddler.js"></script>
 <script src="Data/ArticleStore.js"></script>
 <script src="Data/Data.js"></script>
@@ -2452,9 +2435,6 @@ ArticleStore.prototype.forEachField = function(articleOrTitle, callback, onlyExt
 
 config.notifyTiddlers = [
 	{name: "SystemSettings", notify: onSystemSettingsChange},
-	{name: "StyleSheetLayout", notify: refreshStyles},	
-	{name: "StyleSheet", notify: refreshStyles},
-	{name: "StyleSheetPrint", notify: refreshStyles},
 	{name: "PageTemplate", notify: refreshPageTemplate},	
 	{name: null, notify: refreshDisplay}
 ];
@@ -2501,8 +2481,6 @@ config.refreshers = {
 };
 
 config.refresherData = {
-	styleSheet: "StyleSheet",
-	defaultStyleSheet: "StyleSheet",
 	pageTemplate: "PageTemplate",
 	defaultPageTemplate: "PageTemplate"
 };
@@ -2583,16 +2561,9 @@ function getPageTitle() { // document.title = getPageTitle();
 	return wikifyPlainText(config.options.txtWikiTitle, null, null);	
 }
 
-function refreshStyles(title, doc) {
-	setStylesheet(title == null ? "" : store.getArticleRawTextResolveIncludes(title, "", 10), title, doc || document);
-}
-
 function refreshAll() {
 	refreshPageTemplate();
 	refreshDisplay();
-	refreshStyles("StyleSheetLayout");	
-	refreshStyles(config.refresherData.styleSheet);
-	refreshStyles("StyleSheetPrint");
 }
 
 //--
@@ -2705,135 +2676,6 @@ function decodeCookie(s) {
 	var re = /&#[0-9]{1,5};/g;
 	return s.replace(re,function($0) {return String.fromCharCode(eval($0.replace(/[&#;]/g,'')));});
 }
-
-// Renders a newly created element into place. The element type is looked up in option.types[optionTypeName].elementType
-config.macros.option.genericCreate = function(place, optionTypeName, optionName, className, desc) {
-	var typeInfo = config.macros.option.types[optionTypeName];
-	var element = document.createElement(typeInfo.elementType);
-	if (typeInfo.typeValue)
-		element.setAttribute('type', typeInfo.typeValue);
-	element[typeInfo.eventName] = typeInfo.onChange;
-	element.setAttribute('option', optionName);
-	element.className = className || typeInfo.className;
-	if (config.optionsDesc[optionName])
-		element.setAttribute('title', config.optionsDesc[optionName]);
-	place.appendChild(element);
-	if (desc != 'no')
-		createTiddlyText(place, config.optionsDesc[optionName] || optionName);
-	element[typeInfo.valueField] = config.options[optionName];
-	return element;
-};
-
-config.macros.option.genericOnChange = function(e) {
-	var opt = this.getAttribute('option');
-	if (opt) {
-		var optionTypeName = opt.substr(0, 3);
-		var typeInfo = config.macros.option.types[optionTypeName];
-		if (typeInfo.elementType && typeInfo.valueField)
-			config.macros.option.propagateOption(opt, typeInfo.valueField, this[typeInfo.valueField], typeInfo.elementType, this);
-	}
-	return true;
-};
-
-config.macros.option.types = { // Dictionary(Of OptionTypeName, OptionTypeInfo)
-	'txt': {
-		elementType: 'input',
-		valueField: 'value',
-		eventName: 'onchange',
-		className: 'txtOptionInput',
-		create: config.macros.option.genericCreate,
-		onChange: config.macros.option.genericOnChange
-	},
-	'chk': {
-		elementType: 'input',
-		valueField: 'checked',
-		eventName: 'onclick',
-		className: 'chkOptionInput',
-		typeValue: 'checkbox',
-		create: config.macros.option.genericCreate,
-		onChange: config.macros.option.genericOnChange
-	}
-};
-
-config.macros.option.propagateOption = function(opt, valueField, value, elementType, elem) {
-	config.options[opt] = value;
-	saveOption(opt);
-	var t,nodes = document.getElementsByTagName(elementType);
-	for (t = 0; t < nodes.length; t++) {
-		var optNode = nodes[t].getAttribute('option');
-		if (opt == optNode && nodes[t]!=elem)
-			nodes[t][valueField] = value;
-	}
-};
-
-config.macros.option.handler = function(place, macroName, params, wikifier, paramString) { // Implements IMacroResolver.handler()
-	params = paramString.parseParams('anon', null, true, false, false);
-	var opt = (params[1] && params[1].name == 'anon') ? params[1].value : getParam(params, 'name', null);
-	var className = (params[2] && params[2].name == 'anon') ? params[2].value : getParam(params, 'class', null);
-	var desc = getParam(params, 'desc', 'no');
-	var optionTypeName = opt.substr(0,3);
-	var optionTypeInfo = config.macros.option.types[optionTypeName];
-	if (optionTypeInfo && optionTypeInfo.create)
-		optionTypeInfo.create(place, optionTypeName, opt, className, desc);
-};
-
-// renders a wizard containing a list view containing all options
-config.macros.options.handler = function(place, macroName, params, wikifier, paramString) { // Implements IMacroResolver.handler()
-	params = paramString.parseParams('anon', null, true, false, false);
-	var showUnknown = getParam(params, 'showUnknown', 'no');
-	var presenter = new WizardPresenter();
-	presenter.renderNewView(place, this.wizardTitle);
-	presenter.renderBodyContent(this.step1Title, this.step1Html);
-	var listViewPlaceholder = presenter.getElement('listViewPlaceholder');
-	var chkUnknown = presenter.getElement('chkUnknown');
-	chkUnknown.checked = showUnknown == 'yes';
-	chkUnknown.onchange = this.onChangeUnknown;
-	var listWrapper = document.createElement('div');
-	listViewPlaceholder.parentNode.insertBefore(listWrapper, listViewPlaceholder);
-	presenter.setValue('listWrapper', listWrapper);
-	this.refreshOptions(listWrapper, showUnknown == 'yes');
-};
-
-// renders a listview representing the option entities
-config.macros.options.refreshOptions = function(listWrapper, showUnknown) {
-	var optionViews = [];
-	for (var optionName in config.options) { // Reflection, iterate all members of "config" singleton
-		var optionView = {};
-		optionView.option = '';
-		optionView.name = optionName;		
-		if (config.optionsDesc[optionName]) {
-			optionView.description = config.optionsDesc[optionName];
-			optionViews.push(optionView);
-		} else {
-			if (showUnknown) {
-				optionView.description = this.unknownDescription;
-				optionViews.push(optionView);
-			}
-		}
-	}
-	optionViews.sort(function(a,b) {return a.name.substr(3) < b.name.substr(3) ? -1 : (a.name.substr(3) == b.name.substr(3) ? 0 : +1);});
-	
-	ListView.create(listWrapper, optionViews, this.listViewTemplate); // This is a bidirectional wire-up. A ListView will be rendered, but "optionViews" will receive a tableCellByFieldName dictionary!
-	
-	// The list view was created with read only elements.
-	// The following code will render interactive input elements into table cells.
-	
-	for (var i = 0; i < optionViews.length; i++) {
-		var optionTypeName = optionViews[i].name.substr(0, 3);
-		var typeInfo = config.macros.option.types[optionTypeName];
-		if (typeInfo && typeInfo.create) {
-			typeInfo.create(optionViews[i].tableCellByFieldName['option'], optionTypeName, optionViews[i].name, null, 'no');
-		}
-	}
-};
-
-config.macros.options.onChangeUnknown = function(e) {
-	var presenter = new WizardPresenter(this);
-	var listWrapper = presenter.getValue('listWrapper');
-	jQuery(listWrapper).empty();
-	config.macros.options.refreshOptions(listWrapper, this.checked);
-	return false;
-};
 
 // Vodi
 
@@ -3359,71 +3201,6 @@ if (!$.encoding.digests)
 		return [h0,h1,h2,h3,h4];
 	}
 })(jQuery);
-/*
-jQuery.twStylesheet.js
-
-jQuery plugin to dynamically insert CSS rules into a document
-
-Usage:
-  jQuery.twStylesheet applies style definitions
-  jQuery.twStylesheet.remove neutralizes style definitions
-
-Copyright (c) UnaMesa Association 2009
-
-Triple licensed under the BSD, MIT and GPL licenses:
-  http://www.opensource.org/licenses/bsd-license.php
-  http://www.opensource.org/licenses/mit-license.php
-  http://www.gnu.org/licenses/gpl.html
-*/
-
-(function($) {
-
-var defaultId = "customStyleSheet";
-
-// Add or replace a style sheet
-// css argument is a string of CSS rule sets
-// options.id is an optional name identifying the style sheet
-// options.doc is an optional document reference
-// N.B.: Uses DOM methods instead of jQuery to ensure cross-browser comaptibility.
-$.twStylesheet = function(css, options) {
-	options = options || {};
-	var id = options.id || defaultId;
-	var doc = options.doc || document;
-	var el = doc.getElementById(id);
-	if (doc.createStyleSheet) { // IE-specific handling
-		if (el) {
-			el.parentNode.removeChild(el);
-		}
-		doc.getElementsByTagName("head")[0].insertAdjacentHTML("beforeEnd",
-			'&nbsp;<style id="' + id + '" type="text/css">' + css + '</style>'); // fails without &nbsp;
-	} else { // modern browsers
-		if (el) {
-			el.replaceChild(doc.createTextNode(css), el.firstChild);
-		} else {
-			el = doc.createElement("style");
-			el.type = "text/css";
-			el.id = id;
-			el.appendChild(doc.createTextNode(css));
-			doc.getElementsByTagName("head")[0].appendChild(el);
-		}
-	}
-};
-
-// Remove existing style sheet
-// options.id is an optional name identifying the style sheet
-// options.doc is an optional document reference
-$.twStylesheet.remove = function(options) {
-	options = options || {};
-	var id = options.id || defaultId;
-	var doc = options.doc || document;
-	var el = doc.getElementById(id);
-	if (el) {
-		el.parentNode.removeChild(el);
-	}
-};
-
-})(jQuery);
-
 //]]>
 </script>
 <!--POST-SCRIPT-START-->

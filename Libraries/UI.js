@@ -316,11 +316,3 @@ function scrubNode(e) {
 		c = c.nextSibling;
 	}
 }
-
-function setStylesheet(s,id,doc) {
-	jQuery.twStylesheet(s,{id:id,doc:doc});
-}
-
-function removeStyleSheet(id) {
-	jQuery.twStylesheet.remove({id:id});
-}
