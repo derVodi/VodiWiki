@@ -427,8 +427,8 @@ When working with sensitive data consider the following advice:
 You'll have to address the page and it's part which you want to embed:
 
 {{{
-&lt;&lt;tiddler 'PageTitle##SectionName'&gt;&gt;
-&lt;&lt;tiddler [[PageTitle::SliceName]]&gt;&gt;
+&lt;&lt;transclude 'PageTitle##SectionName'&gt;&gt;
+&lt;&lt;transclude [[PageTitle::SliceName]]&gt;&gt;
 }}}
 
 The page title and part name is never embedded - only the inner part.
@@ -458,18 +458,18 @@ This real new line is not.
 The following code...
 
 {{{
-&lt;&lt;tiddler '##What Is A &quot;Section&quot;?'&gt;&gt;
-&lt;&lt;tiddler 'Embedding Parts Of Other Pages##InvisibleSection'&gt;&gt;
-&lt;&lt;tiddler [[Embedding Parts Of Other Pages::FirstTableCell]]&gt;&gt;
-&lt;&lt;tiddler [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;
+&lt;&lt;transclude '##What Is A &quot;Section&quot;?'&gt;&gt;
+&lt;&lt;transclude 'Embedding Parts Of Other Pages##InvisibleSection'&gt;&gt;
+&lt;&lt;transclude [[Embedding Parts Of Other Pages::FirstTableCell]]&gt;&gt;
+&lt;&lt;transclude [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;
 }}}
 
 ...generates this output:
 
-|&lt;&lt;tiddler '##What Is A &quot;Section&quot;?'&gt;&gt;|
-|&lt;&lt;tiddler 'Embedding Parts Of Other Pages##InvisibleSection'&gt;&gt;|
-|&lt;&lt;tiddler [[Embedding Parts Of Other Pages::FirstTableCell]]&gt;&gt;|
-|&lt;&lt;tiddler [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;|
+|&lt;&lt;transclude '##What Is A &quot;Section&quot;?'&gt;&gt;|
+|&lt;&lt;transclude 'Embedding Parts Of Other Pages##InvisibleSection'&gt;&gt;|
+|&lt;&lt;transclude [[Embedding Parts Of Other Pages::FirstTableCell]]&gt;&gt;|
+|&lt;&lt;transclude [[Embedding Parts Of Other Pages::SliceName]]&gt;&gt;|
 </pre>
 </div>
 <div title="Getting Started" created="201904231951" modified="201904231951" modifier="YourName" changecount="1">
@@ -911,6 +911,7 @@ Otherwise you loose control over the appearance of the glyph and the browsers wi
 <script src="UI/Popup.js"></script>
 <script src="UI/PopUpSupport.js"></script>
 <script src="UI/Story.js"></script>
+<script src="UI/Transclusion.js"></script>
 <script src="UI/Toolbar.js"></script>
 <script src="UI/WizardPresenter.js"></script>
 <script src="Updating/UpdaterUi.js"></script>
@@ -966,8 +967,7 @@ function main() {
 	
 	var m;
 	for (m in config.macros) {
-		if (config.macros[m].init)
-			config.macros[m].init();
+		if (config.macros[m].init) config.macros[m].init();
 	}
 	
 	store.notifyAll();
@@ -2023,84 +2023,6 @@ merge(macro, {
 	itemTemplate: "<<view title link>>"
 });
 
-/**
-	* Renders an article (or parts of it) into another article (called "transclusion").
-	* Optionally resolves placeholders like string.format() would do:
-	* The included article may contain numbered placeholders like "$1, $2" which will be replaced by arguments after the keyword "with:"
-	*
-	* Examples: <<tiddler 'PageTitle##SectionName'>>
-	*           <<tiddler [[PageTitle::SliceName]]>>
-	*           <<tiddler book with: "Dan Brown" "The DaVinci Code">> => would replace "$1" by "Dan Brown" and "$2" by "The DaVinci Code"
-*/
-config.macros.tiddler.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
-	var allowEval = true;
-	var stack = config.macros.tiddler.tiddlerStack;
-	if (stack.length > 0 && config.evaluateMacroParameters == "system") {
-		// included tiddler and "system" evaluation required, so check tiddler tagged appropriately
-		var title = stack[stack.length - 1];
-		var pos = title.indexOf(config.textPrimitives.sectionSeparator);
-		if (pos != -1) {
-			title = title.substr(0, pos); // get the base tiddler title
-		}
-		var t = store.getArticle(title);
-		if (! t || t.tags.indexOf("systemAllowEval") == -1) {
-			allowEval = false;
-		}
-	}
-	params = paramString.parseParams("name", null, allowEval, false, true);
-	var names = params[0]["name"];
-	var titleAndSection = names[0]; // e.g. "foo", "foo##bar", "##bar"
-
-	// Complete '##section' to 'thisTitle##section'
-	var sep = config.textPrimitives.sectionSeparator;
-	var parts = titleAndSection.split(sep);
-	var title = parts[0];
-	var sectionName = parts[1];
-	if (sectionName) sectionName = sectionName.trim();
-	if ((! title.length) && sectionName) {
-		var articleView = story.getArticleViewByChild(place);
-		title = articleView ? articleView.getAttribute('tiddler') : tiddler ? tiddler.title : '';
-		titleAndSection = title + sep + sectionName;
-	}
-
-	var className = names[1] || null;
-	var args = params[0]["with"];
-	var wrapper = createTiddlyElement(place, "span", null, className, null, {
-		refresh: "content", tiddler: titleAndSection
-	});
-	if (args !== undefined)
-		wrapper.setAttribute("args", "[[" + args.join("]] [[") + "]]");
-	this.transclude(wrapper, titleAndSection, args);
-};
-
-config.macros.tiddler.transclude = function(wrapper, titleAndSection, args) {
-	var text = store.getArticleTextPartOrSlice(titleAndSection);
-	if (! text)
-		return;
-	var stack = config.macros.tiddler.tiddlerStack;
-	if (stack.indexOf(titleAndSection) !== -1)
-		return;
-	stack.push(titleAndSection);
-	try {
-		if (typeof args == "string")
-			args = args.readBracketedList();
-		var n = args ? Math.min(args.length, 9) : 0;
-		for (var i = 0; i < n; i++) {
-			var placeholderRE = new RegExp("\\$" + (i + 1),"mg");
-			text = text.replace(placeholderRE, args[i]);
-		}
-		config.macros.tiddler.renderText(wrapper, text, titleAndSection);
-	} finally {
-		stack.pop();
-	}
-};
-
-config.macros.tiddler.renderText = function(place, text, title) {
-	wikify(text, place, null, store.getArticle(title));
-};
-
-config.macros.tiddler.tiddlerStack = [];
-
 config.macros.tag.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
 	var btn = createTagButton(place, params[0], null, params[1], params[2]);
 	if (params[3]) {
@@ -2561,7 +2483,7 @@ config.refreshers = {
 		var args = e.getAttribute("args");
 		if (force != null || changeList == null || (changeList.indexOf && changeList.indexOf(title) != -1)) {
 			jQuery(e).empty();
-			config.macros.tiddler.transclude(e,title,args);
+			config.macros.transclude.transclude(e,title,args);
 			return true;
 		} else
 			return false;

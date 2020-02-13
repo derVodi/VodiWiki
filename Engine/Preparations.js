@@ -81,7 +81,7 @@ config.macros = {
 	today: {},
 	version: {},
 	search: {},
-	tiddler: {},
+	transclude: {},
 	tag: {},
 	tags: {},
 	timeline: {},
