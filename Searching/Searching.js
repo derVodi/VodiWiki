@@ -393,18 +393,18 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 	// Returns the name of the first field found that value succeeds the given test,
 	// or null when no such field is found
 	//
-	abego.MultiFieldRegExpTester.prototype.test = function(tiddler) {
+	abego.MultiFieldRegExpTester.prototype.test = function(titleOrArticle) {
 		var re = this.re;
 		// Check the fields explicitly specified
 		for (var i = 0; i < this.fields.length; i++) {
-			var s = store.getValue(tiddler, this.fields[i]);
+			var s = store.getValue(titleOrArticle, this.fields[i]);
 			if (typeof s == "string" && re.test(s))
 				return this.fields[i];		
 		}
 		// Check the extended fields (if required)
 		if (this.withExtendedFields) 
 			return store.forEachField(
-				tiddler,
+				titleOrArticle,
 				function(tiddler, fieldName, value) {
 					return typeof value == "string" && re.test(value) ? fieldName : null;
 				}, 

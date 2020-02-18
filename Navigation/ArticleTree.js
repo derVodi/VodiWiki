@@ -55,3 +55,31 @@ config.macros.articleTree.getId = function(element) {
 	while (! element.id && element.parentNode) element = element.parentNode;
 	return element.id ? element.id : "<html>";
 }
+
+function highlightArticleTree() {
+	if (typeof _PreviousCurrentArticleTreeElement !== 'undefined') _PreviousCurrentArticleTreeElement.classList.remove('current');
+
+	if (! store.currentTiddler) return; // todo: current darf nicht im store leben, sondern nur in story!
+
+	var articleTreePanel = document.getElementsByClassName('articleTreePanel')[0];
+	var nodeElement = document.querySelector('[tiddlylink="' + store.currentTiddler.title + '"]');
+	
+	if (! articleTreePanel || ! nodeElement) return;
+	
+	nodeElement.classList.add('current');	 
+
+	_PreviousCurrentArticleTreeElement = nodeElement;
+
+	var container = articleTreePanel.parentNode;	
+
+	var offsetToContainer = calcOffsetTo(nodeElement, container);
+
+	if (offsetToContainer < container.scrollTop) container.scrollTop =  Math.max(0, offsetToContainer - nodeElement.offsetHeight);
+
+	var visibleBottom = container.scrollTop + container.clientHeight;
+	var elementBottom = offsetToContainer + nodeElement.offsetHeight;
+
+	if (elementBottom > visibleBottom) {
+		container.scrollTop =  elementBottom - container.clientHeight + nodeElement.offsetHeight;
+	}		 
+}

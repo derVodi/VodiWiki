@@ -1,3 +1,31 @@
+function StringFieldAccess(n, readOnly) {
+	this.set = readOnly ?
+		function(t,v) {if (v != t[n]) throw config.messages.fieldCannotBeChanged.format([n]);} :
+		function(t,v) {if (v != t[n]) {t[n] = v; return true;}};		
+	this.get = function(article) {return article[n];};
+}
+
+function DateFieldAccess(n) {
+	this.set = function(t,v) {
+		var d = v instanceof Date ? v : Date.convertFromYYYYMMDDHHMM(v);
+		if (d != t[n]) {
+			t[n] = d; return true;
+		}
+	};
+	this.get = function(article) {return article[n].convertToYYYYMMDDHHMM();};
+}
+
+function LinksFieldAccess(n) {
+	this.set = function(t,v) {
+		var s = (typeof v == "string") ? v.readBracketedList() : v;
+		if (s.toString() != t[n].toString()) {
+			t[n] = s;
+			return true;
+		}
+	};
+	this.get = function(t) {return String.buildInternalLinksTuple(t[n]);};
+}
+
 //--
 //-- ArticleStore
 //--
@@ -543,9 +571,9 @@ ArticleStore.prototype.getTouched = function() {
 };
 
 // Resolves a Tiddler reference or tiddler title into a Tiddler object, or null if it doesn't exist
-ArticleStore.prototype.resolveTiddler = function(articleOrTitle) {
-	var t = (typeof articleOrTitle == "string") ? this.getArticle(articleOrTitle) : articleOrTitle;
-	return t instanceof Tiddler ? t : null;
+ArticleStore.prototype.getArticleByTitleOrArticle = function(titleOrArticle) {
+	var t = (typeof titleOrArticle == "string") ? this.getArticle(titleOrArticle) : titleOrArticle;
+	return (t instanceof Tiddler) ? t : null;
 };
 
 // Sort an array of articles. 
@@ -571,4 +599,76 @@ ArticleStore.prototype.sortTiddlers = function(articles, sortBy) {
 		articles.sort(function(a,b) {return a.fields[sortBy] < b.fields[sortBy] ? -asc : (a.fields[sortBy] == b.fields[sortBy] ? 0 : +asc);});
 	}
 	return articles;
+};
+
+ArticleStore.standardFieldAccess = {
+	// The set functions return true when setting the data has changed the value.
+	"title":    new StringFieldAccess("title", true),
+	// Handle the "tiddler" field name as the title
+	"tiddler":  new StringFieldAccess("title", true),
+	"text":     new StringFieldAccess("text"),
+	"modifier": new StringFieldAccess("modifier"),
+	"modified": new DateFieldAccess("modified"),
+	"creator":  new StringFieldAccess("creator"),
+	"created":  new DateFieldAccess("created"),
+	"tags":     new LinksFieldAccess("tags")
+};
+
+ArticleStore.isStandardField = function(name) {
+	return ArticleStore.standardFieldAccess[name] != undefined;
+};
+
+// Returns the value of the given field of the tiddler.
+// The fieldName is case-insensitive.
+// Will only return String values (or undefined).
+ArticleStore.prototype.getValue = function(titleOrArticle, fieldName) {
+	var a = this.getArticleByTitleOrArticle(titleOrArticle);
+	
+	if (! a) return undefined;
+
+	if (fieldName.indexOf(config.textPrimitives.sectionSeparator) === 0 || fieldName.indexOf(config.textPrimitives.sliceSeparator) === 0) {
+		var sliceType = fieldName.substr(0, 2);
+		var sliceName = fieldName.substring(2);
+		return store.getArticleTextPartOrSlice("%0%1%2".format(a.title,sliceType,sliceName));
+	} else {
+		fieldName = fieldName.toLowerCase();
+		var accessor = ArticleStore.standardFieldAccess[fieldName];
+		if (accessor) {
+			return accessor.get(a);
+		}
+	}
+	return a.fields[fieldName];
+};
+
+// Calls the callback function for every field in the tiddler.
+// When callback function returns a non-false value the iteration stops
+// and that value is returned.
+// The order of the fields is not defined.
+// @param callback a function(tiddler,fieldName,value).
+ArticleStore.prototype.forEachField = function(titleOrArticle, callback, onlyExtendedFields, sortExtendedFields) { // HACK: Das sollte am Article kleben und nicht am Store
+	var t = this.getArticleByTitleOrArticle(titleOrArticle);
+	if (! t) return undefined;
+	var result;
+		
+	// We want to sort the extended fields because they will be externalized when saving.
+	// If sorted randomly, we would produce unnecessary changes in the saved file which would pop up in any diff viewer.
+	var keys = Object.keys(t.fields); // JavaScript cannot sort t.fields hashtable directly. We rip the keys array and sort that.
+	keys.sort();
+
+	for (var i = 0; i < keys.length; i++) {
+		result = callback(t, keys[i], t.fields[keys[i]]);
+		if (result)	return result;
+	}
+
+	if (onlyExtendedFields) return undefined;
+	
+	for (var n in ArticleStore.standardFieldAccess) {
+		if (n != "tiddler") {
+			// even though the "title" field can also be referenced through the name "tiddler"
+			// we only visit this field once.
+			result = callback(t, n, ArticleStore.standardFieldAccess[n].get(t));
+			if (result)	return result;
+		}
+	}
+	return undefined;
 };
