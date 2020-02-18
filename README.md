@@ -14,9 +14,18 @@ VodiWiki is based on TiddliWiki 2.8.1 by [Jeremy Ruston](https://github.com/Jerm
 
 ## Working With The Source Code
 
-* Just clone/download - the index.html can right be started in any browser
-* Referenced JS files are structured in problem domain specific directories (like "Saving")
-* There is "MyLinker.cs" which does nothing but packing the HTML + JS files into a monolithic HTML file
+* Clone/download
+* You _can_ start indext.html right away, but saving won't work, because in the saved file all JS will be missing
+
+### Building a fully working, monolithic HTML
+
+First build the linker, e.g. using such a command line...
+
+    "command": "\"C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe\" /nologo /out:Building\\MyLinker.exe Building\\MyLinker.cs"
+
+...the invoke the linker with the right arguments, e.g. like this:
+
+    "command": "Building\\MyLinker.exe - index.html Out\\Empty.html Out\\Original.html",
 
 ## Work in Progress
 
