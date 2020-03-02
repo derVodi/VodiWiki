@@ -45,8 +45,8 @@ Popup.place = function(root, popup, valign, halign, offset) {
 	var popupLeft = rootLeft + offset.x;
 	var popupTop = rootTop + offset.y;
 	var winWidth = findWindowWidth();
-	if (popup.offsetWidth > winWidth*0.75)
-		popup.style.width = winWidth*0.75 + "px";
+	if (popup.offsetWidth > winWidth * 0.75)
+		popup.style.width = winWidth * 0.75 + "px";
 	var popupWidth = popup.offsetWidth;
 	var scrollWidth = winWidth - document.body.offsetWidth;
 	if (popupLeft + popupWidth > winWidth - scrollWidth - 1) {
@@ -61,27 +61,24 @@ Popup.place = function(root, popup, valign, halign, offset) {
 };
 
 Popup.find = function(e) {
-	var t,pos = -1;
-	for (t = this.stack.length - 1; t >= 0; t--) {
-		if (isDescendant(e, this.stack[t].popup))
-			pos = t;
+	var i,pos = -1;
+	for (i = this.stack.length - 1; i >= 0; i--) {
+		if (isDescendant(e, this.stack[i].popup)) pos = i;
 	}
 	return pos;
 };
 
 Popup.remove = function(pos) {
-	if (!pos) pos = 0;
-	if (Popup.stack.length > pos) {
-		Popup.removeFrom(pos);
-	}
+	if (! pos) pos = 0;
+	if (Popup.stack.length > pos) Popup.removeFrom(pos);
 };
 
 Popup.removeFrom = function(from) {
-	var t;
-	for (t = Popup.stack.length - 1; t >= from; t--) {
-		var p = Popup.stack[t];
+	var i;
+	for (i = Popup.stack.length - 1; i >= from; i--) {
+		var p = Popup.stack[i];
 		jQuery(p.root).removeClass("highlight");
 		jQuery(p.popup).remove();
 	}
-	Popup.stack = Popup.stack.slice(0,from);
+	Popup.stack = Popup.stack.slice(0, from);
 };

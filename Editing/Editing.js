@@ -115,3 +115,23 @@ config.commands.deleteArticle.handler = function(event, src, title) { // Impleme
 	}
 	return false;
 };
+
+// Zähle, der wievielte Treffer das Wort needle im DOM ist, wenn man bis zum Anker (=selektierter Node) navigiert.
+function recurseViewer(node, anchor, needle) {
+	for (var i = 0; i < node.childNodes.length; i++) {
+		var child = node.childNodes[i];
+		if (child.nodeType == Node.TEXT_NODE) {
+		  if (child.nodeValue.indexOf(needle) >= 0) {
+				recurseViewerOccurance++;
+				if (child == anchor) {
+					return false;
+				}
+			}
+		}
+		var cont = recurseViewer(child, anchor, needle);
+		if (! cont) {
+			return false;
+		}	
+	}
+	return true;
+}

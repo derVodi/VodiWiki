@@ -85,3 +85,16 @@ function onLinkElementClicked(ev) {
 			
 	return false;
 }
+
+config.macros.anchor = {};
+
+// params[0] - Name
+// params[1] - Label
+// e.g. <<anchor 'MyAnchorName' 'Here is an explicite anchor'>>, can be linked to by
+// e.g. [[Local link to a named anchor|##MyAnchorName]]
+config.macros.anchor.handler = function(place, macroName, params) { // Implements IMacroResolver.handler()
+	var e =	createTiddlyElement(place, "a");
+	e.name = params[0];
+	e.text = params[1];
+	e.className = "anchor";
+};

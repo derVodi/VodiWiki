@@ -3,18 +3,6 @@ var storeAreaStartRE = /<((div)|(DIV)) ((id)|(ID))=["']?storeArea['"]?>/; // Use
 var storeAreaEndString = '</d' + 'iv>';
 var storeAreaEndStringUpperCase = '</D' + 'IV>';
 
-function blobToNewArticle(blob, cb){
-	blobToDataUrlAsync(blob, function(dataUrl){
-		article = new Tiddler();
-		var now = new Date();
-		var title = now.convertToYYYYMMDDHHMMSSMMM();
-		article.set(title, dataUrl, config.views.wikified.defaultModifier, now, null, now);
-		article.kind = "$";
-		store.addTiddler(article);
-		if (cb) cb(title, article);
-	});
-}
-
 function blobToDataUrlAsync(blob, cb){
 	var reader = new FileReader();
 	reader.onloadend = function() { cb(reader.result); }
