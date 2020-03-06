@@ -896,7 +896,7 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 					if (t.isMatch) {
 						createTiddlyElement(place,"span",null,"marked",text);
 					} else {
-						createTiddlyText(place, text);
+						appendTextNodeTo(place, text);
 					}
 					remainingLen -= text.length;
 				}
@@ -1437,17 +1437,17 @@ if (! window.abego) { // Ensure_that_the_Plugin_is_only_installed_once.
 				if (getLastResultsCount()) {
 					var lastIndex = pager.getLastIndexOnPage();
 					var s = "%0 - %1".format([pager.getFirstIndexOnPage()+1,lastIndex+1]);
-					createTiddlyText(place, s);
+					appendTextNodeTo(place, s);
 				}
 			},
 			
 			count: function(place) {
-				createTiddlyText(place, getLastResultsCount().toString());
+				appendTextNodeTo(place, getLastResultsCount().toString());
 			},
 			
 			query: function(place) {
 				if (lastQuery) {
-					createTiddlyText(place, lastQuery.toString());
+					appendTextNodeTo(place, lastQuery.toString());
 				}
 			},
 			

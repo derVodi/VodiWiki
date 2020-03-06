@@ -242,7 +242,7 @@ merge(config.commands.cancelEditing,{
 });
 
 merge(config.commands.deleteArticle,{
-	text: "🗙 Delete",
+	text: "⨯ Delete",
 	tooltip: "Delete This Article",
 	warning: "Are you sure you want to delete '%0'?"
 });

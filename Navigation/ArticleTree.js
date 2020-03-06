@@ -18,7 +18,7 @@ config.macros.articleTree.createSubTree = function(place, id, parentTitle, level
 	
 	if (! subArticles.length) {
 		if (! firstLeaf) firstLeaf = parentTitle;
-		createTiddlyText(renderLinkElement(place, parentTitle, false, "leaf"), parentTitle); // leaf
+		appendTextNodeTo(renderLinkElement(place, parentTitle, false, "leaf"), parentTitle); // leaf
 		return;
 	}
 		

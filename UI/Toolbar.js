@@ -103,7 +103,7 @@ config.macros.toolbar.handler = function(place, macroName, params, wikifier, par
 		var commandName = params[i];
 		switch (commandName) {
 		case "!":
-			createTiddlyText(place, this.separator);
+			appendTextNodeTo(place, this.separator);
 			break;
 		case "*":
 			createTiddlyElement(place,"br");

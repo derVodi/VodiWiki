@@ -10,8 +10,7 @@ config.macros.option.genericCreate = function(place, optionTypeName, optionName,
 	if (config.optionsDesc[optionName])
 		element.setAttribute('title', config.optionsDesc[optionName]);
 	place.appendChild(element);
-	if (desc != 'no')
-		createTiddlyText(place, config.optionsDesc[optionName] || optionName);
+	if (desc != 'no') appendTextNodeTo(place, config.optionsDesc[optionName] || optionName);
 	element[typeInfo.valueField] = config.options[optionName];
 	return element;
 };

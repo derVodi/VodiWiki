@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 0, revision: 11};
+var version = {title: "VodiWiki", major: 1, minor: 0, revision: 12};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -217,6 +217,7 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 .highlight, .marked, .toBeImported .tiddlyLinkExisting {background: yellow;}
 .backstageTabHead:hover, .button:hover, .wizardFooter .button:hover {background-color: khaki;}
 .dualColorTable tbody td:first-child, .listView tbody td:first-child {background-color: #DEEBF6;} /* Blue 80% */
+.tinted {background: bisque;} /* Orange 80% */
 .error, .errorButton {background: #f88;} /* Red */
 .wizardFooter .button {background-color: lightgrey;}
 .tab:hover {background-color:#BFBFBF;}
@@ -642,7 +643,7 @@ Some dummy text.
 !Links &amp; Stylings
 
 &lt;html&gt;&lt;pre&gt;
-Regular Text with @@highlighted@@ part.
+Regular Text with @@tinted@@ part.
 
 Link to wiki page with title [[Syntax Reference]]
 
@@ -656,7 +657,7 @@ Line breaks are possible.
 {{TODO{Marks an unfinished part of an article}}}
 &lt;/pre&gt;&lt;/html&gt;
 
-Regular Text with @@highlighted@@ part.
+Regular Text with @@tinted@@ part.
 
 Link to wiki page with title [[Syntax Reference]]
 
@@ -717,7 +718,7 @@ Several lines of blockquoted text.
 </div>
 <div title="Syntax Reference" created="201208280946" modified="202001260754" modifier="Anonymous" changecount="50" parenttitle="​Reference">
 <pre>|Headings|Lists|Lists|Formatting|Code|h
-|{{{!Heading 1}}}&lt;br&gt;{{{!!Heading 2}}}&lt;br&gt;{{{!!!Heading 3}}}|{{{*Unordered 1}}}&lt;br&gt;{{{**Unordered 2}}}&lt;br&gt;{{{***Unordered 3}}}|{{{#Ordered 1}}}&lt;br&gt;{{{##Ordered 2}}}&lt;br&gt;{{{###Ordered 3}}}|{{{''Bold text''}}}&lt;br&gt;{{{//Italic text//}}}&lt;br&gt;{{{--Strikethrough text--}}}&lt;br&gt;{{{@@Highlighted text@@}}}&lt;br&gt;{{{{{notice{Your notice text.}}}}}}&lt;br&gt;{{{@@css:value;css:value;text@@}}}&lt;br&gt;{{{{{class{styled text}}}}}}|&lt;html&gt;&lt;code&gt;{{{Monospaced text}}}&lt;/code&gt;&lt;/html&gt;&lt;br&gt;&quot;&quot;&quot;{{{&quot;&quot;&quot;&lt;br&gt;{{{ Code Block}}}&lt;br&gt;&quot;&quot;&quot;}}}&quot;&quot;&quot;|
+|{{{!Heading 1}}}&lt;br&gt;{{{!!Heading 2}}}&lt;br&gt;{{{!!!Heading 3}}}|{{{*Unordered 1}}}&lt;br&gt;{{{**Unordered 2}}}&lt;br&gt;{{{***Unordered 3}}}|{{{#Ordered 1}}}&lt;br&gt;{{{##Ordered 2}}}&lt;br&gt;{{{###Ordered 3}}}|{{{''Bold text''}}}&lt;br&gt;{{{//Italic text//}}}&lt;br&gt;{{{--Strikethrough text--}}}&lt;br&gt;{{{@@Tinted text@@}}}&lt;br&gt;{{{{{notice{Your notice text.}}}}}}&lt;br&gt;{{{@@css:value;css:value;text@@}}}&lt;br&gt;{{{{{class{styled text}}}}}}|&lt;html&gt;&lt;code&gt;{{{Monospaced text}}}&lt;/code&gt;&lt;/html&gt;&lt;br&gt;&quot;&quot;&quot;{{{&quot;&quot;&quot;&lt;br&gt;{{{ Code Block}}}&lt;br&gt;&quot;&quot;&quot;}}}&quot;&quot;&quot;|
 
 |Tables|Linking &amp; Embedding|Escaping|h
 |{{{|Table caption|c}}}&lt;br&gt;{{{|Heading 1|Heading 2|h}}}&lt;br&gt;{{{|Table|Footer|f}}}&lt;br&gt;{{{|!Heading 1|!Heading 2|}}}&lt;br&gt;{{{| Centered |cell|}}}&lt;br&gt;{{{|Left-Aligned |cell|}}}&lt;br&gt;{{{| Right-Aligned|cell|}}}&lt;br&gt;{{{|bgcolor(blue):Coloured|cell|}}}&lt;br&gt;{{{|&gt;|Colspan cell|}}}&lt;br&gt;{{{|Rowspan|cells|}}}&lt;br&gt;{{{|~|~|}}}|{{{[[PageTitle]]}}}&lt;br&gt;{{{[[Label|PageTitle]]}}}&lt;br&gt;{{{[[Label|##PageElement]]}}}&lt;br&gt;{{{[[Label|PageTitle##PageElement]]}}}&lt;br&gt;{{{[[Label|https://foo.com]]}}}&lt;br&gt;{{{[img[Label|LocalFileName.png]]}}}&lt;br&gt;{{{[img[Label|LocalFileName.png][PageTitle]]}}}&lt;br&gt;{{{[img[Label|LocalFileName.png][https://foo.com]]}}}|{{{&lt;br&gt;}}} - Line Break&lt;br&gt;{{{&quot;&quot;&quot;Escaped Text&quot;&quot;&quot;}}}&lt;br&gt;{{{/%Invisible Comment%/}}}&lt;br&gt;{{{&lt;html&gt;Raw HTML&lt;/html&gt;}}}|
@@ -734,10 +735,16 @@ txtWikiTitle: VodiWiki
 </pre>
 </div>
 <div title="Unicode Collection" created="201907110746" modified="202002091613" modifier="Anonymous" changecount="132" parenttitle="​Reference">
-<pre>{{notice{
+<pre>&lt;html&gt;
+	&lt;style&gt;
+		.arrowsTable1 tbody td:nth-child(n+7):nth-child(-n+11), td[align=center] {background: bisque;}
+	&lt;/style&gt;
+&lt;/html&gt;{{notice{
 Some of the glyphs are composed of 2 characters: The glyph itself + FE0E (&quot;Variation Selector 15&quot;).
 Otherwise you loose control over the appearance of the glyph and the browsers will  render them as colorful emoji.
 }}}
+
+The @@tinted@@ glyphs do not show up in Windows 7.
 
 !Spaces &amp; Control Characters
 
@@ -747,59 +754,61 @@ Otherwise you loose control over the appearance of the glyph and the browsers wi
 
 !Arrows
 
-|&gt;|&gt;|&gt;|&gt;|Regular||&gt;|&gt;|&gt;|&gt;|Triangle Head||&gt;|&gt;|&gt;|&gt;|Black||&gt;|&gt;|&gt;|&gt;|White|
-|←|→|↖|↗|↔|~|⭠|⭢|⭦|⭧|⭤ |~|⬅|➡|⬉|⬈|⬌|~|⇦|⇨|⬁|⬀|⬄|
-|↑|↓|↙|↘|↕|~|⭡|⭣|⭩|⭨|⭥|~|⬆|⬇|⬋|⬊|⬍|~|⇧|⇩|⬃|⬂|⇳|
-|⇇|⇉|⇆|⇄|⤡|~|⮄|⮆|⮀|⮂||~||||||~|⇐|⇒|⇖|⇗|⇔|
-|⇈|⇊|⇅|⇵|⤢|~|⮅|⮇|⮁|⮃||~||||||~|⇑|⇓|⇙|⇘|⇕|
-|↱|↰|⬐|⬎||~|⮣|⮢|⮦|⮧||~|⮫|⮪|⮮|⮯||~|⮳|⮲|⮶|⮷||
-|↳|↲|⬑|⬏||~|⮡|⮠|⮤|⮥||~|⮩|⮨|⮬ |⮭||~|⮱|⮰|⮴|⮵||
-|⇤|⇥|⇱||↹|~|⭰|⭲|⭶|⭷|⭾|~||||||~|⇽|⇾|||⇿|
-|⤒|⤓||⇲|↨|~|⭱|⭳|⭹|⭸|⭿|~||||||~||||||
-|⇠|⇢||||~|⭪|⭬ |⮌|⮎||~||||||~||||||
-|⇡|⇣||||~|⭫|⭭|⮍|⮏||~||||||~||||||
+{{arrowsTable1{
+|&gt;|&gt;|&gt;|&gt;|Regular||&gt;|&gt;|&gt;|&gt;|Triangle Head||&gt;|&gt;|&gt;|&gt;|Black||&gt;|&gt;|&gt;|&gt;|White|h
+|←|→|↖|↗|↔||⭠|⭢|⭦|⭧|⭤ ||⬅|➡|⬉|⬈|⬌||⇦|⇨|⬁|⬀|⬄|
+|↑|↓|↙|↘|↕| |⭡|⭣|⭩|⭨|⭥||⬆|⬇|⬋|⬊|⬍||⇧|⇩|⬃|⬂|⇳|
+|⇇|⇉|⇆|⇄|⤡| |⮄|⮆|⮀|⮂|||||||||⇐|⇒|⇖|⇗|⇔|
+|⇈|⇊|⇅|⇵|⤢| |⮅|⮇|⮁|⮃|||||||||⇑|⇓|⇙|⇘|⇕|
+|↱|↰|⬐|⬎|| |⮣|⮢|⮦|⮧||| ⮫ | ⮪ | ⮮ | ⮯ ||| ⮳ | ⮲ | ⮶ | ⮷ ||
+|↳|↲|⬑|⬏|| |⮡|⮠|⮤|⮥||| ⮩ | ⮨ | ⮬ | ⮭ ||| ⮱ | ⮰ | ⮴ | ⮵ ||
+|⇤|⇥|⇱||↹| |⭰|⭲|⭶|⭷|⭾||||||| |⇽|⇾|||⇿|
+|⤒|⤓||⇲|↨| |⭱|⭳|⭹|⭸|⭿||||||| ||||||
+|⇠|⇢|||| |⭪|⭬ |⮌|⮎|| |||||| ||||||
+|⇡|⇣|||| |⭫|⭭|⮍|⮏|| |||||| ||||||
+}}}
 
 |↤|↦|↥|↧|⍇|⍈|⍐|⍗||⟵|⟶|⟷|⟻|⟼|⬳|⟿|
 |⬸|⤑|⤌|⤍|⤎|⤏|⤝|⤞|~|⟸|⟹|⟺|⟽|⟾|||
 
-|⤶|⤷|⤴|⤵|⟲|⟳|↺|↻|🗘|⮔|↵|↯|⚡︎︎|
-|↩|↪|↶|↷|⥀|⥁|🔄︎︎|🔁︎︎|🔃︎︎||⏎|⭍||
+|⤶|⤷|⤴|⤵|⟲|⟳|↺|↻| 🗘 | ⮔ |↵|↯|⚡︎︎|
+|↩|↪|↶|↷|⥀|⥁|🔄︎︎|🔁︎︎|🔃︎︎||⏎| ⭍ ||
 
 |◀|▶|▲|▼|◢|◣|◥|◤|◄|►|≺|≻|∧|∨|⋖|⋗|⌲|⸢|⸣|⸝|⸜|◜|◝|
-|◁|▷|△|▽|◿|◺|◹|◸|◅|▻|⮜|⮞|⮝|⮟|≪|≫|◬|⸤|⸥|⸌|⸍|◟|◞|
-|◂|▸|▴|▾|◃|▹|▵|▿||⌳|⮘|⮚|⮙|⮛|⋘|⋙|⌵|⌈|⌉|「|」|◠|
+|◁|▷|△|▽|◿|◺|◹|◸|◅|▻| ⮜ | ⮞ | ⮝ | ⮟ |≪|≫|◬|⸤|⸥| ⸌ | ⸍ |◟|◞|
+|◂|▸|▴|▾|◃|▹|▵|▿||⌳| ⮘ | ⮚ | ⮙ | ⮛ |⋘|⋙|⌵|⌈|⌉|「|」|◠|
 |||||||||||⍃|⍄|⍓|⍌|〈|〉||⌊|⌋|『|』|◡|
 
 !UI Widgets
 
-|🗔|🗕|🗖|🗗|🗙|⨯|⌵|☰|…|⋮|⌂|🏠︎︎|⚙|⛭|⏣|⚒|✎|🖉|
-|📄︎︎|📂︎︎|💾︎︎|✂|🗐|📋︎︎|↶|↷|👤︎︎|👥︎︎|🝖|🔎︎︎|⎗|⎘|🗑|
-|💾︎︎| 📁︎︎|📂︎︎|📁︎︎|📂︎︎|🖿|🗀|🗁|🖴|🖧|🗄|🗜|
-|📄︎︎|📃︎︎|📜︎︎|🗆|🗅|🗌|🗋|🗉|🗈|🗏|🗎|🖹|🗇|🗊|🗍|🗐|
-|🗒|🗓|📝︎︎|📋︎︎|📛︎︎|🗟|🖺|🖻|🖼|🖽|🖾|
-|💻︎︎|🖳|🖵|🖥|⌨|🖮|⎙|🗑|🕓︎︎|
-|🛈|⚠|⮿|🅧|☐|☑|☒|⚪︎︎|🔘︎︎|🗸|✓|✔|
-|⚓︎︎|🔗︎︎|🔒︎︎|🔓︎︎|🔏︎︎|🔐︎︎|⚿|🔑︎︎|🗝|🌍︎︎|🌐︎︎|
-|🗢|🗣|🗨|💬︎︎|🗪|🗫|🗬|🗭|🗮|🗯|🗰|💭|
+| 🗔 | 🗕 | 🗖 | 🗗 | 🗙 |⨯|⌵|☰|…|⋮|⌂|🏠︎︎|⚙| ⛭ |⏣|⚒|✎| 🖉 |
+|📄︎︎|📂︎︎|💾︎︎|✂| 🗐 |📋︎︎|↶|↷|👤︎︎|👥︎︎| 🝖 |🔎︎︎|⎗|⎘|🗑|
+|💾︎︎| 📁︎︎|📂︎︎|📁︎︎|📂︎︎| 🖿 | 🗀 | 🗁 | 🖴 | 🖧 |🗄|🗜|
+|📄︎︎|📃︎︎|📜︎︎| 🗆 | 🗅 | 🗌 | 🗋 | 🗉 | 🗈 | 🗏 | 🗎 | 🖹 | 🗇 | 🗊 | 🗍 | 🗐 |
+|🗒|🗓|📝︎︎|📋︎︎|📛︎︎| 🗟 | 🖺 | 🖻 |🖼| 🖽 | 🖾 |
+|💻︎︎| 🖳 | 🖵 |🖥|⌨| 🖮 |⎙|🗑|🕓︎︎|
+|ⓘ| 🛈 |⚠| ⮿ | 🅧 |☐|☑|☒|⚪︎︎|🔘︎︎| 🗸 |✓|✔|
+|⚓︎︎|🔗︎︎|🔒︎︎|🔓︎︎|🔏︎︎|🔐︎︎| ⚿ |🔑︎︎|🗝|🌍︎︎|🌐︎︎|
+| 🗢 |🗣|🗨|💬︎︎| 🗪 | 🗫 | 🗬 | 🗭 | 🗮 |🗯| 🗰 |💭|
 
 !Abstract
 
-|·|•|⚉|⚫︎︎|●|⬤|◦|⚬|⚪|○|○|◯|☉|⚇|⊙|⊚|⦾|⦿|⊛|⊝|⊜|⊕|⊖|⊗|⊘|◌|◍|◎|◖|◗|⯊|⯋|
+|·|•|⚉|⚫︎︎|●|⬤|◦|⚬|⚪|○|○|◯|☉|⚇|⊙|⊚|⦾|⦿|⊛|⊝|⊜|⊕|⊖|⊗|⊘|◌|◍|◎|◖|◗| ⯊ | ⯋ |
 |Ⓞ|①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|♾|
-|▪|◾|◼|■|⬛︎︎|▫|◽|◻|□|⬜|🔲︎︎|🔳︎︎|🖵|⛶|⛚|⊞|⊟|⊠|⊡|▣|⛋|🝙|🝚|▍|
-|◆|⋄|◇|⎔|⬟|⬢|⬣|🔶︎︎|🔷︎︎|🔸︎︎|🔹︎︎|◈|⟐|💠︎︎|🞡|🞢|🞣|🞤|🞥|🞦|🞧|✙|✚|✛|✜|
+|▪|◾|◼|■|⬛︎︎|▫|◽|◻|□|⬜|🔲︎︎|🔳︎︎| 🖵 | ⛶ | ⛚ |⊞|⊟|⊠|⊡|▣| ⛋ | 🝙 | 🝚 |▍|
+|◆|⋄|◇|⎔|⬟|⬢|⬣|🔶︎︎|🔷︎︎|🔸︎︎|🔹︎︎|◈|⟐|💠︎︎| 🞡 | 🞢 | 🞣 | 🞤 | 🞥 | 🞦 | 🞧 |✙|✚|✛|✜|
 |⿰|⿱|⿳|⿲|⿴|⿵|⿶|⿷|⿸|⿹|⿺|⿻|▤|▥|▦|⩩|⫵|
 |☷|☰|≡|≣|⌯|⚌|⚏|𝌮|𝌀|𝌅|𝍖|𝌠|𝍔|𝌞|⠸|⠇|⡆|⠐|⠒|⠛|⠤|⠨|⠭|⠶|⠿|⣿|…|⋮|⋮|⋯|⋰|⋱|﹍|
-|⑅|⑀|⑁|⑂|⑃|⑄|🝗|🝘|🜙|⊶|⊷|⊸|⚯|🜺|🝓|🝢|☍|☌|🝯|🝰|☊|☋|⎌|⚮|⚭|🝆|⚲|🜣|⟟|⫱|🜽|⍝|⊍|
+|⑅|⑀|⑁|⑂|⑃|⑄| 🝗 | 🝘 | 🜙 |⊶|⊷|⊸|⚯| 🜺 | 🝓 | 🝢 |☍|☌| 🝯 | 🝰 |☊|☋|⎌|⚮|⚭| 🝆 |⚲| 🜣 |⟟|⫱| 🜽 |⍝|⊍|
 |⎎|⏍|⍞|⍠|⎕|⎄|⎅|␣|⌴|⍽|⎍|⌶|⏙|⟝|⟞|⊢|⊣|⊤|⊥|⟛|⧿|ꕯ|⥐|
 
 !Emojis
 
 ¯ \ _ (ツ) _ / ¯
-|ꙭ|Ꙭ|👀|💩|💣|💤|👑|🜲|⚡|
-|😃|😢|👍|👎|🖕|❤️|💀|🕱|💬|
-|🖖|👽|👾|⍾|🜶|🜸|☄|🕳|
-|📄|🗐|📋|👤|👥|🔎|🔄|🔁|🔃|
+|ꙭ|Ꙭ|👀|💩|💣|💤|👑| 🜲 |⚡|
+|😃|😢|👍|👎|🖕|❤️|💀| 🕱 |💬|
+|🖖|👽|👾|⍾| 🜶 | 🜸 |☄|🕳|
+|📄| 🗐 |📋|👤|👥|🔎|🔄|🔁|🔃|
 |💻|💾| 📁|📂|📁|📂|🕓|
 |⚓|🔗|🔒|🔓|🔏|🔐|🔑|🌍|🌐|
 |⚫|⬛|🔲|🔳|🔶|🔷|🔸|🔹|💠|
@@ -1022,7 +1031,7 @@ function getParser(tiddler, format) {
 	return formatter;
 }
 
-function Wikifier(wikiSyntaxText, formatter, highlightRegExp, tiddler) {
+function Wikifier(wikiSyntaxText, formatter, highlightRegExp, article) {
 	this.source = wikiSyntaxText;
 	this.output = null;
 	this.formatter = formatter;
@@ -1034,7 +1043,7 @@ function Wikifier(wikiSyntaxText, formatter, highlightRegExp, tiddler) {
 		highlightRegExp.lastIndex = 0;
 		this.highlightMatch = highlightRegExp.exec(wikiSyntaxText);
 	}
-	this.tiddler = tiddler;
+	this.tiddler = article;
 }
 
 Wikifier.prototype.wikifyPlain = function() {
@@ -1098,11 +1107,10 @@ Wikifier.prototype.subWikifyTerm = function(output, terminatorRegExp) {
 	terminatorRegExp.lastIndex = this.nextMatch;
 	var terminatorMatch = terminatorRegExp.exec(this.source);
 	this.formatter.formatterRegExp.lastIndex = this.nextMatch;
-	var formatterMatch = this.formatter.formatterRegExp.exec(terminatorMatch ? this.source.substr(0,terminatorMatch.index) : this.source);
+	var formatterMatch = this.formatter.formatterRegExp.exec(terminatorMatch ? this.source.substr(0, terminatorMatch.index) : this.source);
 	while (terminatorMatch || formatterMatch) {
 		if (terminatorMatch && (!formatterMatch || terminatorMatch.index <= formatterMatch.index)) {
-			if (terminatorMatch.index > this.nextMatch)
-				this.outputText(this.output,this.nextMatch,terminatorMatch.index);
+			if (terminatorMatch.index > this.nextMatch) this.outputText(this.output,this.nextMatch,terminatorMatch.index);
 			this.matchText = terminatorMatch[1];
 			this.matchLength = terminatorMatch[1].length;
 			this.matchStart = terminatorMatch.index;
@@ -1110,14 +1118,13 @@ Wikifier.prototype.subWikifyTerm = function(output, terminatorRegExp) {
 			this.output = oldOutput;
 			return;
 		}
-		if (formatterMatch.index > this.nextMatch)
-			this.outputText(this.output,this.nextMatch,formatterMatch.index);
+		if (formatterMatch.index > this.nextMatch) this.outputText(this.output,this.nextMatch,formatterMatch.index);
 		this.matchStart = formatterMatch.index;
 		this.matchLength = formatterMatch[0].length;
 		this.matchText = formatterMatch[0];
 		this.nextMatch = this.formatter.formatterRegExp.lastIndex;
 		var t;
-		for (t=1; t<formatterMatch.length; t++) {
+		for (t = 1; t < formatterMatch.length; t++) {
 			if (formatterMatch[t]) {
 				this.formatter.formatters[t-1].handler(this);
 				this.formatter.formatterRegExp.lastIndex = this.nextMatch;
@@ -1129,26 +1136,26 @@ Wikifier.prototype.subWikifyTerm = function(output, terminatorRegExp) {
 		formatterMatch = this.formatter.formatterRegExp.exec(terminatorMatch ? this.source.substr(0,terminatorMatch.index) : this.source);
 	}
 	if (this.nextMatch < this.source.length) {
-		this.outputText(this.output,this.nextMatch,this.source.length);
+		this.outputText(this.output, this.nextMatch, this.source.length);
 		this.nextMatch = this.source.length;
 	}
 	this.output = oldOutput;
 };
 
+// Renders a region of wikiSyntaxText (from constructor parameter) into the "place" element and highlights substrings that match this.highlightRegExp
 Wikifier.prototype.outputText = function(place, startPos, endPos) {
 	while (this.highlightMatch && (this.highlightRegExp.lastIndex > startPos) && (this.highlightMatch.index < endPos) && (startPos < endPos)) {
 		if (this.highlightMatch.index > startPos) {
-			createTiddlyText(place, this.source.substring(startPos, this.highlightMatch.index));
+			appendTextNodeTo(place, this.source.substring(startPos, this.highlightMatch.index));
 			startPos = this.highlightMatch.index;
 		}
 		var highlightEnd = Math.min(this.highlightRegExp.lastIndex,endPos);
-		createTiddlyElement(place,"span",null,"highlight",this.source.substring(startPos,highlightEnd));
+		createTiddlyElement(place, "span", null, "highlight", this.source.substring(startPos, highlightEnd));
 		startPos = highlightEnd;
-		if (startPos >= this.highlightRegExp.lastIndex)
-			this.highlightMatch = this.highlightRegExp.exec(this.source);
+		if (startPos >= this.highlightRegExp.lastIndex) this.highlightMatch = this.highlightRegExp.exec(this.source);
 	}
 	if (startPos < endPos) {
-		createTiddlyText(place,this.source.substring(startPos,endPos));
+		appendTextNodeTo(place,this.source.substring(startPos,endPos));
 	}
 };
 
@@ -1436,7 +1443,7 @@ config.macros.tags.handler = function(place, macroName, params, wikifier, paramS
 	for (t = 0; t < tiddler.tags.length; t++) {		
 		if (! label) label = createTiddlyElement(ul, "li", null, "listTitle", lingo.labelTags.format([tiddler.title]));
 		createTagButton(createTiddlyElement(ul, "li"), tiddler.tags[t], tiddler.title);
-		if (t < tiddler.tags.length - 1) createTiddlyText(ul, sep);
+		if (t < tiddler.tags.length - 1) appendTextNodeTo(ul, sep);
 	}
 	if (! label) createTiddlyElement(ul, "li", null, "listTitle", lingo.labelNoTags.format([tiddler.title]));
 };
@@ -1474,56 +1481,54 @@ config.macros.message.handler = function(place, macroName, params) { // Implemen
 			return null;
 	};
 	var m = lookupMessage(config, 0);
-	if (m == null)
-		m = lookupMessage(window, 0);
-	createTiddlyText(place, m.toString().format(params.splice(1)));
+	if (m == null) m = lookupMessage(window, 0);
+	appendTextNodeTo(place, m.toString().format(params.splice(1)));
 };
 
 
 config.macros.view.depth = 0;
 config.macros.view.values = [];
 config.macros.view.views = {
-	text: function(value,place,params,wikifier,paramString,tiddler) {
-		highlightify(value, place, highlightHack, tiddler);
+	text: function(value, place, params, wikifier, paramString, article) {
+		highlightify(value, place, highlightHack, article);
 	},
 	link: function(value, place, params, wikifier, paramString, tiddler) {
 		renderLinkElement(place, value, true);
 	},
-	wikified: function(value,place,params,wikifier,paramString,tiddler) {
-		if (config.macros.view.depth>50)
-			return;
-		if (config.macros.view.depth>0) {
-			if (value==config.macros.view.values[config.macros.view.depth-1]) {
+	wikified: function(value, place, params, wikifier, paramString, tiddler) {
+		if (config.macros.view.depth > 50) return;
+		if (config.macros.view.depth > 0) {
+			if (value == config.macros.view.values[config.macros.view.depth - 1]) {
 				return;
 			}
 		}
 		config.macros.view.values[config.macros.view.depth] = value;
 		config.macros.view.depth++;
-		if (params[2])
-			value=params[2].unescapeLineBreaks().format([value]);
+		if (params[2]) value = params[2].unescapeLineBreaks().format([value]);
 		wikify(value, place, highlightHack, tiddler);
 		config.macros.view.depth--;
 		config.macros.view.values[config.macros.view.depth] = null;
 	},
 	date: function(value,place,params,wikifier,paramString,tiddler) {
 		value = Date.convertFromYYYYMMDDHHMM(value);
-		createTiddlyText(place,value.formatString(params[2] || config.views.wikified.dateFormat));
+		appendTextNodeTo(place,value.formatString(params[2] || config.views.wikified.dateFormat));
 	}
 };
 
-config.macros.view.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
-	if ((tiddler instanceof Tiddler) && params[0]) {
-		var value = store.getValue(tiddler,params[0]);
+// params[0] - the name of an article's property the value of which shall be rendered
+// params[1] - the name of a view handler (text, link, wikified, date)) that shall be used to render the value
+config.macros.view.handler = function(place, macroName, params, wikifier, paramString, article) { // Implements IMacroResolver.handler()
+	if ((article instanceof Tiddler) && params[0]) {
+		var value = store.getValue(article, params[0]);
 		if (value) {
 			var type = params[1] || config.macros.view.defaultView;
 			var handler = config.macros.view.views[type];
-			if (handler)
-				handler(value,place,params,wikifier,paramString,tiddler);
+			if (handler) handler(value, place, params, wikifier, paramString, article);
 		}
 	}
 };
 
-config.macros.edit.handler = function(place,macroName,params,wikifier,paramString,tiddler) { // Implements IMacroResolver.handler()
+config.macros.edit.handler = function(place, macroName, params, wikifier, paramString, tiddler) { // Implements IMacroResolver.handler()
 	var field = params[0];
 	var rows = params[1] || 0;
 	var defVal = params[2] || '';
@@ -1811,8 +1816,8 @@ function refreshElements(root, changeList) {
 }
 
 // scans html code for elements with macro attributes and executes the macros. E.g. <span macro="version"></span>
-function applyHtmlMacros(root, tiddler) {
-	var e = root.firstChild;
+function applyHtmlMacros(containerElement, article) {
+	var e = containerElement.firstChild;
 	while (e) {
 		var nextChild = e.nextSibling;
 		if (e.getAttribute) {
@@ -1825,10 +1830,10 @@ function applyHtmlMacros(root, tiddler) {
 					params = macro.substr(p + 1);
 					macro = macro.substr(0, p);
 				}
-				invokeMacro(e, macro, params, null, tiddler);
+				invokeMacro(e, macro, params, null, article);
 			}
 		}
-		if (e.hasChildNodes()) applyHtmlMacros(e, tiddler);
+		if (e.hasChildNodes()) applyHtmlMacros(e, article); // recursion!
 		e = nextChild;
 	}
 }

@@ -398,7 +398,7 @@ config.formatters = [
 				linkElement = renderLinkElement(w.output, text, false, null, w.isStatic);
 			}
 			if (text.substring(0, 2) == config.textPrimitives.sectionSeparator) text = text.substring(2); // remove leading "##" of local section links.
-			createTiddlyText(linkElement, text); // before, the linkElement has been rendered without innerHtml. We've now inserted the text as innerHtml.
+			appendTextNodeTo(linkElement, text); // before, the linkElement has been rendered without innerHtml. We've now inserted the text as innerHtml.
 			w.nextMatch = this.lookaheadRegExp.lastIndex;
 		}
 	}
@@ -513,7 +513,7 @@ config.formatters = [
 			var e = createTiddlyElement(w.output,"span");
 			var styles = config.formatterHelpers.inlineCssHelper(w);
 			if (styles.length == 0)
-				e.className = "marked";
+				e.className = "tinted";
 			else
 				config.formatterHelpers.applyCssHelper(e,styles);
 			w.subWikifyTerm(e,/(@@)/mg);

@@ -20,13 +20,13 @@ var backstage = {
 		this.panel = document.getElementById("backstagePanel");
 		
 		this.showButton = renderTiddlyButton(this.button, "⌵", null, function(e) {backstage.show(); return false;}, null, "backstageShow");
-		this.hideButton = renderTiddlyButton(this.button, "🗙", null,	function(e) {backstage.hide(); return false;}, null, "backstageHide");
+		this.hideButton = renderTiddlyButton(this.button, "⨯", null,	function(e) {backstage.hide(); return false;}, null, "backstageHide");
 		
 		this.cloak.onmousedown = function(e) {backstage.showTaskView(null);};
 		
 		this.panelBody = createTiddlyElement(this.panel, "div", null, "backstagePanelBody");
 		
-		createTiddlyText(this.tabBar, "Backstage: ");
+		appendTextNodeTo(this.tabBar, "Backstage: ");
 		
 		// If a task has an action, then it's button will be rendered without an arrow and it'll be performed immediately
 		// Otherwise a wizard will pop up.
@@ -55,7 +55,7 @@ var backstage = {
 			btn.setAttribute("task", taskName);
 		}
 		
-		createTiddlyText(this.tabBar, formatVersion());
+		appendTextNodeTo(this.tabBar, formatVersion());
 		
 		this.hide();
 	},

@@ -112,12 +112,11 @@ ListView.columnTypes = {};
 
 ListView.columnTypes.String = {
 	createHeader: function(place, columnTemplate, col) {
-		createTiddlyText(place, columnTemplate.title);
+		appendTextNodeTo(place, columnTemplate.title);
 	},
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
-		if (v != undefined)
-			createTiddlyText(place,v);
+		if (v != undefined) appendTextNodeTo(place, v);
 	}
 };
 
@@ -125,8 +124,7 @@ ListView.columnTypes.WikiText = {
 	createHeader: ListView.columnTypes.String.createHeader,
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
-		if (v != undefined)
-			wikify(v,place,null,null);
+		if (v != undefined)	wikify(v,place,null,null);
 	}
 };
 
@@ -134,8 +132,7 @@ ListView.columnTypes.Tiddler = {
 	createHeader: ListView.columnTypes.String.createHeader,
 	createItem: function(place, listObject, field, columnTemplate, col, row) {
 		var v = listObject[field];
-		if (v != undefined && v.title)
-			renderLinkElement(place, v.title, true);
+		if (v != undefined && v.title) renderLinkElement(place, v.title, true);
 	}
 };
 
@@ -146,9 +143,8 @@ ListView.columnTypes.Size = {
 		var v = listObject[field];
 		if (v != undefined) {
 			var t = 0;
-			while (t<msg.length-1 && v<msg[t].unit)
-				t++;
-			createTiddlyText(place,msg[t].template.format([Math.round(v/msg[t].unit)]));
+			while (t < msg.length-1 && v < msg[t].unit) t++;
+			appendTextNodeTo(place,msg[t].template.format([Math.round(v/msg[t].unit)]));
 		}
 	}
 };
@@ -158,8 +154,7 @@ ListView.columnTypes.Link = {
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
 		var c = columnTemplate.text;
-		if (v != undefined)
-			renderExternalLink(place,v,c || v);
+		if (v != undefined) renderExternalLink(place,v,c || v);
 	}
 };
 
@@ -167,8 +162,7 @@ ListView.columnTypes.Date = {
 	createHeader: ListView.columnTypes.String.createHeader,
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var v = listObject[field];
-		if (v != undefined)
-			createTiddlyText(place,v.formatString(columnTemplate.dateFormat));
+		if (v != undefined)	appendTextNodeTo(place,v.formatString(columnTemplate.dateFormat));
 	}
 };
 
@@ -178,8 +172,8 @@ ListView.columnTypes.StringList = {
 		var v = listObject[field];
 		if (v != undefined) {
 			var t;
-			for (t=0; t<v.length; t++) {
-				createTiddlyText(place,v[t]);
+			for (t = 0; t < v.length; t++) {
+				appendTextNodeTo(place, v[t]);
 				createTiddlyElement(place,"br");
 			}
 		}
@@ -197,8 +191,7 @@ ListView.columnTypes.Selector = {
 	onHeaderChange: function(e) {
 		var state = this.checked;
 		var view = navigateThroughDom(this, "TABLE");
-		if (!view)
-			return;
+		if (! view) return;
 		ListView.forEachSelectedCheckbox(view, function(e, rowName) {
 			e.checked = state;
 		});
@@ -209,17 +202,15 @@ ListView.columnTypes.Tags = {
 	createHeader: ListView.columnTypes.String.createHeader,
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
 		var tags = listObject[field];
-		createTiddlyText(place,String.buildInternalLinksTuple(tags));
+		appendTextNodeTo(place,String.buildInternalLinksTuple(tags));
 	}
 };
 
 ListView.columnTypes.Boolean = {
 	createHeader: ListView.columnTypes.String.createHeader,
 	createItem: function(place,listObject,field,columnTemplate,col,row) {
-		if (listObject[field] == true)
-			createTiddlyText(place,columnTemplate.trueText);
-		if (listObject[field] == false)
-			createTiddlyText(place,columnTemplate.falseText);
+		if (listObject[field] == true) appendTextNodeTo(place,columnTemplate.trueText);
+		if (listObject[field] == false) appendTextNodeTo(place,columnTemplate.falseText);
 	}
 };
 
@@ -243,7 +234,7 @@ ListView.columnTypes.TiddlerLink = {
 		var v = listObject[field];
 		if (v != undefined) {
 			var link = renderLinkElement(place, listObject[columnTemplate.tiddlerLink]);
-			createTiddlyText(link, listObject[field]);
+			appendTextNodeTo(link, listObject[field]);
 		}
 	}
 };

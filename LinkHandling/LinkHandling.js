@@ -48,11 +48,9 @@ function renderExternalLink(place, url, label) {
 	link.href = url;
 	var f = config.messages.externalLinkTooltip;
 	link.title = f ? f.format([url]) : url;
-	if (config.options.chkOpenInNewWindow)
-		link.target = "_blank";
+	if (config.options.chkOpenInNewWindow) link.target = "_blank";
 	place.appendChild(link);
-	if (label)
-		createTiddlyText(link, label);
+	if (label) appendTextNodeTo(link, label);
 	return link;
 }
 

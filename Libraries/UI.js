@@ -188,7 +188,7 @@ function blurElement(e) {
 	}
 }
 
-function createTiddlyText(parent, text) {
+function appendTextNodeTo(parent, text) {
 	return parent.appendChild(document.createTextNode(text));
 }
 

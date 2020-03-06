@@ -17,7 +17,7 @@ function renderBreadcrumbs() {
 	
 	for (var i = parentTitles.length - 1; i >= 0; i--) {		
 	 renderLinkElement(place, parentTitles[i], parentTitles[i]);
-	 createTiddlyText(place, " ▸ ");
+	 appendTextNodeTo(place, " ▸ ");
 	}	
-	createTiddlyText(place, store.currentTiddler.title);
+	appendTextNodeTo(place, store.currentTiddler.title);
 };
