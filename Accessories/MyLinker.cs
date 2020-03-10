@@ -2,9 +2,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
+[assembly:AssemblyVersionAttribute(MyLinker.Version)]
 public class MyLinker {
 
-	private const string Version = "0.0.1";
+	public const string Version = "0.0.1";
 
 	private static bool _WithinJsBlock;
 
