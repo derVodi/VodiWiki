@@ -1,6 +1,6 @@
 // Save this tiddlywiki with the pending changes
 function saveChangesAction(forceManualMode) {
-	clearMessage();	
+	clearMessage();
 	var msg = config.messages;
 	var originalUrl = decodeURIComponent(document.location.toString()); // document.location is URL escaped like "file:///C:/Foo/V%C3%B6di%F0%9F%92%ADWiki.html"
 	var localPath = getLocalPath(originalUrl);
@@ -8,62 +8,94 @@ function saveChangesAction(forceManualMode) {
 	if (outdatedHtmlSource == null) {
 		alert(msg.cantSaveError);
 		return;
-	}		
-	var couldBeSavedAutomatically = injectArticlesAndSave(localPath, outdatedHtmlSource, forceManualMode);
-	if (couldBeSavedAutomatically){
-		store.setDirty(false);	
-		displayMessage(config.messages.mainSaved);
 	}
+	injectArticlesAndSave(localPath, outdatedHtmlSource, forceManualMode);
+}
+
+var mainSavedDMessageShownOnce = false;
+
+function onAfterSavedSuccessfully(viaSaver){
+	store.setDirty(false);
+	if (viaSaver) return;
+	var duration = (! viaSaver && ! mainSavedDMessageShownOnce) ? -1 : null;
+	mainSavedDMessageShownOnce = true;
+	displayMessage(config.messages.mainSavedViaDownload, null, duration);
 }
 
 function injectArticlesAndSave(localPath, htmlSource, forceManualMode) {
 	try {
 		var revisedHtmlSource = injectAllArticles(htmlSource);
-		return saveFile(localPath, revisedHtmlSource, forceManualMode);
+		saveFile(localPath, revisedHtmlSource, forceManualMode);
 	} catch (ex) {
 		showException(ex);
-		return false;
+	}
+}
+
+function saveWithoutExternalSaver(fileUrl, htmlSource){
+	if (saveFileViaBlobApi(fileUrl, htmlSource)) {
+		onAfterSavedSuccessfully(false);
+	} else {
+		saveFileViaManualDownloadLink(htmlSource);
 	}
 }
 
 // Returns true, if saving was possible unattendedly (without forcing the user to download manually)
 window.saveFile = window.saveFile || function(fileUrl, htmlSource, forceManualMode) {
-	
-	if (! forceManualMode) if (saveFileViaBlobApi(fileUrl, htmlSource)) return true;
-		
-	// Fallback: Create data URL link for manual download
-		
+
+	if (forceManualMode){
+		saveFileViaManualDownloadLink(htmlSource);
+		return;
+	}
+
+	// try to push to VodiWikiSaver web service
+
+	var request = new XMLHttpRequest;
+	request.open('POST', "http://localhost:8080/VodiWikiSaver/1Update?" + encodeURIComponent(window.location), true);
+	request.onload = function(e){
+		if (this.response != 'OK'){
+			alert(this.response);
+			saveWithoutExternalSaver(fileUrl, htmlSource);
+		} else {
+			onAfterSavedSuccessfully(true);
+		}
+	};
+	request.onerror = function(e){
+		saveWithoutExternalSaver(fileUrl, htmlSource);
+	};
+	request.send(htmlSource);
+}
+
+function saveFileViaManualDownloadLink(htmlSource){
 	var dataUrl = "data:text/html;charset=UTF-8;base64," + encodeBase64(unescape(encodeURIComponent(htmlSource)));
 	// JavaScript strings are UTF-16.
 	// encodeURIComponent() will re-encode the UTF-16 string to UTF-8, but unfortunalely escape all URL-poison-chars/spaces
 	// after calling unescape() you get pure UTF-8
-	
-	displayMessage(config.messages.mainDownloadManual, dataUrl, -1);		
-	return false;
+
+	displayMessage(config.messages.mainDownloadManual, dataUrl, -1);
 }
 
-function saveFileViaBlobApi(fileUrl, htmlSource) {	
+function saveFileViaBlobApi(fileUrl, htmlSource) {
 	if (document.createElement("a").download == undefined) return null;
 	try {
-		
+
 		var slashpos = fileUrl.lastIndexOf("/");
-		if (slashpos == -1) slashpos = fileUrl.lastIndexOf("\\"); 
+		if (slashpos == -1) slashpos = fileUrl.lastIndexOf("\\");
 		var filename = fileUrl.substr(slashpos + 1);
-		
+
 		var blob = new Blob([htmlSource], {encoding: "UTF-8", type: "data:text/html; charset=UTF-8"});
 		var uri = window.URL.createObjectURL(blob);
-		
+
 		var link = document.createElement("a");
 		// link.setAttribute("target", "_blank");
 		link.setAttribute("href", uri);
 		link.setAttribute("download", filename);
-		document.body.appendChild(link);		
+		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
 		// window.URL.revokeObjectURL(uri); // todo: normally this should be done - edge won't save with this - maybe a timing problem, solution could be using a callback (if possible)
 	} catch(ex) {
 		return false;
-	}	
+	}
 	return true;
 }
 
@@ -83,7 +115,7 @@ LoaderBase.prototype.loadTiddler = function(sourceElement, destinationStore, art
 	var title = this.getTitle(sourceElement);
 	if (! title) return;
 	if (safeMode && isShadowTiddler(title)) return;
-		
+
 	var article = destinationStore.getOrAddNewArticle(title);
 	this.populateArticleFromElement(article, title, sourceElement);
 	articles.push(article);
@@ -122,7 +154,7 @@ TW21Loader.prototype = new LoaderBase();
 
 TW21Loader.prototype.getTitle = function(node) {
 	// Line breaks in HTML source appear as "text elements" here which don't have "getAttribute" and must be ignored
-	return (node.getAttribute) ? node.getAttribute("title") : null;	
+	return (node.getAttribute) ? node.getAttribute("title") : null;
 };
 
 TW21Loader.prototype.populateArticleFromElement = function(targetArticle, title, sourceDivElement) {
@@ -170,9 +202,9 @@ TW21Saver.prototype.transformArticleToDiv = function(store, article) {
 		;
 		var tags = article.getTagsTuple();
 		if (tags) attributes += ' tags="' + tags.htmlEncode() + '"';
-		
+
 		var extendedAttributes = ""; // changecount parenttitle
-		
+
 		store.forEachField(article,
 			function(article, fieldName, value) {
 				// don't store stuff from the temp namespace
@@ -180,7 +212,7 @@ TW21Saver.prototype.transformArticleToDiv = function(store, article) {
 				if (value && ! fieldName.match(/^temp\./)) extendedAttributes += ' %0="%1"'.format([fieldName, value.escapeLineBreaks().htmlEncode()]);
 			}, true
 		);
-		
+
 		return ('<div title="%0"%1%2>\n<pre>%3</pre>\n</'+'div>').format([
 			article.title.htmlEncode(),
 			attributes,

@@ -17,7 +17,7 @@ merge(config.optionsDesc, {
 	chkAutoSave: "Automatically save changes",
 	chkRegExpSearch: "Enable regular expressions for searches",
 	chkCaseSensitiveSearch: "Case-sensitive searching",
-	chkIncrementalSearch: "Incremental key-by-key searching",	
+	chkIncrementalSearch: "Incremental key-by-key searching",
 	chkOpenInNewWindow: "Open external links in a new window",
 	chkToggleLinks: "Clicking on links to open tiddlers causes them to close",
 	chkHttpReadOnly: "Hide editing features when viewed over HTTP",
@@ -42,7 +42,7 @@ merge(config.messages,{
 	invalidFileError: "The original file '%0' does not appear to be a valid Wiki",
 	emptySaved: "Empty Wiki created in your download location.",
 	emptyFailed: "Failed to create empty Wiki file",
-	mainSaved: "Wiki saved.",
+	mainSavedViaDownload: "Wiki saved via download.\nFor better saving download and run VodiWikiSaver.",
 	mainDownloadManual: "RIGHT CLICK HERE to download/save main Wiki file",
 	macroError: "Error in macro <<%0>>",
 	macroErrorDetails: "Error while executing macro <<%0>>:\n%1",
@@ -74,7 +74,7 @@ merge(config.messages.tiddlerPopup,{});
 merge(config.views.wikified.tag,{
 	labelNoTags: "no tags",
 	labelTags: "tags: ",
-	tooltip: "Show articles tagged with '%0'",	
+	tooltip: "Show articles tagged with '%0'",
 	popupNone: "No other articles tagged with '%0'"
 });
 
@@ -187,7 +187,7 @@ merge(config.macros.importTiddlers,{
 			{name: 'Tags', field: 'tags', title: "Tags", type: 'Tags'}
 		],
 		rowClasses: []
-	}		
+	}
 });
 
 merge(config.macros.upgrade,{
@@ -200,7 +200,7 @@ merge(config.macros.upgrade,{
 		"<h1>Check for Upgrade (This Version: <span macro=\"version\"></span>)</h1>" +
 		"Hitting the button will check for an update of the integrated viewer and editor.<br/>"+
 		"Your content will be preserved.<br/>"+
-	  "(Update source: <a href='%0' class='externalLink' target='_blank'>%0</a>).",	
+	  "(Update source: <a href='%0' class='externalLink' target='_blank'>%0</a>).",
 	errorNotSaved: "You must save changes before you can perform an upgrade",
 	step2Title: "Confirm",
 	step2Html_downgrade: "You are about to downgrade to Wiki version %0 from %1.<br><br>Downgrading to an earlier version of the core code is not recommended",
