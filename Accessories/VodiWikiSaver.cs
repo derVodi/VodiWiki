@@ -12,7 +12,7 @@ using System.Web;
 [assembly:AssemblyProduct(VodiWikiSaver.Product)]
 public class VodiWikiSaver {
 
-	public const string Version = "1.0.13";
+	public const string Version = "1.1.0";
 
 	public const string Product = "VodiWikiSaver";
 

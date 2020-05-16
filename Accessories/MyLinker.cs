@@ -1,16 +1,17 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 [assembly:AssemblyVersionAttribute(MyLinker.Version)]
 public class MyLinker {
 
-	public const string Version = "0.0.1";
+	public const string Version = "0.0.2";
 
 	private static bool _WithinJsBlock;
 
 	private static bool _SkippingContent;
-	
+
 	private static bool _MinifiedDirIsClean;
 
 	private static string[] _Args;
@@ -32,10 +33,10 @@ public class MyLinker {
 	}
 
 	public static string ProcessLine(string line, StreamWriter emptyWikiWriter, StreamWriter fullWikiWriter){
-		
+
 		if (line.IndexOf("<!--POST-STOREAREA-->") > -1){
 			emptyWikiWriter.WriteLine("</div>");
-			_SkippingContent = false;			
+			_SkippingContent = false;
 			return line;
 		}
 
@@ -46,13 +47,13 @@ public class MyLinker {
 
 		if (line.IndexOf("<!--JS-START-->") > -1) {
 			if (_WithinJsBlock) Console.WriteLine("ERROR JS-START cannot be nested!");
-			_WithinJsBlock = true;			
+			_WithinJsBlock = true;
 			return ("<script id=\"jsSection\">");
 		}
 
 		if (line.IndexOf("<!--JS-END-->") > -1){
 			if (! _WithinJsBlock) Console.WriteLine("ERROR closing JS-START was never opened!");
-			_WithinJsBlock = false;			
+			_WithinJsBlock = false;
 			return "</script>";
 		}
 
@@ -60,10 +61,10 @@ public class MyLinker {
 			string jsPath = line.Substring(13, line.IndexOf("\"", 13) - 13);
 			Console.Write("\"" + jsPath + "\" ");
 			if(_Args[0].IndexOf("-minify-") > -1 ){
-				Console.Write("Minifying ... ");				
+				Console.Write("Minifying ... ");
 				jsPath = Minify(jsPath, ! _MinifiedDirIsClean);
 				_MinifiedDirIsClean = true;
-			} 
+			}
 			Console.Write("Embedding ... ");
 			CopyLineByLine(
 				jsPath,
@@ -84,7 +85,7 @@ public class MyLinker {
 
 	public static string Minify(string sourceFileFullName, bool cleanupBefore){
 		string miniOutDir = Path.Combine("Out", "Minified");
-		if (cleanupBefore) Directory.Delete(miniOutDir, true);
+		if (cleanupBefore && Directory.Exists(miniOutDir)) Directory.Delete(miniOutDir, true);
 		string destinationFileFullName = Path.Combine(miniOutDir, Path.GetDirectoryName(sourceFileFullName).Replace("/", ".") + "." + Path.GetFileName(sourceFileFullName));
 		string parameters = "-o \"" + destinationFileFullName + "\" \"" + sourceFileFullName + "\"";
 		// Console.WriteLine(parameters);
@@ -104,7 +105,7 @@ public class MyLinker {
 				if (processedLine != null){
 					emptyWikiWriter.WriteLine(processedLine);
 					fullWikiWriter.WriteLine(processedLine);
-				} 
+				}
 			}
 		}
 	}
