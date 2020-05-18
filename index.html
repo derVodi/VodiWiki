@@ -3,7 +3,7 @@
 <head>
 <script id="versionArea" type="text/javascript">
 //<![CDATA[
-var version = {title: "VodiWiki", major: 1, minor: 1, revision: 0};
+var version = {title: "VodiWiki", major: 1, minor: 1, revision: 1};
 //]]>
 </script>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -96,6 +96,7 @@ textarea, .articleContentContainer pre {tab-size: 2; -moz-tab-size: 2}
 .articleTreePanel {line-height: 1.4em;}
 .title {font-size: 18pt; font-weight: normal;}
 #tiddlerDisplay .title {margin:-0.5em 0 12pt 0;}
+.twtable caption {font-size: 9.5pt;}
 table.listView {font-size: 0.85em;}
 .externalLink {text-decoration: underline;}
 .tiddlyLinkNonExisting, .missing .articleContentContainer, .missing .title {font-style:italic;}
@@ -206,7 +207,7 @@ h2, h3, h4, h5 {color: #366092;}
 .button:hover {border-color: #db4;}
 .button:active {background: #db4; border-color: #841;}
 
-.backstageTabHead, .tabSelected, .tabUnselected, .tab:hover, .tabContents a, .tabContents a:hover, #backstageHide {color: white;}
+.backstageTabHead, .tabSelected, .tabUnselected, .tab:hover, .tabContents a, .tabContents a:hover, #backstageHide, .twtable caption {color: white;}
 
 /* Colors.Backgrounds (sorting: getting darker) */
 
@@ -222,6 +223,7 @@ body, .twtable thead td, .twtable th, #backstagePanel, .backstageSelTab, pre, .p
 .wizardFooter .button {background-color: lightgrey;}
 .tab:hover {background-color:#BFBFBF;}
 .tab {background-color: darkgray;}
+.twtable caption {background-color:darkslategray;}
 .tabSelected:hover, .tabContents a:hover {background-color:#636363 !important;}
 .tabSelected, .tabContents {background-color: #535353 !important;} /* Black 35% */
 .tiddlyLink.current {background-color: #333333 !important;} /* Black 35% */
@@ -647,6 +649,7 @@ Some dummy text.
 !Tables
 
 &lt;html&gt;&lt;pre&gt;
+|This is the caption|c
 |table|table| centered header |h
 |table|table|left aligned text is default|
 |table|table| right|
@@ -658,6 +661,7 @@ Some dummy text.
 |Batz|Cell Content|Cell Content|
 }}}&lt;/pre&gt;&lt;/html&gt;
 
+|This is the caption|c
 |table|table| centered header |h
 |table|table|left aligned text is default|
 |table|table| right|
